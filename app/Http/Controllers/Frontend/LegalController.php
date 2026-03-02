@@ -21,9 +21,15 @@ class LegalController extends Controller
 
     public function terms(): View
     {
-        $legal = Legal::query()
-            ->with('translations')
-            ->firstWhere('key', 'terms-of-use');
+        $baseQuery = Legal::query()->with('translations');
+
+        $legal = (clone $baseQuery)->firstWhere('key', 'terms-of-use');
+
+        if (! $legal instanceof Legal) {
+            // Keep backwards compatibility with installations that used `terms`
+            // instead of `terms-of-use` as the legal document key.
+            $legal = (clone $baseQuery)->firstWhere('key', 'terms');
+        }
 
         return view('frontend.legal.terms', compact('legal'));
     }

@@ -9,28 +9,16 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-/**
- * ProductFilterWidget
- *
- * Livewire component for ProductFilterWidget with reactive frontend functionality, real-time updates, and user interaction handling.
- *
- * @property string $search
- * @property array  $categories
- * @property array  $brands
- * @property array  $selectedAttributes
- * @property float  $minPrice
- * @property float  $maxPrice
- * @property bool   $inStock
- * @property string $sortBy
- * @property string $sortDirection
- */
 final class ProductFilterWidget extends Component
 {
+    public ?int $categoryId = null;
+
     #[Url]
     public string $search = '';
 
@@ -53,208 +41,344 @@ final class ProductFilterWidget extends Component
     public bool $inStock = false;
 
     #[Url]
+    public bool $onSale = false;
+
+    #[Url]
     public string $sortBy = 'created_at';
 
     #[Url]
     public string $sortDirection = 'desc';
 
-    /**
-     * Initialize the Livewire component with parameters.
-     */
-    public function mount(): void
+    public function mount(?int $categoryId = null): void
     {
-        // Ensure proper type casting for URL parameters
+        $this->categoryId = $categoryId;
         $this->minPrice = (float) $this->minPrice;
         $this->maxPrice = (float) $this->maxPrice;
         $this->updatePriceRange();
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedSearch functionality with proper error handling.
-     */
     public function updatedSearch(): void
     {
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedCategories functionality with proper error handling.
-     */
     public function updatedCategories(): void
     {
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedBrands functionality with proper error handling.
-     */
     public function updatedBrands(): void
     {
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedSelectedAttributes functionality with proper error handling.
-     */
     public function updatedSelectedAttributes(): void
     {
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedMinPrice functionality with proper error handling.
-     */
     public function updatedMinPrice(): void
     {
         $this->minPrice = (float) $this->minPrice;
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedMaxPrice functionality with proper error handling.
-     */
     public function updatedMaxPrice(): void
     {
         $this->maxPrice = (float) $this->maxPrice;
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedInStock functionality with proper error handling.
-     */
     public function updatedInStock(): void
     {
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedOnSale functionality with proper error handling.
-     */
     public function updatedOnSale(): void
     {
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedSortBy functionality with proper error handling.
-     */
     public function updatedSortBy(): void
     {
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatedSortDirection functionality with proper error handling.
-     */
     public function updatedSortDirection(): void
     {
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle clearFilters functionality with proper error handling.
-     */
     public function clearFilters(): void
     {
-        $this->reset(['search', 'categories', 'brands', 'attributes', 'inStock', 'sortBy', 'sortDirection']);
+        $this->reset([
+            'search',
+            'categories',
+            'brands',
+            'selectedAttributes',
+            'inStock',
+            'onSale',
+            'sortBy',
+            'sortDirection',
+        ]);
+
         $this->updatePriceRange();
-        $this->dispatch('filter-updated');
+        $this->dispatchFilters();
     }
 
-    /**
-     * Handle updatePriceRange functionality with proper error handling.
-     */
     public function updatePriceRange(): void
     {
-        $priceRange = Product::selectRaw('MIN(price) as min_price, MAX(price) as max_price')->first();
-        $this->minPrice = (float) ($priceRange->min_price ?? 0);
-        $this->maxPrice = (float) ($priceRange->max_price ?? 10000);
+        $priceRange = $this->baseProductsQuery()
+            ->selectRaw('MIN(price) as min_price, MAX(price) as max_price')
+            ->first();
+
+        $minPrice = (float) ($priceRange->min_price ?? 0);
+        $maxPrice = (float) ($priceRange->max_price ?? 10000);
+
+        $this->minPrice = max(0, $minPrice);
+        $this->maxPrice = $maxPrice > 0 ? $maxPrice : 10000;
     }
 
-    /**
-     * Handle availableCategories functionality with proper error handling.
-     */
     #[Computed]
     public function availableCategories(): Collection
     {
-        return Category::where('is_visible', true)->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])->orderBy('name')->get();
+        return Category::query()
+            ->where('is_visible', true)
+            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
+            ->whereHas('products', function (Builder $productQuery): void {
+                $this->applyCategoryScopeToProducts($productQuery);
+            })
+            ->orderBy('name')
+            ->get();
     }
 
-    /**
-     * Handle availableBrands functionality with proper error handling.
-     */
     #[Computed]
     public function availableBrands(): Collection
     {
-        return Brand::where('is_visible', true)->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])->orderBy('name')->get();
+        return Brand::query()
+            ->where('is_visible', true)
+            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
+            ->whereHas('products', function (Builder $productQuery): void {
+                $this->applyCategoryScopeToProducts($productQuery);
+            })
+            ->orderBy('name')
+            ->get();
     }
 
-    /**
-     * Handle availableAttributes functionality with proper error handling.
-     */
     #[Computed]
     public function availableAttributes(): Collection
     {
-        return Attribute::with(['values' => function ($query) {
-            $query->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])->orderBy('sort_order');
-        }])->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])->where('is_filterable', true)->orderBy('sort_order')->get();
+        return Attribute::query()
+            ->where('is_filterable', true)
+            ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
+            ->whereHas('values', function (Builder $valueQuery): void {
+                $valueQuery
+                    ->whereHas('variants')
+                    ->whereHas('products', function (Builder $productQuery): void {
+                        $this->applyCategoryScopeToProducts($productQuery);
+                    });
+            })
+            ->with(['values' => function ($query): void {
+                $query
+                    ->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])
+                    ->whereHas('variants')
+                    ->whereHas('products', function (Builder $productQuery): void {
+                        $this->applyCategoryScopeToProducts($productQuery);
+                    })
+                    ->orderBy('sort_order');
+            }])
+            ->orderBy('sort_order')
+            ->get()
+            ->filter(fn (Attribute $attribute): bool => $attribute->values->isNotEmpty() && ! $this->isIpRatingAttribute($attribute))
+            ->values();
     }
 
-    /**
-     * Handle getFilteredProductsQuery functionality with proper error handling.
-     */
-    public function getFilteredProductsQuery()
+    public function getFilteredProductsQuery(): Builder
     {
-        $query = Product::query()->with(['brand', 'categories', 'media', 'translations']);
-        // Search filter
-        if ($this->search) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')->orWhere('description', 'like', '%' . $this->search . '%')->orWhere('sku', 'like', '%' . $this->search . '%')->orWhereHas('brand', function ($brandQuery) {
-                    $brandQuery->where('name', 'like', '%' . $this->search . '%');
-                });
+        $query = $this->baseProductsQuery()->with(['brand', 'categories', 'media', 'translations']);
+
+        if ($this->search !== '') {
+            $query->where(function (Builder $searchQuery): void {
+                $searchQuery
+                    ->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('description', 'like', '%' . $this->search . '%')
+                    ->orWhere('sku', 'like', '%' . $this->search . '%')
+                    ->orWhereHas('brand', function (Builder $brandQuery): void {
+                        $brandQuery->where('name', 'like', '%' . $this->search . '%');
+                    });
             });
         }
-        // Category filter
-        if (! empty($this->categories)) {
-            $query->whereHas('categories', function ($q) {
-                $q->whereIn('categories.id', $this->categories);
+
+        if ($this->categories !== []) {
+            $query->whereHas('categories', function (Builder $categoryQuery): void {
+                $categoryQuery->whereIn('categories.id', $this->normalizeIdList($this->categories));
             });
         }
-        // Brand filter
-        if (! empty($this->brands)) {
-            $query->whereIn('brand_id', $this->brands);
+
+        if ($this->brands !== []) {
+            $query->whereIn('brand_id', $this->normalizeIdList($this->brands));
         }
-        // Price range filter
+
         if ($this->minPrice > 0 || $this->maxPrice < 10000) {
             $query->whereBetween('price', [$this->minPrice, $this->maxPrice]);
         }
-        // Stock filter
+
         if ($this->inStock) {
             $query->where('stock_quantity', '>', 0);
         }
-        // Attribute filters
-        if (! empty($this->selectedAttributes)) {
-            foreach ($this->selectedAttributes as $attributeId => $valueIds) {
-                if (! empty($valueIds)) {
-                    $query->whereHas('attributes', function ($q) use ($attributeId, $valueIds) {
-                        $q->where('attributes.id', $attributeId)->whereHas('values', function ($valueQuery) use ($valueIds) {
-                            $valueQuery->whereIn('attribute_values.id', $valueIds);
-                        });
-                    });
-                }
+
+        if ($this->onSale) {
+            $query->whereHas('discounts', static function (Builder $discountQuery): void {
+                $discountQuery->active();
+            });
+        }
+
+        if ($this->selectedAttributes !== []) {
+            foreach ($this->normalizeSelectedAttributes($this->selectedAttributes) as $attributeId => $valueIds) {
+                $query->whereHas('attributes', function ($attributeQuery) use ($attributeId, $valueIds): void {
+                    $attributeQuery
+                        ->where('attributes.id', $attributeId)
+                        ->wherePivotIn('attribute_value_id', $valueIds);
+                });
             }
         }
-        // Sorting
-        $query->orderBy($this->sortBy, $this->sortDirection);
+
+        return $query->orderBy($this->sortBy, $this->sortDirection);
+    }
+
+    public function render(): View
+    {
+        return view('livewire.components.product-filter', [
+            'availableCategories' => $this->availableCategories,
+            'availableBrands' => $this->availableBrands,
+            'availableAttributes' => $this->availableAttributes,
+        ]);
+    }
+
+    private function dispatchFilters(): void
+    {
+        $this->dispatch('filter-updated', filters: [
+            'search' => $this->search,
+            'categories' => $this->normalizeIdList($this->categories),
+            'brands' => $this->normalizeIdList($this->brands),
+            'selectedAttributes' => $this->normalizeSelectedAttributes($this->selectedAttributes),
+            'minPrice' => $this->minPrice,
+            'maxPrice' => $this->maxPrice,
+            'inStock' => $this->inStock,
+            'onSale' => $this->onSale,
+            'sortBy' => $this->sortBy,
+            'sortDirection' => $this->sortDirection,
+        ]);
+    }
+
+    private function baseProductsQuery(): Builder
+    {
+        $query = Product::query()->published();
+        $this->applyCategoryScopeToProducts($query);
 
         return $query;
     }
 
-    /**
-     * Render the Livewire component view with current state.
-     */
-    public function render(): View
+    private function applyCategoryScopeToProducts(Builder $query): void
     {
-        return view('livewire.components.product-filter', ['availableCategories' => $this->availableCategories, 'availableBrands' => $this->availableBrands, 'availableAttributes' => $this->availableAttributes]);
+        $query->published();
+
+        if ($this->categoryId !== null && $this->categoryId > 0) {
+            $query->whereHas('categories', function (Builder $categoryQuery): void {
+                $categoryQuery->where('categories.id', $this->categoryId);
+            });
+        }
+    }
+
+    private function isIpRatingAttribute(Attribute $attribute): bool
+    {
+        $name = mb_strtolower((string) ($attribute->name ?? ''));
+        $normalizedName = preg_replace('/\s+/', ' ', trim($name)) ?? $name;
+        $slug = mb_strtolower((string) ($attribute->slug ?? ''));
+
+        if (
+            $name === 'ip rating'
+            || $slug === 'ip-rating'
+            || $slug === 'ip_rating'
+            || str_contains($slug, 'ip-rating')
+            || str_contains($slug, 'ip_rating')
+            || (
+                str_contains($normalizedName, 'ip')
+                && (
+                    str_contains($normalizedName, 'rating')
+                    || str_contains($normalizedName, 'reiting')
+                    || str_contains($normalizedName, 'class')
+                    || str_contains($normalizedName, 'klase')
+                )
+            )
+        ) {
+            return true;
+        }
+
+        foreach ($attribute->translations as $translation) {
+            $translatedName = mb_strtolower((string) ($translation->name ?? ''));
+            $normalizedTranslatedName = preg_replace('/\s+/', ' ', trim($translatedName)) ?? $translatedName;
+
+            if (
+                $translatedName === 'ip rating'
+                || (
+                    str_contains($normalizedTranslatedName, 'ip')
+                    && (
+                        str_contains($normalizedTranslatedName, 'rating')
+                        || str_contains($normalizedTranslatedName, 'reiting')
+                        || str_contains($normalizedTranslatedName, 'class')
+                        || str_contains($normalizedTranslatedName, 'klase')
+                    )
+                )
+            ) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param  array<int, int|string> $values
+     * @return array<int, int>
+     */
+    private function normalizeIdList(array $values): array
+    {
+        $normalized = array_map(static fn ($value): int => (int) $value, $values);
+        $normalized = array_values(array_filter($normalized, static fn (int $value): bool => $value > 0));
+
+        return array_values(array_unique($normalized));
+    }
+
+    /**
+     * @param  array<int|string, array<int, int|string>> $selectedAttributes
+     * @return array<int, array<int, int>>
+     */
+    private function normalizeSelectedAttributes(array $selectedAttributes): array
+    {
+        $normalized = [];
+
+        foreach ($selectedAttributes as $attributeId => $valueIds) {
+            if (! is_array($valueIds)) {
+                continue;
+            }
+
+            $normalizedAttributeId = (int) $attributeId;
+
+            if ($normalizedAttributeId <= 0) {
+                continue;
+            }
+
+            $normalizedValueIds = $this->normalizeIdList($valueIds);
+
+            if ($normalizedValueIds === []) {
+                continue;
+            }
+
+            $normalized[$normalizedAttributeId] = $normalizedValueIds;
+        }
+
+        return $normalized;
     }
 }

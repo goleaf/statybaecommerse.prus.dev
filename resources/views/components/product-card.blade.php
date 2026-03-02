@@ -69,12 +69,7 @@
                 @if ($isNew)
                     <span
                           class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg backdrop-blur-sm border border-white/20 animate-pulse">
-                        <span class="flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
-                            {{ __('messages.new') }}
-                        </span>
+                        {{ __('messages.new') }}
                     </span>
                 @endif
             </div>
@@ -128,23 +123,6 @@
             </a>
         </h3>
 
-        {{-- Enhanced Rating with modern design --}}
-        @if ($showRating && $product->reviews_count > 0)
-            <div class="flex items-center mb-3">
-                <div class="flex items-center bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded-lg">
-                    @for ($i = 1; $i <= 5; $i++)
-                        <svg class="w-4 h-4 {{ $i <= $product->avg_rating ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600' }}"
-                             fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                    @endfor
-                    <span class="ml-1 text-sm font-semibold text-yellow-600 dark:text-yellow-400">{{ number_format($product->avg_rating, 1) }}</span>
-                </div>
-                <span class="ml-2 text-sm text-gray-600 dark:text-gray-400">({{ $product->reviews_count }})</span>
-            </div>
-        @endif
-
         {{-- Enhanced Price and Stock --}}
         <div class="flex justify-between items-center mb-4">
             <div class="flex flex-col">
@@ -179,14 +157,9 @@
         @if ($showAddToCart)
             <button wire:click="addToCart({{ $product->id }})"
                     @if ($product->stock_quantity <= 0) disabled @endif
-                    class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white text-sm px-6 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:transform-none">
-                <span class="flex items-center justify-center gap-2">
+                    class="w-full cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 text-white text-sm px-6 py-3 rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl disabled:transform-none">
+                <span class="flex items-center justify-center">
                     {{ __('ui.add_to_cart') }}
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01">
-                        </path>
-                    </svg>
                 </span>
             </button>
         @endif

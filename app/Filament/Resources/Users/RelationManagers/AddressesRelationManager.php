@@ -5,20 +5,20 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Users\RelationManagers;
 
 use App\Enums\AddressType;
+use App\Filament\Resources\AddressResource;
 use App\Models\Address;
 use App\Models\Country;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\Action as TableAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -172,16 +172,15 @@ class AddressesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->using(function (array $data): Address {
-                        $payload = $this->normalizeAddressData($data);
-                        $payload['user_id'] = $this->getOwnerRecord()->getKey();
-
-                        return Address::withoutGlobalScopes()->create($payload);
-                    }),
+                Action::make('create')
+                    ->icon('heroicon-m-plus')
+                    ->url(fn (): string => AddressResource::getUrl('create', [
+                        'user_id'  => $this->getOwnerRecord()->getKey(),
+                        'redirect' => request()->fullUrl(),
+                    ])),
             ])
             ->recordActions([
-                Action::make('set_default')
+                TableAction::make('set_default')
                     ->label(__('messages.set_as_default') ?? 'Set as Default')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -201,8 +200,18 @@ class AddressesRelationManager extends RelationManager
                             ->send();
                     })
                     ->hidden(fn (Address $record): bool => $record->is_default),
-                EditAction::make()
-                    ->mutateDataUsing(fn (array $data): array => $this->normalizeAddressData($data)),
+                Action::make('view')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn (Address $record): string => AddressResource::getUrl('view', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->url(fn (Address $record): string => AddressResource::getUrl('edit', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -254,3 +263,4 @@ class AddressesRelationManager extends RelationManager
         return sprintf('%s (%s)', $name, $code);
     }
 }
+

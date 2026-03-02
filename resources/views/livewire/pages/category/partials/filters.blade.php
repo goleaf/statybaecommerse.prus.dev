@@ -55,9 +55,6 @@
             <input type="checkbox" wire:model.live="onSale" class="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500">
             <span>{{ __('messages.promotions') }}</span>
         </div>
-        <span class="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
-            {{ __('messages.hot') }}
-        </span>
     </label>
 
     <label class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50/70">
@@ -152,33 +149,6 @@
             </label>
         @empty
             <p class="text-xs text-slate-500">{{ __('messages.no_collections_available_yet') }}</p>
-        @endforelse
-    </div>
-</details>
-
-<details class="group rounded-2xl border border-slate-200 bg-white {{ $cardShadow }}" open>
-    <summary class="flex cursor-pointer items-center justify-between {{ $summaryPaddingX }} {{ $summaryPaddingY }} text-sm font-semibold text-slate-800 transition hover:text-cyan-700">
-        <span>{{ __('messages.categories_index_filters_categories') }}</span>
-        <svg class="h-4 w-4 text-slate-500 transition-transform duration-200 group-open:rotate-180" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
-        </svg>
-    </summary>
-    <div class="{{ $summaryPaddingX }} pb-5 {{ $sectionSpacing }} max-h-56 overflow-y-auto">
-        @forelse ($this->facetCategories as $category)
-            <label class="flex items-center justify-between gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50/70">
-                <span class="flex items-center gap-3">
-                    <input type="checkbox"
-                           value="{{ $category['id'] }}"
-                           wire:model.live="selectedCategoryIds"
-                           class="rounded border-slate-300 text-cyan-600 focus:ring-cyan-500">
-                    <span>{{ $category['name'] }}</span>
-                </span>
-                <span class="inline-flex min-w-[2.5rem] items-center justify-center rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-700">
-                    {{ $category['count'] }}
-                </span>
-            </label>
-        @empty
-            <p class="text-xs text-slate-500">{{ __('messages.no_nested_categories_available') }}</p>
         @endforelse
     </div>
 </details>

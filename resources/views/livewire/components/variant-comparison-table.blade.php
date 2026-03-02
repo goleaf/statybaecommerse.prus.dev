@@ -100,29 +100,6 @@
                         @endforeach
                     </tr>
 
-                    <!-- Rating Row -->
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {{ __('product.variants.fields.rating') }}
-                        </td>
-                        @foreach($variantsToCompare as $variant)
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                <div class="flex items-center">
-                                    <div class="flex items-center">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            <svg class="w-4 h-4 {{ $i <= $this->getVariantRating($variant) ? 'text-yellow-400' : 'text-gray-300' }}" fill="currentColor" viewBox="0 0 20 20">
-                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                                            </svg>
-                                        @endfor
-                                    </div>
-                                    <span class="ml-2 text-sm text-gray-600">
-                                        {{ number_format($this->getVariantRating($variant), 1) }} ({{ $this->getVariantReviewsCount($variant) }})
-                                    </span>
-                                </div>
-                            </td>
-                        @endforeach
-                    </tr>
-
                     <!-- Views and Clicks Row -->
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -207,12 +184,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 <div class="flex flex-col space-y-2">
                                     <button
-                                        class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        class="inline-flex items-center cursor-pointer px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                         onclick="addToCart({{ $variant->id }})"
                                     >
-                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
-                                        </svg>
                                         {{ __('product.variants.actions.add_to_cart') }}
                                     </button>
                                     <button

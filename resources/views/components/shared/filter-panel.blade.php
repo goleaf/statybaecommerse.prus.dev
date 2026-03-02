@@ -67,7 +67,6 @@
             <option value="name">{{ __('shared.sort_name_az') }}</option>
             <option value="price">{{ __('shared.sort_price_low') }}</option>
             <option value="popularity">{{ __('shared.sort_popularity') }}</option>
-            <option value="rating">{{ __('shared.sort_rating') }}</option>
         </x-shared.select>
     </div>
 

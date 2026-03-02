@@ -272,7 +272,14 @@ final class ShoppingCartWidget extends Component
         if ($this->cartItems->isEmpty()) {
             return;
         }
-        $this->redirect(route('checkout.index', app()->getLocale()));
+
+        if (auth()->check()) {
+            $this->redirect(route('frontend.checkout.index'));
+
+            return;
+        }
+
+        $this->redirect(route('register'));
     }
 
     /**

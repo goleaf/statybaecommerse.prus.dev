@@ -22,6 +22,7 @@ final class ReferralCodeForm
                 ->relationship('user', 'name')
                 ->searchable()
                 ->preload()
+                ->default(static fn (): ?int => request()->integer('user_id') ?: null)
                 ->required(),
             TextInput::make('code')
                 ->required()

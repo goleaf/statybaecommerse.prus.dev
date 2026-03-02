@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Auth;
 
 use App\Livewire\Forms\LoginForm;
+use App\Services\Cart\CartService;
 use App\Support\Security\Captcha\CaptchaManager;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Session;
@@ -24,9 +25,15 @@ final class Login extends Component
 
     public function login(): void
     {
-        $this->loginForm->authenticate();
+        $previousSessionId = (string) Session::getId();
+        $user = $this->loginForm->authenticate();
 
         Session::regenerate();
+        app(CartService::class)->claimSessionCartForUser(
+            userId: (int) $user->getAuthIdentifier(),
+            previousSessionId: $previousSessionId,
+            currentSessionId: (string) Session::getId(),
+        );
 
         $this->redirectIntended(default: route('account.index', absolute: false), navigate: true);
     }

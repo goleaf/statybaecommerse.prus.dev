@@ -74,6 +74,7 @@ class PartnerForm
                     ->schema([
                         Toggle::make('is_enabled')
                             ->label(__('messages.enabled'))
+                            ->default(true)
                             ->required(),
                     ])
                     ->columnSpanFull(),

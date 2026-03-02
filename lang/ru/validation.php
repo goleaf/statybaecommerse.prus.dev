@@ -6,12 +6,38 @@ $base = require base_path('vendor/laravel/framework/src/Illuminate/Translation/l
 
 return array_replace_recursive($base, [
     'accepted' => 'Поле :attribute должно быть принято.',
+    'email'    => 'Поле :attribute должно быть действительным адресом электронной почты.',
     'exists'   => 'Выбранное значение :attribute недопустимо.',
+    'lowercase' => 'Поле :attribute должно содержать только строчные буквы.',
     'required' => 'Поле :attribute обязательно.',
+    'confirmed' => 'Подтверждение поля :attribute не совпадает.',
+    'regex'     => 'Поле :attribute имеет неверный формат.',
     'max'      => [
         'string' => 'Поле :attribute не должно превышать :max символов.',
     ],
+    'min'      => [
+        'string' => 'Поле :attribute должно содержать не менее :min символов.',
+    ],
+    'unique'   => 'Такое значение :attribute уже используется.',
     'attributes' => [
+        'first_name'            => 'имя',
+        'last_name'             => 'фамилия',
+        'email'                 => 'эл. почта',
+        'password'              => 'пароль',
+        'password_confirmation' => 'подтверждение пароля',
+        'loginForm' => [
+            'email'           => 'эл. почта',
+            'password'        => 'пароль',
+            'captchaToken'    => 'токен безопасности',
+            'captchaResponse' => 'ответ проверки безопасности',
+        ],
+        'registrationForm' => [
+            'first_name'            => 'имя',
+            'last_name'             => 'фамилия',
+            'email'                 => 'эл. почта',
+            'password'              => 'пароль',
+            'password_confirmation' => 'подтверждение пароля',
+        ],
         'selectedShippingOption' => 'способ доставки',
         'selectedPaymentMethod'  => 'способ оплаты',
         'billing'                => [

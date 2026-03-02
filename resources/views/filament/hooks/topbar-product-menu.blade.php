@@ -28,7 +28,7 @@
                     'route' => 'filament.admin.resources.brands.index',
                     'active' => 'filament.admin.resources.brands.*',
                     'label' => __('admin.navigation.brands'),
-                    'icon' => 'heroicon-o-star',
+                    'icon' => 'heroicon-o-tag',
                 ],
                 [
                     'route' => 'filament.admin.resources.product-features.index',

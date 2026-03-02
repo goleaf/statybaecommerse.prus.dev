@@ -103,7 +103,7 @@
         <button
                 wire:click="addToCart"
                 @if ($product->manage_stock && $product->stock_quantity <= 0) disabled @endif
-                class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
+                class="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-md transition-colors duration-200">
             @if ($product->manage_stock && $product->stock_quantity <= 0)
                 {{ __('messages.out_of_stock') }}
             @else

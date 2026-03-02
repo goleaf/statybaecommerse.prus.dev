@@ -89,11 +89,6 @@
                                     </div>
                                 @endif
 
-                                {{-- WebP Badge --}}
-                                <div class="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs">
-                                    WebP
-                                </div>
-
                             @else
                                 <div class="w-full h-full flex items-center justify-center">
                                     <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

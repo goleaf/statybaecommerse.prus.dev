@@ -290,7 +290,7 @@
                                     {{ __('categories.show.advanced_filters') }}
                                 </h3>
                                 <div>
-                                    @livewire('components.product-filter-widget')
+                                    @livewire('components.product-filter-widget', ['categoryId' => $category->id])
                                 </div>
                             </div>
                         @endif
@@ -347,7 +347,6 @@
                                     <option value="created_at" class="bg-dark text-white">{{ __('categories.show.sort_newest') }}</option>
                                     <option value="name" class="bg-dark text-white">{{ __('categories.show.sort_name') }}</option>
                                     <option value="price" class="bg-dark text-white">{{ __('categories.show.sort_price') }}</option>
-                                    <option value="rating" class="bg-dark text-white">{{ __('categories.show.sort_rating') }}</option>
                                 </select>
 
                                 <label for="sort-direction" class="text-white/80 font-semibold">
@@ -370,74 +369,75 @@
                     @if ($isIndex)
                         {{-- Categories Display --}}
                         @if ($categories->count() > 0)
-                            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                @foreach ($categories as $category)
-                                    @php
-                                        $slug = method_exists($category, 'trans')
-                                            ? ($category->trans('slug') ?? $category->slug)
-                                            : ($category->slug ?? (is_string($category) ? $category : null));
-                                        $name = method_exists($category, 'trans')
-                                            ? ($category->trans('name') ?? $category->name)
-                                            : $category->name;
-                                        $description = method_exists($category, 'trans')
-                                            ? ($category->trans('description') ?? $category->description)
-                                            : $category->description;
-                                        $banner = method_exists($category, 'getBannerUrl') ? $category->getBannerUrl('md') : null;
-                                        $image = $category->hero_image_url
-                                            ?? $banner
-                                            ?? (method_exists($category, 'getImageUrl') ? $category->getImageUrl('md') : null)
-                                            ?? (method_exists($category, 'getFirstMediaUrl') ? $category->getFirstMediaUrl('images', 'image-md') : null)
-                                            ?? (method_exists($category, 'getFirstMediaUrl') ? $category->getFirstMediaUrl('images') : null);
-                                        $productCount = $category->products_count
-                                            ?? ($category->published_products_count ?? ($category->products?->count() ?? 0));
-                                    @endphp
+                            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full text-sm">
+                                        <thead class="bg-slate-50">
+                                            <tr>
+                                                <th scope="col" class="w-[28%] px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                                    {{ __('messages.name') }}
+                                                </th>
+                                                <th scope="col" class="w-[46%] px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                                    {{ __('messages.description') }}
+                                                </th>
+                                                <th scope="col" class="w-[12%] px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                                    {{ __('messages.products') }}
+                                                </th>
+                                                <th scope="col" class="w-[14%] px-6 py-3.5 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
+                                                    {{ __('messages.view') }}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-200 bg-white">
+                                            @foreach ($categories as $category)
+                                                @php
+                                                    $slug = method_exists($category, 'trans')
+                                                        ? ($category->trans('slug') ?? $category->slug)
+                                                        : ($category->slug ?? (is_string($category) ? $category : null));
+                                                    $name = method_exists($category, 'trans')
+                                                        ? ($category->trans('name') ?? $category->name)
+                                                        : $category->name;
+                                                    $description = method_exists($category, 'trans')
+                                                        ? ($category->trans('description') ?? $category->description)
+                                                        : $category->description;
+                                                    $productCount = $category->products_count
+                                                        ?? ($category->published_products_count ?? ($category->products?->count() ?? 0));
+                                                @endphp
 
-                                    <article class="group flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-cyan-300 hover:shadow-xl">
-                                        <div class="relative h-48 overflow-hidden sm:h-52">
-                                            @if ($image)
-                                                <img src="{{ $image }}"
-                                                     alt="{{ $name }}"
-                                                     loading="lazy"
-                                                     class="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                                            @else
-                                                <div class="flex h-full w-full items-center justify-center bg-slate-100 text-4xl font-semibold text-slate-700">
-                                                    {{ mb_strtoupper(mb_substr($name, 0, 2)) }}
-                                                </div>
-                                            @endif
-                                            <div class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-5 pb-4 pt-12">
-                                                <h3 class="text-lg font-semibold text-white drop-shadow-lg">
-                                                    {{ $name }}
-                                                </h3>
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-slate-800 shadow-sm">
-                                                    {{ $productCount }}
-                                                    <span class="text-slate-400">{{ __('messages.products') }}</span>
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div class="flex flex-1 flex-col justify-between gap-4 px-5 py-6">
-                                            @if ($description)
-                                                <p class="text-sm leading-relaxed text-slate-600 line-clamp-3">
-                                                    {{ \Illuminate\Support\Str::limit(strip_tags($description), 180) }}
-                                                </p>
-                                            @else
-                                                <p class="text-sm text-slate-400">
-                                                    {{ __('categories.index.description_placeholder') }}
-                                                </p>
-                                            @endif
-
-                                            <div class="flex items-center justify-center">
-                                                <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
-                                                   class="inline-flex items-center gap-2 rounded-full bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700">
-                                                    {{ __('categories.index.view_category') }}
-                                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                                    </svg>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </article>
-                                @endforeach
+                                                <tr class="group transition-colors even:bg-slate-50/40 hover:bg-slate-50">
+                                                    <td class="px-6 py-4 align-middle">
+                                                        <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
+                                                           class="font-semibold text-slate-900 transition group-hover:text-slate-700">
+                                                            {{ $name }}
+                                                        </a>
+                                                    </td>
+                                                    <td class="px-6 py-4 align-middle">
+                                                        @if ($description)
+                                                            <p class="max-w-2xl leading-relaxed text-slate-600">
+                                                                {{ \Illuminate\Support\Str::limit(strip_tags($description), 180) }}
+                                                            </p>
+                                                        @else
+                                                            <p class="text-slate-400">
+                                                                {{ __('categories.index.description_placeholder') }}
+                                                            </p>
+                                                        @endif
+                                                    </td>
+                                                    <td class="px-6 py-4 align-middle">
+                                                        <span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                                                            {{ $productCount }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="px-6 py-4 text-right align-middle">
+                                                        <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
+                                                           class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+                                                            {{ __('categories.index.view_category') }}
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
                             <div class="mt-10">
@@ -667,7 +667,7 @@
                                                                 {{ __('categories.show.filters_title') }}
                                                             </h4>
                                                             <div class="space-y-1">
-                                                                @livewire('components.product-filter-widget')
+                                                                @livewire('components.product-filter-widget', ['categoryId' => $category->id])
                                                             </div>
                                                         </div>
                                                     </div>

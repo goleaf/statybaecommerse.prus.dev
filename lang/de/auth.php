@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 return [
-    'failed'     => 'auth.failed',
-    'password'   => 'auth.password',
-    'throttle'   => 'auth.throttle',
-    'two_factor' => 'auth.two_factor',
+    'failed'     => 'Diese Zugangsdaten stimmen nicht mit unseren Aufzeichnungen überein.',
+    'password'   => 'Das angegebene Passwort ist ungültig.',
+    'throttle'   => 'Zu viele Anmeldeversuche. Bitte versuchen Sie es in :seconds Sekunden erneut.',
+    'two_factor' => 'Der angegebene Zwei-Faktor-Code ist ungültig.',
     'ui'         => [
         'common' => [
             'and'             => 'und',

@@ -20,10 +20,10 @@
         </div>
 
         <div class="rounded-lg border border-gray-200 p-6">
-            <h2 class="mb-4 text-base font-semibold text-gray-900">Documents</h2>
+            <h2 class="mb-4 text-base font-semibold text-gray-900">{{ __('frontend.account.navigation.documents') }}</h2>
 
             @if ($recentInvoices->isEmpty())
-                <p class="text-sm text-gray-500">No order invoices available yet.</p>
+                <p class="text-sm text-gray-500">{{ __('frontend.account.documents_empty') }}</p>
             @else
                 <div class="space-y-3">
                     @foreach ($recentInvoices as $invoice)

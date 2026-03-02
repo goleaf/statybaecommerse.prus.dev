@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ReferralCodes;
 use App\Filament\Resources\ReferralCodes\Pages\CreateReferralCode;
 use App\Filament\Resources\ReferralCodes\Pages\EditReferralCode;
 use App\Filament\Resources\ReferralCodes\Pages\ListReferralCodes;
+use App\Filament\Resources\ReferralCodes\Pages\ViewReferralCode;
 use App\Filament\Resources\ReferralCodes\Schemas\ReferralCodeForm;
 use App\Filament\Resources\ReferralCodes\Tables\ReferralCodesTable;
 use App\Models\ReferralCode;
@@ -46,6 +47,7 @@ class ReferralCodeResource extends Resource
         return [
             'index'  => ListReferralCodes::route('/'),
             'create' => CreateReferralCode::route('/create'),
+            'view'   => ViewReferralCode::route('/{record}'),
             'edit'   => EditReferralCode::route('/{record}/edit'),
         ];
     }

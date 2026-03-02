@@ -248,6 +248,67 @@ final class ReferralController extends Controller
     }
 
     /**
+     * Show referral and reward statistics for the authenticated customer.
+     */
+    public function statistics(): View
+    {
+        $user = $this->resolveAuthenticatedUser();
+
+        $referralStats = $user->referrals()
+            ->selectRaw('COUNT(*) as total')
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END), 0) as completed")
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) as pending")
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'expired' THEN 1 ELSE 0 END), 0) as expired")
+            ->first();
+
+        $rewardStats = $user->referralRewards()
+            ->selectRaw('COALESCE(SUM(amount), 0) as total')
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END), 0) as pending")
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'applied' THEN amount ELSE 0 END), 0) as applied")
+            ->first();
+
+        $totalReferrals = (int) ($referralStats->total ?? 0);
+        $completedReferrals = (int) ($referralStats->completed ?? 0);
+        $pendingReferrals = (int) ($referralStats->pending ?? 0);
+        $expiredReferrals = (int) ($referralStats->expired ?? 0);
+        $totalRewards = (float) ($rewardStats->total ?? 0);
+        $pendingRewards = (float) ($rewardStats->pending ?? 0);
+        $appliedRewards = (float) ($rewardStats->applied ?? 0);
+        $conversionRate = $totalReferrals > 0 ? round($completedReferrals / $totalReferrals * 100, 1) : 0.0;
+
+        $monthlyStats = $user->referrals()
+            ->select('created_at')
+            ->whereNotNull('created_at')
+            ->where('created_at', '>=', now()->subMonths(11)->startOfMonth())
+            ->latest('created_at')
+            ->get()
+            ->groupBy(static fn (Referral $referral): string => (string) $referral->created_at?->format('Y-m'))
+            ->sortKeysDesc()
+            ->map(static function ($groupedRows, string $yearMonth): object {
+                [$year, $month] = array_map('intval', explode('-', $yearMonth));
+
+                return (object) [
+                    'year' => $year,
+                    'month' => $month,
+                    'count' => $groupedRows->count(),
+                ];
+            })
+            ->values();
+
+        return view('referrals.statistics', compact(
+            'totalReferrals',
+            'completedReferrals',
+            'pendingReferrals',
+            'expiredReferrals',
+            'totalRewards',
+            'pendingRewards',
+            'appliedRewards',
+            'conversionRate',
+            'monthlyStats',
+        ));
+    }
+
+    /**
      * Handle rewards functionality with proper error handling.
      */
     public function rewards(): View

@@ -1022,6 +1022,38 @@ return [
             'shipping' => 'Shipping',
             'terms'    => 'Terms',
         ],
+        'defaults' => [
+            'terms' => [
+                'sections' => [
+                    [
+                        'title' => '1. Acceptance of terms',
+                        'paragraphs' => [
+                            'By using this website and placing orders, you agree to these terms and all applicable laws.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Orders and pricing',
+                        'paragraphs' => [
+                            'All product information and prices are provided in good faith and may be updated without prior notice.',
+                            'An order becomes final only after confirmation and successful payment processing.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Delivery and returns',
+                        'paragraphs' => [
+                            'Delivery timelines depend on stock availability, carrier schedules, and destination.',
+                            'Return requests are processed according to our return policy and applicable consumer rights.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Contact and support',
+                        'paragraphs' => [
+                            'If you have any questions regarding these terms, please contact our customer support team.',
+                        ],
+                    ],
+                ],
+            ],
+        ],
         'document_unavailable'     => 'Our :document is currently unavailable.',
         'last_reviewed'            => 'Last reviewed',
         'no_documents'             => 'No documents',

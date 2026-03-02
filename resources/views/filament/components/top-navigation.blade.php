@@ -39,7 +39,7 @@
         [
             'route' => 'filament.admin.resources.brands.index',
             'label' => __('admin.navigation.brands'),
-            'icon'  => 'star',
+            'icon'  => 'tag',
         ],
         [
             'route' => 'filament.admin.resources.product-images.index',

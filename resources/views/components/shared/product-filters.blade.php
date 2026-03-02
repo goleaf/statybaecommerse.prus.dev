@@ -67,7 +67,6 @@
                 <option value="name">{{ __('messages.frontend') }}</option>
                 <option value="price">{{ __('messages.frontend') }}</option>
                 <option value="popularity">{{ __('messages.frontend') }}</option>
-                <option value="rating">{{ __('messages.frontend') }}</option>
             </x-shared.select>
         @endif
     </div>

@@ -95,31 +95,6 @@
                             </div>
                         </div>
 
-                        {{-- Rating --}}
-                        <div class="mb-6">
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('ui.rating') }}</h4>
-                            <div class="space-y-2">
-                                @for ($i = 5; $i >= 1; $i--)
-                                    <label
-                                           class="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors duration-200">
-                                        <input type="radio" x-model="filters.rating" value="{{ $i }}"
-                                               class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
-                                        <div class="flex items-center gap-1">
-                                            @for ($j = 1; $j <= 5; $j++)
-                                                <svg class="w-4 h-4 {{ $j <= $i ? 'text-yellow-400' : 'text-gray-300' }}"
-                                                     fill="currentColor" viewBox="0 0 20 20">
-                                                    <path
-                                                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            @endfor
-                                            <span class="text-sm text-gray-700">{{ $i }}
-                                                {{ __('ui.stars_up') }}</span>
-                                        </div>
-                                    </label>
-                                @endfor
-                            </div>
-                        </div>
-
                         {{-- Availability --}}
                         <div class="mb-6">
                             <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('messages.availability') }}</h4>
@@ -179,7 +154,6 @@
                                 <option value="price_desc">{{ __('ui.price_high_to_low') }}</option>
                                 <option value="name_asc">{{ __('ui.name_a_to_z') }}</option>
                                 <option value="name_desc">{{ __('ui.name_z_to_a') }}</option>
-                                <option value="rating_desc">{{ __('ui.highest_rated') }}</option>
                                 <option value="newest">{{ __('ui.newest_first') }}</option>
                                 <option value="popularity">{{ __('ui.most_popular') }}</option>
                             </select>
@@ -231,7 +205,6 @@
                 priceMax: '',
                 categories: [],
                 brands: [],
-                rating: '',
                 inStock: false,
                 onSale: false,
                 newArrivals: false
@@ -244,7 +217,6 @@
                 if (this.filters.priceMax) params.set('price_max', this.filters.priceMax);
                 if (this.filters.categories.length > 0) params.set('categories', this.filters.categories.join(','));
                 if (this.filters.brands.length > 0) params.set('brands', this.filters.brands.join(','));
-                if (this.filters.rating) params.set('rating', this.filters.rating);
                 if (this.filters.inStock) params.set('in_stock', '1');
                 if (this.filters.onSale) params.set('on_sale', '1');
                 if (this.filters.newArrivals) params.set('new_arrivals', '1');
@@ -259,7 +231,6 @@
                     priceMax: '',
                     categories: [],
                     brands: [],
-                    rating: '',
                     inStock: false,
                     onSale: false,
                     newArrivals: false

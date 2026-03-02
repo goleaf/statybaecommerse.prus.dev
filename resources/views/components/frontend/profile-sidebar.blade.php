@@ -38,7 +38,7 @@
         {{ __('frontend.account.navigation.account') }}
     </h3>
     <div class="mt-1 space-y-1" aria-labelledby="settings-headline">
-        <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
+        <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="w-full group flex items-center px-3 py-2 text-sm font-medium text-red-600 rounded-md hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300 transition-colors">
                 <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 text-red-500 group-hover:text-red-600 dark:text-red-400 dark:group-hover:text-red-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">

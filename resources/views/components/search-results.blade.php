@@ -79,7 +79,6 @@
                             <option value="price_desc">{{ __('frontend.search_results.sort.price_high_low') }}</option>
                             <option value="name_asc">{{ __('frontend.search_results.sort.name_a_z') }}</option>
                             <option value="name_desc">{{ __('frontend.search_results.sort.name_z_a') }}</option>
-                            <option value="rating_desc">{{ __('frontend.search_results.sort.highest_rated') }}</option>
                             <option value="newest">{{ __('frontend.search_results.sort.newest_first') }}</option>
                         </select>
                     </div>
@@ -134,28 +133,6 @@
                             </div>
                         </div>
 
-                        {{-- Rating --}}
-                        <div>
-                            <h4 class="text-sm font-semibold text-gray-900 mb-3">{{ __('frontend.search_results.filters.rating') }}</h4>
-                            <div class="space-y-2">
-                                @for ($i = 5; $i >= 1; $i--)
-                                    <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
-                                        <input type="radio" x-model="filters.rating" value="{{ $i }}"
-                                               class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
-                                        <div class="flex items-center gap-1">
-                                            @for ($j = 1; $j <= 5; $j++)
-                                                <svg class="w-3 h-3 {{ $j <= $i ? 'text-yellow-400' : 'text-gray-300' }}"
-                                                     fill="currentColor" viewBox="0 0 20 20">
-                                                    <path
-                                                          d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                </svg>
-                                            @endfor
-                                            <span class="text-sm text-gray-700">{{ $i }}+</span>
-                                        </div>
-                                    </label>
-                                @endfor
-                            </div>
-                        </div>
                     </div>
 
                     <div class="flex gap-2 mt-4">
@@ -278,8 +255,7 @@
                 priceMin: '',
                 priceMax: '',
                 categories: [],
-                brands: [],
-                rating: ''
+                brands: []
             },
 
             performSearch() {
@@ -313,7 +289,6 @@
                 if (this.filters.categories.length > 0) url.searchParams.set('categories', this.filters.categories.join(
                     ','));
                 if (this.filters.brands.length > 0) url.searchParams.set('brands', this.filters.brands.join(','));
-                if (this.filters.rating) url.searchParams.set('rating', this.filters.rating);
 
                 window.location.href = url.toString();
             },
@@ -323,8 +298,7 @@
                     priceMin: '',
                     priceMax: '',
                     categories: [],
-                    brands: [],
-                    rating: ''
+                    brands: []
                 };
 
                 const url = new URL(window.location);
@@ -332,7 +306,6 @@
                 url.searchParams.delete('price_max');
                 url.searchParams.delete('categories');
                 url.searchParams.delete('brands');
-                url.searchParams.delete('rating');
 
                 window.location.href = url.toString();
             },

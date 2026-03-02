@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 return [
-    'failed'     => 'auth.failed',
-    'password'   => 'auth.password',
-    'throttle'   => 'auth.throttle',
-    'two_factor' => 'auth.two_factor',
+    'failed'     => 'These credentials do not match our records.',
+    'password'   => 'The provided password is incorrect.',
+    'throttle'   => 'Too many login attempts. Please try again in :seconds seconds.',
+    'two_factor' => 'The provided two factor authentication code was invalid.',
     'ui'         => [
         'common' => [
             'and'             => 'and',

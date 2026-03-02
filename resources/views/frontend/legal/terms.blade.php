@@ -4,6 +4,9 @@
     $defaultTitle = __('frontend.legal.terms_of_service');
     $pageTitle = $legal?->getTranslatedSeoTitle() ?? $legal?->getTranslatedTitle() ?? $defaultTitle;
     $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('frontend.legal.descriptions.terms');
+    $emptyMessage = __('frontend.legal.document_unavailable', [
+        'document' => \Illuminate\Support\Str::lower($defaultTitle),
+    ]);
 @endphp
 
 @section('title', $pageTitle)
@@ -19,7 +22,7 @@
                 'legal' => $legal,
                 'heading' => $legal?->getTranslatedTitle() ?? $defaultTitle,
                 'description' => $pageDescription,
-                'emptyMessage' => __('messages.frontend_legal'),
+                'emptyMessage' => $emptyMessage,
                 'fallbackKey' => 'terms',
             ])
         </div>

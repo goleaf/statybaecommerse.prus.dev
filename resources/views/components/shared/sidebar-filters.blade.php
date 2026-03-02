@@ -165,7 +165,6 @@
                 <option value="price">{{ __('frontend.filters.sort.price_low_high') }}</option>
                 <option value="price_desc">{{ __('frontend.filters.sort.price_high_low') }}</option>
                 <option value="popularity">{{ __('frontend.filters.sort.most_popular') }}</option>
-                <option value="rating">{{ __('frontend.filters.sort.highest_rated') }}</option>
             </x-shared.select>
         </x-shared.card>
     @endif

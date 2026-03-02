@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\Resources\Subscribers\SubscriberResource;
+use App\Models\Subscriber;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -17,6 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class SubscriberRelationManager extends RelationManager
 {
@@ -49,6 +51,7 @@ class SubscriberRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->recordTitleAttribute('email')
             ->columns([
                 TextColumn::make('email')
@@ -75,10 +78,26 @@ class SubscriberRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                Action::make('create')
+                    ->icon('heroicon-m-plus')
+                    ->url(fn (): string => SubscriberResource::getUrl('create', [
+                        'user_id'  => $this->getOwnerRecord()->getKey(),
+                        'redirect' => request()->fullUrl(),
+                    ])),
             ])
             ->recordActions([
-                EditAction::make(),
+                Action::make('view')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn (Subscriber $record): string => SubscriberResource::getUrl('view', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->url(fn (Subscriber $record): string => SubscriberResource::getUrl('edit', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -88,3 +107,4 @@ class SubscriberRelationManager extends RelationManager
             ]);
     }
 }
+

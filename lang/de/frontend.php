@@ -1022,6 +1022,38 @@ return [
             'shipping' => 'Shipping',
             'terms'    => 'Terms',
         ],
+        'defaults' => [
+            'terms' => [
+                'sections' => [
+                    [
+                        'title' => '1. Annahme der Bedingungen',
+                        'paragraphs' => [
+                            'Durch die Nutzung dieser Website und das Aufgeben von Bestellungen akzeptieren Sie diese Bedingungen sowie alle geltenden Gesetze.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Bestellungen und Preise',
+                        'paragraphs' => [
+                            'Alle Produktinformationen und Preise werden nach bestem Wissen bereitgestellt und können ohne Vorankündigung aktualisiert werden.',
+                            'Eine Bestellung gilt erst nach Bestätigung und erfolgreicher Zahlungsabwicklung als verbindlich.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Lieferung und Rückgabe',
+                        'paragraphs' => [
+                            'Lieferzeiten hängen von Lagerbestand, Versanddienstleister und Zielort ab.',
+                            'Rückgaben werden gemäß unserer Rückgaberichtlinie und den geltenden Verbraucherrechten bearbeitet.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Kontakt und Support',
+                        'paragraphs' => [
+                            'Wenn Sie Fragen zu diesen Bedingungen haben, kontaktieren Sie bitte unseren Kundensupport.',
+                        ],
+                    ],
+                ],
+            ],
+        ],
         'document_unavailable'     => 'Unser Dokument „:document“ ist derzeit nicht verfügbar.',
         'last_reviewed'            => 'Last reviewed',
         'no_documents'             => 'No documents',

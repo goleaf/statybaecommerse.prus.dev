@@ -132,6 +132,7 @@ class UserResourceTest extends TestCase
             'all',
             'company',
             'addresses',
+            'cart_items',
             'customer_groups',
             'partners',
             'referral_codes',

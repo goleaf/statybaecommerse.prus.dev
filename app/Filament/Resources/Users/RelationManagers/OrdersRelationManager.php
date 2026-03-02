@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\Resources\OrderResource;
 use App\Enums\OrderPaymentState;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
 use BackedEnum;
-use Filament\Actions\AssociateAction;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -21,6 +20,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class OrdersRelationManager extends RelationManager
 {
@@ -62,6 +62,7 @@ class OrdersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->recordTitleAttribute('number')
             ->columns([
                 TextColumn::make('number')
@@ -84,13 +85,26 @@ class OrdersRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->mutateDataUsing(static fn (array $data): array => self::normalizeOrderPayload($data)),
-                AssociateAction::make(),
+                Action::make('create')
+                    ->icon('heroicon-m-plus')
+                    ->url(fn (): string => OrderResource::getUrl('create', [
+                        'user_id'  => $this->getOwnerRecord()->getKey(),
+                        'redirect' => request()->fullUrl(),
+                    ])),
             ])
             ->recordActions([
-                EditAction::make()
-                    ->mutateDataUsing(static fn (array $data): array => self::normalizeOrderPayload($data)),
+                Action::make('view')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn ($record): string => OrderResource::getUrl('view', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->url(fn ($record): string => OrderResource::getUrl('edit', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -188,3 +202,4 @@ class OrdersRelationManager extends RelationManager
         return round((float) $value, 2);
     }
 }
+

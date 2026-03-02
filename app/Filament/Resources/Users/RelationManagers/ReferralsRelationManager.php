@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\Resources\Referrals\ReferralResource;
 use App\Models\Referral;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -61,6 +61,7 @@ class ReferralsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->recordTitleAttribute('referral_code')
             ->columns([
                 TextColumn::make('referred.name')
@@ -84,19 +85,26 @@ class ReferralsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->mutateDataUsing(static function (array $data): array {
-                        $resolvedCode = trim((string) ($data['referral_code'] ?? ''));
-
-                        $data['referral_code'] = $resolvedCode !== '' ? $resolvedCode : Referral::generateUniqueCode();
-                        $data['status'] = (string) ($data['status'] ?? 'pending');
-                        $data['source'] = (string) ($data['source'] ?? 'admin');
-
-                        return $data;
-                    }),
+                Action::make('create')
+                    ->icon('heroicon-m-plus')
+                    ->url(fn (): string => ReferralResource::getUrl('create', [
+                        'user_id'  => $this->getOwnerRecord()->getKey(),
+                        'redirect' => request()->fullUrl(),
+                    ])),
             ])
             ->recordActions([
-                EditAction::make(),
+                Action::make('view')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn (Referral $record): string => ReferralResource::getUrl('view', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->url(fn (Referral $record): string => ReferralResource::getUrl('edit', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -106,3 +114,4 @@ class ReferralsRelationManager extends RelationManager
             ]);
     }
 }
+

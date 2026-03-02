@@ -10,9 +10,9 @@
 @endphp
 
 <div {{ $attributes->class([
-    'relative min-h-screen overflow-hidden bg-sage text-dark',
+    'relative overflow-hidden bg-sage text-dark',
 ]) }}>
-    <div class="relative z-10 flex min-h-screen items-center py-12 sm:py-16">
+    <div class="relative z-10 flex items-start py-4 sm:py-6">
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 {{ $maxWidth }}">
             <div @class([
                 'grid grid-cols-1 gap-10',

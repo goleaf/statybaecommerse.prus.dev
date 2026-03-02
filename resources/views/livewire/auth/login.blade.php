@@ -19,7 +19,7 @@
         <div class="space-y-2">
             <x-auth-session-status class="text-sm text-dark" :status="session('status')" />
 
-            <form wire:submit="login" class="space-y-6">
+            <form wire:submit="login" class="space-y-6" data-disable-submit-spinner="true">
                 <div class="space-y-4">
                     <div class="space-y-2">
                         <x-forms.label for="email" :value="__('messages.auth_email')" />
@@ -69,19 +69,9 @@
 
                 <button
                     type="submit"
-                    wire:loading.attr="disabled"
-                    class="w-full bg-dark px-4 py-2.5 text-sm font-semibold text-sage transition hover:bg-stone hover:text-dark focus:outline-none disabled:cursor-not-allowed disabled:opacity-70"
+                    class="auth-submit-button w-full bg-dark px-4 py-2.5 text-sm font-semibold focus:outline-none"
                 >
-                    <span wire:loading.remove>
-                        {{ __('auth.ui.login.title') }}
-                    </span>
-                    <span wire:loading class="inline-flex items-center gap-2">
-                        <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        {{ __('auth.ui.login.connecting') }}
-                    </span>
+                    {{ __('auth.ui.login.title') }}
                 </button>
             </form>
         </div>
@@ -95,7 +85,7 @@
 
         <p class="text-center text-xs text-slate-500">
             {{ __('auth.ui.common.terms_agreement') }}
-            <x-link href="#" class="text-dark hover:text-stone">{{ __('auth.ui.common.terms_of_use') }}</x-link>
+            <x-link href="{{ route('frontend.legal.terms') }}" class="text-dark hover:text-stone">{{ __('auth.ui.common.terms_of_use') }}</x-link>
             {{ __('auth.ui.common.and') }}
             <x-link href="#" class="text-dark hover:text-stone">{{ __('auth.ui.common.privacy_policy') }}</x-link>.
         </p>

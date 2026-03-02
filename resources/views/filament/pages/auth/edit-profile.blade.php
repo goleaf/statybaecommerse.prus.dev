@@ -89,12 +89,6 @@
                             €{{ number_format(auth()->user()->total_spent, 2) }}</dd>
                     </div>
                     <div class="flex justify-between">
-                        <dt class="text-sm text-gray-500 dark:text-gray-400">{{ __('admin.profile.reviews_count') }}
-                        </dt>
-                        <dd class="text-sm font-medium text-gray-900 dark:text-white">
-                            {{ auth()->user()->reviews_count }}</dd>
-                    </div>
-                    <div class="flex justify-between">
                         <dt class="text-sm text-gray-500 dark:text-gray-400">{{ __('admin.profile.member_since') }}
                         </dt>
                         <dd class="text-sm font-medium text-gray-900 dark:text-white">

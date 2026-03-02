@@ -50,9 +50,8 @@
         <div class="absolute bottom-3 left-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <button 
                 wire:click="addToCart"
-                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                class="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center"
             >
-                <x-heroicon-o-shopping-cart class="w-4 h-4" />
                 {{ __('translations.add_to_cart') }}
             </button>
         </div>
@@ -71,22 +70,6 @@
                 {{ $product->name }}
             </button>
         </h3>
-
-        {{-- Rating --}}
-        @if($product->reviews_count > 0)
-            <div class="flex items-center gap-1 mb-2">
-                <div class="flex">
-                    @for($i = 1; $i <= 5; $i++)
-                        @if($i <= $product->average_rating)
-                            <x-heroicon-s-star class="w-4 h-4 text-yellow-400" />
-                        @else
-                            <x-heroicon-o-star class="w-4 h-4 text-gray-300" />
-                        @endif
-                    @endfor
-                </div>
-                <span class="text-sm text-gray-500">({{ $product->reviews_count }})</span>
-            </div>
-        @endif
 
         {{-- Price --}}
         <div class="flex items-center gap-2 mb-3">

@@ -481,6 +481,16 @@ footer .footer-contact-item {
     font-size: 1.125rem;
   }
 }
+.header-action-button .header-action-button__user-name {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+@media (min-width: 640px) {
+  .header-action-button .header-action-button__user-name {
+    font-size: 0.875rem;
+  }
+}
 .header-action-button:hover {
   background-color: #262523 !important;
   color: #e3ebd2 !important;
@@ -492,6 +502,9 @@ footer .footer-contact-item {
 .header-action-button:hover span, .header-action-button:hover p {
   color: #e3ebd2 !important;
   transform: scale(1.05);
+}
+.header-action-button:hover .header-action-button__user-name {
+  transform: none;
 }
 
 .shopping-cart-button {
@@ -1085,6 +1098,9 @@ footer .footer-contact-item {
 }
 .bg-sage button, .bg-sage .btn {
   color: #1f2937 !important;
+}
+.bg-sage button.auth-submit-button {
+  color: #ffffff !important;
 }
 .bg-sage button.bg-brand-primary, .bg-sage button.bg-brand-primary-dark, .bg-sage .btn.bg-brand-primary, .bg-sage .btn.bg-brand-primary-dark {
   color: white !important;

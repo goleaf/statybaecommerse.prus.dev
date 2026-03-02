@@ -18,14 +18,14 @@
 @section('content')
     <div class="relative overflow-hidden bg-slate-50 py-12 sm:py-16 lg:py-20">
         <div class="pointer-events-none absolute inset-0">
-            <div class="absolute -top-28 left-1/2 h-72 w-72 -translate-x-[130%] rounded-full bg-sky-200/50 blur-3xl"></div>
-            <div class="absolute right-0 top-20 h-80 w-80 translate-x-1/3 rounded-full bg-amber-200/50 blur-3xl"></div>
+            <div class="absolute -top-28 left-1/2 h-72 w-72 -translate-x-[130%] rounded-full bg-emerald-200/55 blur-3xl"></div>
+            <div class="absolute right-0 top-20 h-80 w-80 translate-x-1/3 rounded-full bg-lime-200/55 blur-3xl"></div>
         </div>
 
         <div class="relative mx-auto w-full max-w-6xl space-y-16 px-4 sm:px-6 lg:px-8">
             <section class="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
                 <div class="space-y-6 rounded-[2rem] border border-slate-200 bg-white/90 p-8 shadow-[0_28px_80px_-52px_rgba(15,23,42,0.7)] backdrop-blur-sm sm:p-10">
-                    <span class="inline-flex items-center rounded-full bg-sky-100 px-4 py-1 text-sm font-semibold tracking-wide text-sky-700">
+                    <span class="inline-flex items-center rounded-full bg-emerald-100 px-4 py-1 text-sm font-semibold tracking-wide text-emerald-700">
                         {{ __('frontend.about.hero.eyebrow') }}
                     </span>
                     <h1 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
@@ -34,22 +34,15 @@
                     <p class="text-lg leading-8 text-slate-600">
                         {{ __('frontend.about.hero.subtitle') }}
                     </p>
-                    <p class="text-base font-semibold text-sky-700">
+                    <p class="text-base font-semibold text-emerald-700">
                         {{ __('messages.footer_tagline') }}
                     </p>
-                    <div>
-                        <a href="{{ route('frontend.contact.index') }}"
-                           class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-sky-200 transition duration-300 hover:-translate-y-0.5 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
-                            {{ __('frontend.about.hero.cta') }}
-                            <x-untitledui-arrow-up-right class="h-4 w-4" />
-                        </a>
-                    </div>
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     @foreach ($metricsItems as $metric)
-                        <article class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-sky-300 hover:shadow-lg">
-                            <p class="text-3xl font-black tracking-tight text-sky-700">
+                        <article class="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:shadow-lg">
+                            <p class="text-3xl font-black tracking-tight text-emerald-700">
                                 {{ $metric['value'] }}
                             </p>
                             <p class="mt-2 text-sm font-medium leading-6 text-slate-600">
@@ -72,11 +65,8 @@
 
                 <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     @foreach ($valuesItems as $item)
-                        <article class="flex h-full flex-col rounded-2xl border border-slate-200 bg-slate-50 p-6 transition duration-300 hover:border-sky-300 hover:bg-white hover:shadow-md">
-                            <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-100 to-cyan-100 text-sm font-bold text-sky-700">
-                                {{ str_pad((string) $loop->iteration, 2, '0', STR_PAD_LEFT) }}
-                            </span>
-                            <h3 class="mt-4 text-lg font-semibold text-slate-900">
+                        <article class="flex h-full flex-col rounded-2xl border border-slate-200 bg-slate-50 p-6 transition duration-300 hover:border-emerald-300 hover:bg-white hover:shadow-md">
+                            <h3 class="text-lg font-semibold text-slate-900">
                                 {{ $item['title'] }}
                             </h3>
                             <p class="mt-3 text-sm leading-6 text-slate-600">
@@ -87,7 +77,7 @@
                 </div>
             </section>
 
-            <section class="overflow-hidden rounded-[2rem] border border-sky-200 bg-gradient-to-r from-sky-50 via-cyan-50 to-amber-50 p-8 shadow-[0_24px_65px_-45px_rgba(3,105,161,0.9)] sm:p-10">
+            <section class="overflow-hidden rounded-[2rem] border border-emerald-200 bg-gradient-to-r from-emerald-50 via-green-50 to-lime-50 p-8 shadow-[0_24px_65px_-45px_rgba(5,150,105,0.45)] sm:p-10">
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-[1.15fr_auto] sm:items-center">
                     <div class="space-y-3">
                         <h2 class="text-2xl font-bold text-slate-900 sm:text-3xl">
@@ -96,13 +86,6 @@
                         <p class="text-base leading-7 text-slate-600">
                             {{ __('frontend.about.cta.subtitle') }}
                         </p>
-                    </div>
-                    <div>
-                        <a href="{{ route('frontend.contact.index') }}"
-                           class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-sky-200 transition duration-300 hover:-translate-y-0.5 hover:bg-sky-700">
-                            {{ __('frontend.about.cta.button') }}
-                            <x-untitledui-arrow-up-right class="h-4 w-4" />
-                        </a>
                     </div>
                 </div>
             </section>

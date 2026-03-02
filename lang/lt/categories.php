@@ -27,7 +27,7 @@ return [
         'sort_name_desc'          => 'Pavadinimas (Ž–A)',
         'sort_products_asc'       => 'Mažiausiai produktų',
         'sort_products_desc'      => 'Daugiausia produktų',
-        'title'                   => 'Atraskite kiekvieną StatyBae Commerce skyrių',
+        'title'                   => 'Atraskite kiekvieną skyrių',
         'view_category'           => 'Peržiūrėti kategoriją',
         'view_grid'               => 'Tinklelis',
         'view_list'               => 'Sąrašas',

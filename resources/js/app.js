@@ -281,8 +281,19 @@ function initializeSearchEnhancements() {
 
 // Loading states and skeleton screens
 function initializeLoadingStates() {
+    const isAuthFormPath = () => {
+        const segments = window.location.pathname.toLowerCase().split('/').filter(Boolean);
+        const currentPage = segments[segments.length - 1] ?? '';
+
+        return currentPage === 'login' || currentPage === 'register';
+    };
+
     // Add loading states to forms
     document.querySelectorAll('form').forEach((form) => {
+        if (form.dataset.disableSubmitSpinner === 'true' || isAuthFormPath()) {
+            return;
+        }
+
         form.addEventListener('submit', function () {
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {

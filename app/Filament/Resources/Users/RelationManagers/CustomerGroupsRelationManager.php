@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\Resources\CustomerGroups\CustomerGroupResource;
 use App\Models\CustomerGroup;
-use Filament\Actions\AttachAction;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -137,6 +136,7 @@ class CustomerGroupsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
@@ -156,20 +156,26 @@ class CustomerGroupsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->mutateDataUsing(static fn (array $data): array => self::normalizePayload($data)),
-                AttachAction::make()
-                    ->preloadRecordSelect()
-                    ->recordSelectSearchColumns(['name', 'code'])
-                    ->recordSelectOptionsQuery(
-                        static fn (Builder $query): Builder => $query
-                            ->withoutGlobalScopes()
-                            ->orderBy('name'),
-                    ),
+                Action::make('create')
+                    ->icon('heroicon-m-plus')
+                    ->url(fn (): string => CustomerGroupResource::getUrl('create', [
+                        'attach_user_id' => $this->getOwnerRecord()->getKey(),
+                        'redirect'       => request()->fullUrl(),
+                    ])),
             ])
             ->recordActions([
-                EditAction::make()
-                    ->mutateDataUsing(static fn (array $data): array => self::normalizePayload($data)),
+                Action::make('view')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn (CustomerGroup $record): string => CustomerGroupResource::getUrl('view', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->url(fn (CustomerGroup $record): string => CustomerGroupResource::getUrl('edit', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
                 DetachAction::make(),
             ])
             ->toolbarActions([
@@ -238,3 +244,4 @@ class CustomerGroupsRelationManager extends RelationManager
         return $normalized !== '' ? str_replace([' ', '-'], '_', $normalized) : $default;
     }
 }
+

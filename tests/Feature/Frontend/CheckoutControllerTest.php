@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Frontend;
 
 use App\Models\Brand;
+use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -105,6 +106,34 @@ final class CheckoutControllerTest extends TestCase
         ])->post(route('frontend.checkout.process'), []);
 
         $response->assertSessionHasErrors(['full_name', 'email', 'address_line_1', 'city', 'postal_code', 'country', 'payment_method']);
+    }
+
+    public function test_index_uses_user_owned_cart_items_even_when_session_id_changes(): void
+    {
+        $user = User::factory()->create();
+        $product = $this->createVisibleProduct();
+
+        CartItem::query()->create([
+            'session_id'       => 'legacy-session-id',
+            'user_id'          => $user->id,
+            'product_id'       => $product->id,
+            'quantity'         => 2,
+            'minimum_quantity' => 1,
+            'unit_price'       => 20.0,
+            'price'            => 20.0,
+            'total_price'      => 40.0,
+            'product_snapshot' => [
+                'name' => $product->name,
+                'sku'  => $product->sku,
+            ],
+        ]);
+
+        $response = $this->actingAs($user)
+            ->withSession(['cart' => []])
+            ->get(route('frontend.checkout.index'));
+
+        $response->assertOk();
+        $response->assertSee($product->name);
     }
 
     private function createVisibleProduct(): Product

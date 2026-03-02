@@ -21,6 +21,7 @@ final class ReferralForm
                 ->relationship('referrer', 'name')
                 ->searchable()
                 ->preload()
+                ->default(static fn (): ?int => request()->integer('user_id') ?: null)
                 ->required(),
             Select::make('referred_id')
                 ->relationship('referred', 'name')

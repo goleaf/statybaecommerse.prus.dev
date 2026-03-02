@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\Resources\NotificationResource;
+use App\Models\Notification;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\TextInput;
@@ -16,6 +17,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class NotificationsRelationManager extends RelationManager
 {
@@ -37,6 +39,7 @@ class NotificationsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->recordTitleAttribute('type')
             ->columns([
                 TextColumn::make('type')
@@ -56,10 +59,26 @@ class NotificationsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
+                Action::make('create')
+                    ->icon('heroicon-m-plus')
+                    ->url(fn (): string => NotificationResource::getUrl('create', [
+                        'user_id'  => $this->getOwnerRecord()->getKey(),
+                        'redirect' => request()->fullUrl(),
+                    ])),
             ])
             ->recordActions([
-                EditAction::make(),
+                Action::make('view')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn (Notification $record): string => NotificationResource::getUrl('view', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->url(fn (Notification $record): string => NotificationResource::getUrl('edit', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -69,3 +88,4 @@ class NotificationsRelationManager extends RelationManager
             ]);
     }
 }
+

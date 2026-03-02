@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Subscribers;
 use App\Filament\Resources\Subscribers\Pages\CreateSubscriber;
 use App\Filament\Resources\Subscribers\Pages\EditSubscriber;
 use App\Filament\Resources\Subscribers\Pages\ListSubscribers;
+use App\Filament\Resources\Subscribers\Pages\ViewSubscriber;
 use App\Filament\Resources\Subscribers\Schemas\SubscriberForm;
 use App\Filament\Resources\Subscribers\Tables\SubscribersTable;
 use App\Models\Subscriber;
@@ -61,6 +62,7 @@ class SubscriberResource extends Resource
         return [
             'index'  => ListSubscribers::route('/'),
             'create' => CreateSubscriber::route('/create'),
+            'view'   => ViewSubscriber::route('/{record}'),
             'edit'   => EditSubscriber::route('/{record}/edit'),
         ];
     }

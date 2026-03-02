@@ -1,129 +1,142 @@
 <x-layouts.base title="{{ __('frontend.cart.view_cart') }}">
-    <div class="bg-sage">
-    <!-- Hero Banner (centered) -->
-    <section class="relative bg-sage z-10 overflow-hidden">
-        <x-container class="px-4 py-16">
-            <div class="mx-auto w-full max-w-7xl space-y-6 text-dark text-center">
-                <p class="uppercase text-3xl md:text-4xl font-medium">
-                    {{ __('frontend.cart.view_cart') }}
-                </p>
-                <p class="text-sm max-w-2xl mx-auto">
-                    {{ __('frontend.cart.review_prompt') }}
-                </p>
-                @if (!empty($items))
-                    @php($itemCount = (int) data_get($summary ?? [], 'item_count', 0))
-                    <p class="uppercase font-semibold text-2xl sm:text-3xl md:text-4xl">
-                        {{ $itemCount }} {{ trans_choice('frontend.cart.items', $itemCount) }}
+    @php
+        $itemsCollection = collect($items ?? []);
+        $itemCount = (int) data_get($summary ?? [], 'item_count', $itemsCollection->sum(fn (array $item): int => (int) data_get($item, 'quantity', 0)));
+
+        $orderSummaryItems = $itemsCollection
+            ->map(static function (array $item): array {
+                $quantity = (int) data_get($item, 'quantity', 0);
+                $lineTotal = (float) data_get($item, 'total', ((float) data_get($item, 'price', 0) * $quantity));
+
+                return [
+                    'name'                 => (string) data_get($item, 'name', __('ui.unknown_product')),
+                    'quantity'             => $quantity,
+                    'line_total'           => $lineTotal,
+                    'formatted_line_total' => \Illuminate\Support\Number::currency($lineTotal, current_currency(), app()->getLocale()),
+                ];
+            })
+            ->values();
+    @endphp
+
+    <div class="min-h-screen bg-gray-50">
+        <section class="border-b border-gray-200 bg-white">
+            <x-container class="px-4 py-10">
+                <div class="mx-auto w-full max-w-7xl space-y-3">
+                    <h1 class="text-2xl font-bold text-gray-900 md:text-3xl">
+                        {{ __('frontend.cart.view_cart') }}
+                    </h1>
+                    <p class="max-w-3xl text-sm text-gray-600">
+                        {{ __('frontend.cart.review_prompt') }}
                     </p>
-                @endif
-            </div>
-        </x-container>
-    </section>
-    <div class="w-full h-[1px] bg-brand-primary relative">
-        <div class="aspect-square h-10 bg-brand-primary absolute -top-5 left-1/2 -translate-x-1/2 z-20 rotate-45 flex items-center justify-center">
-            <svg class="text-white w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-        </div>
-    </div>
-    <x-container class="px-4 py-10">
-        <div class="mx-auto w-full max-w-7xl grid grid-cols-1 gap-10 lg:grid-cols-12">
-            <div class="col-span-full space-y-8 lg:col-span-9">
-        <h1 class="text-3xl font-semibold text-gray-900 dark:text-gray-100">{{ __('frontend.cart.view_cart') }}</h1>
-        @if ($items)
-                    <section class="bg-dark border border-sage/30 rounded-2xl shadow-sm">
-                        <div class="p-6 space-y-6 divide-y divide-sage/30 text-sage">
-                    @foreach ($items as $item)
-                                <div class="pt-4 first:pt-0 flex flex-col md:flex-row md:items-center md:justify-between gap-4 hover:bg-dark/70 transition-colors rounded-xl px-2">
-                                    <div class="text-sage">
-                                        <h2 class="text-lg font-semibold">
-                                            <a href="#" class="text-white hover:text-sage hover:underline" aria-label="{{ __('frontend.cart.view_product', ['name' => $item['name']]) }}">{{ $item['name'] }}</a>
-                                        </h2>
-                                        <p class="text-sm text-sage/80">{{ __('frontend.cart.unit_price', ['price' => app_money_format($item['price'])]) }}</p>
-                                        <p class="text-sm text-sage/80">{{ __('frontend.cart.quantity_label', ['quantity' => $item['quantity']]) }}</p>
-                            </div>
-                                    <div class="flex items-center justify-end gap-3 text-sm text-sage">
-                                        <dt class="text-sage/80">{{ __('messages.Tax') }}:</dt>
-                                        <dd class="font-semibold text-white">{{ $summary['formatted_tax_amount'] }}</dd>
-                            </div>
-                                    <div class="flex items-center justify-end gap-3 text-sm text-sage">
-                                        <dt class="text-sage/80">{{ __('messages.Shipping') }}:</dt>
-                                        <dd class="font-semibold text-white">{{ $summary['formatted_shipping_amount'] }}</dd>
-                            </div>
-                            @if(($summary['discount_amount'] ?? 0) > 0)
-                                        <div class="flex items-center justify-end gap-3 text-sm text-green-400">
-                                    <dt>{{ __('messages.Discount') }}:</dt>
-                                    <dd class="font-semibold">-{{ $summary['formatted_discount_amount'] }}</dd>
-                                </div>
-                            @endif
-                                    <div class="flex items-center justify-end gap-3 text-base font-semibold text-white border-t border-sage/30 pt-2">
-                                <dt>{{ __('messages.Total') }}:</dt>
-                                <dd>{{ $summary['formatted_total'] }}</dd>
-                            </div>
-                        </div>
-                    @endforeach
+                    @if ($itemCount > 0)
+                        <p class="text-sm font-medium text-gray-700">
+                            {{ $itemCount }} {{ trans_choice('frontend.cart.items', $itemCount) }}
+                        </p>
+                    @endif
                 </div>
-            </section>
-        @else
-            <p class="text-gray-500 dark:text-gray-400">{{ __('frontend.cart.empty_description') }}</p>
-        @endif
-            </div>
-            <aside class="col-span-full lg:col-span-3">
-                <section class="bg-dark border border-sage/30 rounded-2xl shadow-sm p-6">
-            <h2 class="text-2xl font-semibold mb-4">{{ __('frontend.cart.order_summary') }}</h2>
-                    <dl class="space-y-3 text-sm text-sage">
-                <div class="flex justify-between">
-                            <dt class="text-sage/80">{{ __('messages.Subtotal') }}</dt>
-                            <dd class="text-white">{{ app_money_format($subtotal) }}</dd>
-                </div>
-                <div class="flex justify-between">
-                            <dt class="text-sage/80">{{ __('messages.Tax') }}</dt>
-                            <dd class="text-white">{{ app_money_format($tax) }}</dd>
-                </div>
-                <div class="flex justify-between">
-                            <dt class="text-sage/80">{{ __('messages.Shipping') }}</dt>
-                            <dd class="text-white">{{ app_money_format($shipping) }}</dd>
-                </div>
-                        <div class="flex justify-between">
-                            <dt class="text-sage/80">{{ __('messages.Discount') }}</dt>
-                            <dd class="text-red-400">-{{ app_money_format($discount) }}</dd>
-                </div>
-                        <div class="flex justify-between items-center text-lg font-semibold text-white bg-sage/10 rounded-xl px-4 py-3 border border-sage/30">
-                            <dt class="text-white">{{ __('messages.Total') }}</dt>
-                            <dd class="text-white">{{ app_money_format($total) }}</dd>
-                </div>
-            </dl>
+            </x-container>
+        </section>
 
-                    <div class="mt-6 flex flex-wrap items-center gap-4 text-sage">
-                <form method="POST" action="{{ route('frontend.cart.clear') }}">
-                    @csrf
-                            <button type="submit" class="px-4 py-2 border border-sage/30 rounded-lg text-sm hover:bg-sage/10">{{ __('frontend.cart.clear_cart') }}</button>
-                </form>
-
-                <form method="POST" action="{{ route('frontend.discounts.apply-coupon') }}" class="flex items-center gap-2">
-                    @csrf
-                            <label for="code" class="text-sm text-sage/80">{{ __('frontend.cart.coupon_code') }}</label>
-                            <input id="code" name="code" class="rounded-lg border border-sage/30 bg-dark/30 text-white placeholder:text-sage/50" placeholder="{{ __('frontend.cart.enter_code') }}">
-                            <button type="submit" class="px-4 py-2 rounded-lg bg-sage text-dark">{{ __('frontend.cart.apply_coupon') }}</button>
-                </form>
-
-                <form method="POST" action="{{ route('frontend.discounts.remove-coupon') }}">
-                    @csrf
-                            <button type="submit" class="text-sm text-red-400 hover:text-red-300">{{ __('frontend.cart.remove_coupon') }}</button>
-                </form>
-
-                        <div class="w-full flex flex-col sm:flex-row gap-3">
-                            <a href="{{ route('frontend.checkout.index') }}" class="flex-1 inline-flex items-center justify-center px-5 py-3 rounded-full bg-sage text-dark hover:bg-sage/90">
-                                {{ __('frontend.cart.proceed_to_checkout') }}
-                            </a>
-                            <a href="{{ route('frontend.products.index', ['locale' => app()->getLocale()]) ?? '/products' }}" class="flex-1 inline-flex items-center justify-center px-5 py-3 border border-sage/30 rounded-full text-sage hover:bg-sage/10">
+        <x-container class="px-4 py-10">
+            <div class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 lg:grid-cols-12">
+                <section class="col-span-full space-y-5 lg:col-span-8">
+                    @if ($itemsCollection->isEmpty())
+                        <div class="rounded-xl border border-gray-200 bg-white p-10 text-center shadow-sm">
+                            <h2 class="text-xl font-semibold text-gray-900">{{ __('messages.your_cart_is_empty') }}</h2>
+                            <p class="mt-2 text-sm text-gray-600">{{ __('frontend.cart.empty_description') }}</p>
+                            <a
+                                href="{{ \Illuminate\Support\Facades\Route::has('localized.products.index') ? route('localized.products.index', ['locale' => app()->getLocale()]) : route('frontend.products.index') }}"
+                                class="mt-6 inline-flex items-center justify-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary/90"
+                            >
                                 {{ __('frontend.cart.continue_shopping') }}
                             </a>
                         </div>
+                    @else
+                        <div class="space-y-4">
+                            @foreach ($itemsCollection as $item)
+                                @php
+                                    $productName = (string) data_get($item, 'name', __('ui.unknown_product'));
+                                    $unitPrice = (float) data_get($item, 'price', 0);
+                                    $quantity = (int) data_get($item, 'quantity', 0);
+                                    $lineTotal = (float) data_get($item, 'total', $unitPrice * $quantity);
+                                    $imageUrl = data_get($item, 'image');
+                                @endphp
+
+                                <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                                    <div class="flex flex-wrap items-center gap-4 md:flex-nowrap md:justify-between">
+                                        <div class="flex min-w-0 items-center gap-4">
+                                            <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                                                @if (is_string($imageUrl) && $imageUrl !== '')
+                                                    <img src="{{ $imageUrl }}" alt="{{ $productName }}" class="h-full w-full object-cover" loading="lazy" />
+                                                @else
+                                                    <div class="flex h-full w-full items-center justify-center">
+                                                        <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <div class="min-w-0">
+                                                <h3 class="truncate text-base font-semibold text-gray-900">{{ $productName }}</h3>
+                                                <p class="mt-1 text-sm text-gray-600">
+                                                    {{ __('frontend.cart.unit_price', ['price' => app_money_format($unitPrice)]) }}
+                                                </p>
+                                                <p class="mt-2 inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                                                    {{ __('frontend.cart.quantity_label', ['quantity' => $quantity]) }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <p class="text-lg font-semibold text-gray-900">
+                                            {{ \Illuminate\Support\Number::currency($lineTotal, current_currency(), app()->getLocale()) }}
+                                        </p>
+                                    </div>
+                                </article>
+                            @endforeach
+                        </div>
+                    @endif
+                </section>
+
+                <aside class="col-span-full space-y-5 lg:col-span-4 lg:sticky lg:top-24 lg:self-start">
+                    <x-order.right-panel
+                        :items="$orderSummaryItems"
+                        :summary="$summary ?? []"
+                        :item-count="$itemCount"
+                        :show-coupon="(bool) (config('app-features.features.discount') ?? true)"
+                    />
+
+                    <section class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                        <div class="space-y-3">
+                            <a
+                                href="{{ auth()->check() ? route('frontend.checkout.index') : route('register') }}"
+                                class="inline-flex w-full items-center justify-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary/90"
+                            >
+                                {{ __('frontend.cart.proceed_to_checkout') }}
+                            </a>
+
+                            <a
+                                href="{{ \Illuminate\Support\Facades\Route::has('localized.products.index') ? route('localized.products.index', ['locale' => app()->getLocale()]) : route('frontend.products.index') }}"
+                                class="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                            >
+                                {{ __('frontend.cart.continue_shopping') }}
+                            </a>
+
+                            @if ($itemsCollection->isNotEmpty())
+                                <form method="POST" action="{{ route('frontend.cart.clear') }}">
+                                    @csrf
+                                    <button
+                                        type="submit"
+                                        class="inline-flex w-full items-center justify-center rounded-lg border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 transition hover:bg-red-100"
+                                    >
+                                        {{ __('frontend.cart.clear_cart') }}
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </section>
+                </aside>
             </div>
-        </section>
-            </aside>
-        </div>
-    </x-container>
+        </x-container>
     </div>
 </x-layouts.base>

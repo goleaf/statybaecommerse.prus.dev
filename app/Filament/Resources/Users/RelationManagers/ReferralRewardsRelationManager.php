@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\Resources\ReferralRewards\ReferralRewardResource;
 use App\Models\ReferralReward;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -93,18 +93,26 @@ class ReferralRewardsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make()
-                    ->mutateDataUsing(fn (array $data): array => $this->normalizeRewardData($data))
-                    ->using(function (array $data): ReferralReward {
-                        $payload = $this->normalizeRewardData($data);
-                        $payload['user_id'] = $this->getOwnerRecord()->getKey();
-
-                        return ReferralReward::withoutGlobalScopes()->create($payload);
-                    }),
+                Action::make('create')
+                    ->icon('heroicon-m-plus')
+                    ->url(fn (): string => ReferralRewardResource::getUrl('create', [
+                        'user_id'  => $this->getOwnerRecord()->getKey(),
+                        'redirect' => request()->fullUrl(),
+                    ])),
             ])
             ->recordActions([
-                EditAction::make()
-                    ->mutateDataUsing(fn (array $data): array => $this->normalizeRewardData($data)),
+                Action::make('view')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn (ReferralReward $record): string => ReferralRewardResource::getUrl('view', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->url(fn (ReferralReward $record): string => ReferralRewardResource::getUrl('edit', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -216,3 +224,4 @@ class ReferralRewardsRelationManager extends RelationManager
         ];
     }
 }
+

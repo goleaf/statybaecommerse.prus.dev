@@ -40,7 +40,7 @@
         </div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="bg-blue-50 rounded-lg p-4">
                 <h3 class="text-sm font-medium text-blue-600">{{ __('ui.total_users') }}</h3>
                 <p class="text-2xl font-bold text-blue-900">{{ $stats['users'] }}</p>
@@ -56,10 +56,6 @@
             <div class="bg-yellow-50 rounded-lg p-4">
                 <h3 class="text-sm font-medium text-yellow-600">{{ __('messages.brands') }}</h3>
                 <p class="text-2xl font-bold text-yellow-900">{{ $stats['brands'] }}</p>
-            </div>
-            <div class="bg-red-50 rounded-lg p-4">
-                <h3 class="text-sm font-medium text-red-600">{{ __('common.reviews') }}</h3>
-                <p class="text-2xl font-bold text-red-900">{{ $stats['reviews'] }}</p>
             </div>
         </div>
 
@@ -89,7 +85,7 @@
         <!-- Global Stats (Global Cache) -->
         <div class="bg-green-50 rounded-lg p-4 mb-6">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('ui.global_site_statistics_global_cache') }}</h2>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div class="text-center">
                     <p class="text-2xl font-bold text-green-900">{{ $globalSiteStats['total_products'] }}</p>
                     <p class="text-sm text-green-700">{{ __('messages.products') }}</p>
@@ -101,10 +97,6 @@
                 <div class="text-center">
                     <p class="text-2xl font-bold text-green-900">{{ $globalSiteStats['total_brands'] }}</p>
                     <p class="text-sm text-green-700">{{ __('messages.brands') }}</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold text-green-900">{{ number_format($globalSiteStats['average_rating'], 1) }}</p>
-                    <p class="text-sm text-green-700">{{ __('ui.avg_rating') }}</p>
                 </div>
             </div>
             <p class="text-xs text-green-600 mt-2 text-center">

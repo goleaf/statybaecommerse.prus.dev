@@ -126,14 +126,7 @@
 
         <!-- Footer -->
         <div class="px-4 py-3 border-t border-gray-200 bg-gray-50">
-            @if($isAuthenticated && Route::has('account.notifications'))
-                <a
-                    href="{{ route('account.notifications') }}"
-                    class="block text-center text-sm text-indigo-600 hover:text-indigo-500 font-medium"
-                >
-                    {{ __('ui.view_all_notifications') }}
-                </a>
-            @elseif(!$isAuthenticated && Route::has('login'))
+            @if(!$isAuthenticated && Route::has('login'))
                 <a
                     href="{{ route('login') }}"
                     class="block text-center text-sm text-indigo-600 hover:text-indigo-500 font-medium"

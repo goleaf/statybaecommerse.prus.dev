@@ -55,6 +55,7 @@ class OrderForm
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload()
+                            ->default(static fn (): ?int => request()->integer('user_id') ?: null)
                             ->live()
                             ->afterStateUpdated(function ($state, Set $set) {
                                 if (! $state) {

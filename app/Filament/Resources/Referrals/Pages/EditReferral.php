@@ -34,24 +34,22 @@ class EditReferral extends EditRecord
         return true;
     }
 
-    /**
-     * Scope custom styling hooks to the referral edit page only.
-     *
-     * @return array<int, string>
-     */
-    public function getPageClasses(): array
-    {
-        return [
-            ...parent::getPageClasses(),
-            'fi-referrals-edit-page',
-        ];
-    }
-
     protected function getHeaderActions(): array
     {
         return [
             DeleteAction::make(),
         ];
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        $redirectUrl = request()->query('redirect');
+
+        if (is_string($redirectUrl) && $redirectUrl !== '') {
+            return $redirectUrl;
+        }
+
+        return parent::getRedirectUrl();
     }
 
     private function normalizeLocalizedText(mixed $state): ?string

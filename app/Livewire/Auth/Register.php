@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire\Auth;
 
 use App\Livewire\Forms\RegistrationForm;
+use App\Services\Cart\CartService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -21,7 +23,14 @@ final class Register extends Component
 
     public function register(): void
     {
-        $this->registrationForm->register();
+        $previousSessionId = (string) Session::getId();
+        $user = $this->registrationForm->register();
+
+        app(CartService::class)->claimSessionCartForUser(
+            userId: (int) $user->getAuthIdentifier(),
+            previousSessionId: $previousSessionId,
+            currentSessionId: (string) Session::getId(),
+        );
 
         $this->redirect(route('account.index', absolute: false), navigate: true);
     }

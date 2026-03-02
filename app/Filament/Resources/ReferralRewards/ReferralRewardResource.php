@@ -7,6 +7,7 @@ namespace App\Filament\Resources\ReferralRewards;
 use App\Filament\Resources\ReferralRewards\Pages\CreateReferralReward;
 use App\Filament\Resources\ReferralRewards\Pages\EditReferralReward;
 use App\Filament\Resources\ReferralRewards\Pages\ListReferralRewards;
+use App\Filament\Resources\ReferralRewards\Pages\ViewReferralReward;
 use App\Filament\Resources\ReferralRewards\Schemas\ReferralRewardForm;
 use App\Filament\Resources\ReferralRewards\Tables\ReferralRewardsTable;
 use App\Models\ReferralReward;
@@ -46,6 +47,7 @@ class ReferralRewardResource extends Resource
         return [
             'index'  => ListReferralRewards::route('/'),
             'create' => CreateReferralReward::route('/create'),
+            'view'   => ViewReferralReward::route('/{record}'),
             'edit'   => EditReferralReward::route('/{record}/edit'),
         ];
     }

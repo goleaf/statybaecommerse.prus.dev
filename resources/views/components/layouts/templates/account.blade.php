@@ -41,17 +41,7 @@
                             <span class="truncate">{{ __('frontend.account.navigation.addresses') }}</span>
                         </a>
 
-
-                        <!-- Notifications -->
-                        <a href="{{ route('account.notifications') }}" 
-                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors @if(request()->routeIs('account.notifications*')) bg-gray-100 text-gray-900 @else text-gray-700 hover:bg-gray-50 hover:text-gray-900 @endif">
-                            <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 @if(request()->routeIs('account.notifications*')) text-gray-700 @else text-gray-400 group-hover:text-gray-500 @endif" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-                            </svg>
-                            <span class="truncate">{{ __('frontend.account.navigation.notifications') }}</span>
-                        </a>
-
-                        <!-- Referrals -->
+                        {{-- Referrals link disabled by request.
                         <a href="{{ route('referrals.index') }}" 
                            class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors @if(request()->routeIs('referrals.*')) bg-gray-100 text-gray-900 @else text-gray-700 hover:bg-gray-50 hover:text-gray-900 @endif">
                             <svg class="flex-shrink-0 -ml-1 mr-3 h-6 w-6 @if(request()->routeIs('referrals.*')) text-gray-700 @else text-gray-400 group-hover:text-gray-500 @endif" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -59,6 +49,7 @@
                             </svg>
                             <span class="truncate">{{ __('frontend.account.navigation.referrals') }}</span>
                         </a>
+                        --}}
                     </div>
 
                     <div class="mt-8">
@@ -110,12 +101,11 @@
                             <a href="{{ route('account.addresses') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors @if(request()->routeIs('account.addresses*')) bg-gray-100 text-gray-900 @else text-gray-700 hover:bg-gray-50 hover:text-gray-900 @endif">
                                 <span>{{ __('frontend.account.navigation.addresses') }}</span>
                             </a>
-                            <a href="{{ route('account.notifications') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors @if(request()->routeIs('account.notifications*')) bg-gray-100 text-gray-900 @else text-gray-700 hover:bg-gray-50 hover:text-gray-900 @endif">
-                                <span>{{ __('frontend.account.navigation.notifications') }}</span>
-                            </a>
+                            {{-- Referrals mobile link disabled by request.
                             <a href="{{ route('referrals.index') }}" class="group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors @if(request()->routeIs('referrals.*')) bg-gray-100 text-gray-900 @else text-gray-700 hover:bg-gray-50 hover:text-gray-900 @endif">
                                 <span>{{ __('frontend.account.navigation.referrals') }}</span>
                             </a>
+                            --}}
                         </div>
                     </div>
                 </div>

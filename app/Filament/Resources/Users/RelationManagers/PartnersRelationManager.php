@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\Resources\Partners\PartnerResource;
 use App\Models\PartnerTier;
-use Filament\Actions\AttachAction;
+use App\Models\Partner;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -78,6 +78,7 @@ class PartnersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
@@ -113,18 +114,26 @@ class PartnersRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                CreateAction::make(),
-                AttachAction::make()
-                    ->preloadRecordSelect()
-                    ->recordSelectSearchColumns(['name', 'code', 'contact_email', 'contact_phone'])
-                    ->recordSelectOptionsQuery(
-                        static fn (Builder $query): Builder => $query
-                            ->withoutGlobalScopes()
-                            ->orderBy('name'),
-                    ),
+                Action::make('create')
+                    ->icon('heroicon-m-plus')
+                    ->url(fn (): string => PartnerResource::getUrl('create', [
+                        'attach_user_id' => $this->getOwnerRecord()->getKey(),
+                        'redirect'       => request()->fullUrl(),
+                    ])),
             ])
             ->recordActions([
-                EditAction::make(),
+                Action::make('view')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn (Partner $record): string => PartnerResource::getUrl('view', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->url(fn (Partner $record): string => PartnerResource::getUrl('edit', [
+                        'record'   => $record,
+                        'redirect' => request()->fullUrl(),
+                    ])),
                 DetachAction::make(),
             ])
             ->toolbarActions([
@@ -134,3 +143,4 @@ class PartnersRelationManager extends RelationManager
             ]);
     }
 }
+

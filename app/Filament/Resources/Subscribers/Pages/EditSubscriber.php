@@ -18,4 +18,15 @@ class EditSubscriber extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        $redirectUrl = request()->query('redirect');
+
+        if (is_string($redirectUrl) && $redirectUrl !== '') {
+            return $redirectUrl;
+        }
+
+        return parent::getRedirectUrl();
+    }
 }

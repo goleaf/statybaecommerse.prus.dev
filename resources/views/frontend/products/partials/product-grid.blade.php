@@ -22,12 +22,8 @@
                 </div>
 
                 <div class="flex flex-1 flex-col gap-3 p-5">
-                    <div class="flex items-center justify-between text-xs font-medium uppercase tracking-wide text-gray-500">
+                    <div class="text-xs font-medium uppercase tracking-wide text-gray-500">
                         <span>{{ optional($product->brand)->name }}</span>
-                        <span class="flex items-center gap-1 text-amber-500">
-                            <x-untitledui-star class="h-4 w-4" />
-                            <span>{{ number_format($product->average_rating, 1) }}</span>
-                        </span>
                     </div>
 
                     <h3 class="text-lg font-semibold text-gray-900 line-clamp-2 group-hover:text-indigo-600">

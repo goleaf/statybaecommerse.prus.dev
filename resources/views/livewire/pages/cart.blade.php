@@ -153,7 +153,7 @@
                             </div>
 
                             <div class="grid gap-3 sm:grid-cols-2">
-                                <a href="{{ route('frontend.checkout.index') }}"
+                                <a href="{{ auth()->check() ? route('frontend.checkout.index') : route('register') }}"
                                    class="inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition">
                                     {{ __('translations.proceed_to_checkout') }}
                                 </a>

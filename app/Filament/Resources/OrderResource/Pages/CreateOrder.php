@@ -39,6 +39,14 @@ class CreateOrder extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        if (! is_numeric($data['user_id'] ?? null)) {
+            $requestedUserId = request()->integer('user_id');
+
+            if ($requestedUserId > 0) {
+                $data['user_id'] = $requestedUserId;
+            }
+        }
+
         $this->serviceAttachments = $data['services'] ?? [];
 
         unset($data['services']);
@@ -79,5 +87,16 @@ class CreateOrder extends CreateRecord
         }
 
         $order->services()->syncWithoutDetaching($payload);
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        $redirectUrl = request()->query('redirect');
+
+        if (is_string($redirectUrl) && $redirectUrl !== '') {
+            return $redirectUrl;
+        }
+
+        return parent::getRedirectUrl();
     }
 }

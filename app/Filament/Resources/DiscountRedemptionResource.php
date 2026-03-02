@@ -91,7 +91,7 @@ class DiscountRedemptionResource extends Resource
                     )
                     ->searchable()
                     ->preload()
-                    ->default(static fn (): ?int => Auth::id()),
+                    ->default(static fn (): ?int => request()->integer('user_id') ?: Auth::id()),
                 TextInput::make('amount_saved')
                     ->numeric()
                     ->required()

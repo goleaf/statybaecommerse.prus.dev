@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Support\Frontend\DataProviders\BrandCatalogueDataProvider;
 use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
 use App\Support\Frontend\DataProviders\ProductCatalogueDataProvider;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
@@ -50,10 +51,25 @@ final class ProductController extends Controller
         ]));
     }
 
-    public function show(Product $product): View
+    public function show(Product $product): RedirectResponse
     {
-        $data = $this->dataProvider->getProductDetailData($product);
+        $locale = app()->getLocale();
+        if (! is_string($locale) || $locale === '') {
+            $locale = config('app.locale', 'lt');
+        }
 
-        return view('frontend.products.show', $data);
+        $productSlug = $product->slug ?? (string) $product->getRouteKey();
+
+        if (method_exists($product, 'trans')) {
+            $translatedSlug = $product->trans('slug');
+            if (is_string($translatedSlug) && $translatedSlug !== '') {
+                $productSlug = $translatedSlug;
+            }
+        }
+
+        return redirect()->route('localized.products.show', [
+            'locale'  => $locale,
+            'product' => $productSlug,
+        ]);
     }
 }

@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Referrals;
 use App\Filament\Resources\Referrals\Pages\CreateReferral;
 use App\Filament\Resources\Referrals\Pages\EditReferral;
 use App\Filament\Resources\Referrals\Pages\ListReferrals;
+use App\Filament\Resources\Referrals\Pages\ViewReferral;
 use App\Filament\Resources\Referrals\RelationManagers\ReferralCampaignsRelationManager;
 use App\Filament\Resources\Referrals\RelationManagers\ReferralCodesRelationManager;
 use App\Filament\Resources\Referrals\RelationManagers\ReferralCodeStatisticsRelationManager;
@@ -62,6 +63,7 @@ class ReferralResource extends Resource
         return [
             'index'  => ListReferrals::route('/'),
             'create' => CreateReferral::route('/create'),
+            'view'   => ViewReferral::route('/{record}'),
             'edit'   => EditReferral::route('/{record}/edit'),
         ];
     }

@@ -25,6 +25,7 @@ final class ReferralRewardForm
                 ->relationship('user', 'name')
                 ->searchable()
                 ->preload()
+                ->default(static fn (): ?int => request()->integer('user_id') ?: null)
                 ->required(),
             Select::make('order_id')
                 ->relationship('order', 'id')

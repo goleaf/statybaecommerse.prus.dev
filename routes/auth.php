@@ -48,7 +48,5 @@ Route::middleware('auth')->group(function (): void {
             return redirect()->route('account.orders.detail', ['number' => $number]);
         })->name('order.show');
 
-        // Notifications page (graceful if DB notifications not set up)
-        Route::get('notifications', \App\Livewire\Pages\Account\Notifications::class)->name('notifications');
     });
 });

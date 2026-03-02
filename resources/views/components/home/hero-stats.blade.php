@@ -19,8 +19,6 @@
                 :products="$metrics['products_count'] ?? 0"
                 :categories="$metrics['categories_count'] ?? 0"
                 :brands="$metrics['brands_count'] ?? 0"
-                :reviews="$metrics['reviews_count'] ?? 0"
-                :rating="$metrics['avg_rating'] ?? 0"
             />
         </div>
     </div>

@@ -21,6 +21,42 @@ final class CartService
 
     public function __construct(private readonly SessionStore $session) {}
 
+    /**
+     * Attach cart rows from a guest session to an authenticated customer.
+     */
+    public function claimSessionCartForUser(int $userId, string $previousSessionId, string $currentSessionId): void
+    {
+        if ($userId <= 0 || $currentSessionId === '') {
+            return;
+        }
+
+        $sessionIds = $this->normalizeSessionIds(
+            $currentSessionId,
+            $previousSessionId !== $currentSessionId ? $previousSessionId : null
+        );
+
+        DB::transaction(function () use ($userId, $sessionIds, $currentSessionId): void {
+            CartItem::withoutGlobalScopes()
+                ->where('user_id', $userId)
+                ->where(function (Builder $query) use ($currentSessionId): void {
+                    $query->whereNull('session_id')
+                        ->orWhere('session_id', '!=', $currentSessionId);
+                })
+                ->update(['session_id' => $currentSessionId]);
+
+            if ($sessionIds !== []) {
+                CartItem::withoutGlobalScopes()
+                    ->whereIn('session_id', $sessionIds)
+                    ->update([
+                        'user_id'    => $userId,
+                        'session_id' => $currentSessionId,
+                    ]);
+            }
+
+            $this->consolidateUserCartRows($userId, $currentSessionId);
+        });
+    }
+
     public function clear(?int $userId, string $sessionId, ?string $fallbackSessionId = null): void
     {
         if ($fallbackSessionId === null) {
@@ -573,6 +609,57 @@ final class CartService
     private function summaryCacheKey(?int $userId, string $sessionId): string
     {
         return 'cart.summary.' . md5($sessionId . '|' . ($userId ?? 'guest'));
+    }
+
+    private function consolidateUserCartRows(int $userId, string $sessionId): void
+    {
+        $cartRows = CartItem::withoutGlobalScopes()
+            ->where('user_id', $userId)
+            ->orderBy('id')
+            ->get();
+
+        if ($cartRows->isEmpty()) {
+            return;
+        }
+
+        $cartRows
+            ->groupBy(static fn (CartItem $item): string => implode('|', [
+                (string) ($item->product_id ?? 0),
+                (string) ($item->variant_id ?? 0),
+                (string) ($item->product_variant_id ?? 0),
+            ]))
+            ->each(function (Collection $group) use ($userId, $sessionId): void {
+                /** @var CartItem $primary */
+                $primary = $group->first();
+
+                if ($primary === null) {
+                    return;
+                }
+
+                if ($group->count() > 1) {
+                    $mergedQuantity = 0;
+                    $minimumQuantity = max(1, (int) ($primary->minimum_quantity ?? 1));
+
+                    foreach ($group as $row) {
+                        $mergedQuantity += max(1, (int) ($row->quantity ?? 1));
+                        $minimumQuantity = max($minimumQuantity, (int) ($row->minimum_quantity ?? 1), 1);
+
+                        if ($row->getKey() === $primary->getKey()) {
+                            continue;
+                        }
+
+                        $row->delete();
+                    }
+
+                    $primary->quantity = $mergedQuantity;
+                    $primary->minimum_quantity = $minimumQuantity;
+                }
+
+                $primary->user_id = $userId;
+                $primary->session_id = $sessionId;
+                $primary->synchronizePriceAttributes();
+                $primary->save();
+            });
     }
 
     private function extractNullableInt(mixed $value): ?int

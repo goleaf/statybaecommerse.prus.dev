@@ -332,7 +332,7 @@
                                 </div>
                             @endif
                         </div>
-                    </section>`r`n
+                    </section>
                 </div>
 
                 <div class="lg:col-span-5 space-y-6">

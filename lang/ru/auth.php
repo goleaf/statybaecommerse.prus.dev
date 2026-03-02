@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 return [
-    'failed'     => 'auth.failed',
-    'password'   => 'auth.password',
-    'throttle'   => 'auth.throttle',
-    'two_factor' => 'auth.two_factor',
+    'failed'     => 'Введенные учетные данные не совпадают с нашими записями.',
+    'password'   => 'Указан неверный пароль.',
+    'throttle'   => 'Слишком много попыток входа. Повторите через :seconds сек.',
+    'two_factor' => 'Указан неверный код двухфакторной аутентификации.',
     'ui'         => [
         'common' => [
             'and'             => 'и',

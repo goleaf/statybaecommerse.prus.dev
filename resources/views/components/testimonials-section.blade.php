@@ -2,7 +2,6 @@
     'testimonials' => null,
     'title' => null,
     'subtitle' => null,
-    'showRatings' => true,
     'showAvatars' => true,
     'autoplay' => true,
     'autoplayInterval' => 5000,
@@ -11,14 +10,13 @@
 
 @php
     $title = $title ?? __('ui.what_our_customers_say');
-    $subtitle = $subtitle ?? __('ui.read_reviews_from_satisfied_customers_who_love_our_products_and_service');
+    $subtitle = $subtitle ?? '';
     $testimonials =
         $testimonials ??
         collect([
             [
                 'name' => __('frontend.testimonials.defaults.customer_1.name'),
                 'location' => __('frontend.testimonials.defaults.customer_1.location'),
-                'rating' => 5,
                 'text' => __('ui.the_quality_of_products_exceeded_my_expectations_fast_shipping_and_excellent_customer_service_i_will_definitely_order_again',
                 ),
                 'avatar' => null,
@@ -28,7 +26,6 @@
             [
                 'name' => __('frontend.testimonials.defaults.customer_2.name'),
                 'location' => __('frontend.testimonials.defaults.customer_2.location'),
-                'rating' => 5,
                 'text' => __('ui.outstanding_customer_support_and_the_product_arrived_in_perfect_condition_highly_recommended_for_anyone_looking_for_quality_items',
                 ),
                 'avatar' => null,
@@ -38,7 +35,6 @@
             [
                 'name' => __('frontend.testimonials.defaults.customer_3.name'),
                 'location' => __('frontend.testimonials.defaults.customer_3.location'),
-                'rating' => 4,
                 'text' => __('ui.great_selection_of_products_and_competitive_prices_the_checkout_process_was_smooth_and_i_received_my_order_quickly',
                 ),
                 'avatar' => null,
@@ -48,7 +44,6 @@
             [
                 'name' => __('frontend.testimonials.defaults.customer_4.name'),
                 'location' => __('frontend.testimonials.defaults.customer_4.location'),
-                'rating' => 5,
                 'text' => __('ui.excellent_shopping_experience_from_start_to_finish_the_product_descriptions_were_accurate_and_the_quality_is_top_notch',
                 ),
                 'avatar' => null,
@@ -58,7 +53,6 @@
             [
                 'name' => __('frontend.testimonials.defaults.customer_5.name'),
                 'location' => __('frontend.testimonials.defaults.customer_5.location'),
-                'rating' => 5,
                 'text' => __('ui.ive_been_a_customer_for_over_a_year_now_and_im_always_impressed_with_the_service_fast_delivery_and_great_products'),
                 'avatar' => null,
                 'product' => __('frontend.testimonials.defaults.customer_5.product'),
@@ -67,7 +61,6 @@
             [
                 'name' => __('frontend.testimonials.defaults.customer_6.name'),
                 'location' => __('frontend.testimonials.defaults.customer_6.location'),
-                'rating' => 4,
                 'text' => __('ui.good_variety_of_products_and_reasonable_prices_the_customer_service_team_was_very_helpful_when_i_had_questions',
                 ),
                 'avatar' => null,
@@ -86,7 +79,9 @@
         {{-- Header --}}
         <div class="text-center mb-12">
             <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">{{ $title }}</h2>
-            <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ $subtitle }}</p>
+            @if ($subtitle !== '')
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">{{ $subtitle }}</p>
+            @endif
         </div>
 
         {{-- Testimonials Carousel --}}
@@ -118,29 +113,16 @@
                                 @foreach ($chunk as $testimonial)
                                     <div
                                          class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-large transition-shadow duration-300">
-                                        {{-- Rating --}}
-                                        @if ($showRatings)
-                                            <div class="flex items-center mb-4">
-                                                <div class="flex items-center">
-                                                    @for ($i = 1; $i <= 5; $i++)
-                                                        <svg class="w-5 h-5 {{ $i <= $testimonial['rating'] ? 'text-yellow-400' : 'text-gray-300' }}"
-                                                             fill="currentColor" viewBox="0 0 20 20">
-                                                            <path
-                                                                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                                                        </svg>
-                                                    @endfor
-                                                </div>
-                                                @if ($testimonial['verified'])
-                                                    <span
-                                                          class="ml-2 inline-flex items-center gap-1 text-xs text-green-600 font-medium">
-                                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                                            <path fill-rule="evenodd"
-                                                                  d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                                  clip-rule="evenodd" />
-                                                        </svg>
-                                                        {{ __('ui.verified') }}
-                                                    </span>
-                                                @endif
+                                        @if ($testimonial['verified'])
+                                            <div class="mb-4">
+                                                <span class="inline-flex items-center gap-1 text-xs text-green-600 font-medium">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd"
+                                                              d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                              clip-rule="evenodd" />
+                                                    </svg>
+                                                    {{ __('ui.verified') }}
+                                                </span>
                                             </div>
                                         @endif
 
@@ -199,16 +181,10 @@
         </div>
 
         {{-- Stats Section --}}
-        <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
             <div class="text-center">
                 <div class="text-4xl font-bold text-blue-600 mb-2">{{ $testimonials->count() }}+</div>
                 <div class="text-gray-600">{{ __('ui.happy_customers') }}</div>
-            </div>
-            <div class="text-center">
-                <div class="text-4xl font-bold text-blue-600 mb-2">
-                    {{ number_format($testimonials->avg('rating'), 1) }}
-                </div>
-                <div class="text-gray-600">{{ __('ui.average_rating') }}</div>
             </div>
             <div class="text-center">
                 <div class="text-4xl font-bold text-blue-600 mb-2">98%</div>

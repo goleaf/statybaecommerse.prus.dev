@@ -6,7 +6,26 @@ $base = require base_path('vendor/laravel/framework/src/Illuminate/Translation/l
 
 return array_replace_recursive($base, [
     'accepted'   => 'The :attribute field must be accepted.',
+    'regex'      => 'The :attribute format is invalid.',
     'attributes' => [
+        'first_name'            => 'first name',
+        'last_name'             => 'last name',
+        'email'                 => 'email address',
+        'password'              => 'password',
+        'password_confirmation' => 'password confirmation',
+        'loginForm' => [
+            'email'           => 'email address',
+            'password'        => 'password',
+            'captchaToken'    => 'security token',
+            'captchaResponse' => 'security check answer',
+        ],
+        'registrationForm' => [
+            'first_name'            => 'first name',
+            'last_name'             => 'last name',
+            'email'                 => 'email address',
+            'password'              => 'password',
+            'password_confirmation' => 'password confirmation',
+        ],
         'selectedShippingOption' => 'shipping method',
         'selectedPaymentMethod'  => 'payment method',
         'billing'                => [

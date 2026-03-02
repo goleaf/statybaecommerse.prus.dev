@@ -70,21 +70,19 @@
                     ? route('localized.brands.index', ['locale' => $locale])
                     : url('/' . $locale . '/brands'),
             ],
-            [
-                'key' => 'downloads',
-                'label' => __('messages.nav_downloads'),
-                'url' => '#',
-            ],
-            [
-                'key' => 'vendor_catalogs',
-                'label' => __('messages.nav_vendor_catalogs'),
-                'url' => '#',
-            ],
-            [
-                'key' => 'support',
-                'label' => __('messages.nav_support_center'),
-                'url' => 'mailto:eegidia@gmail.com',
-            ],
+            // Downloads menu item disabled by request.
+            // [
+            //     'key' => 'downloads',
+            //     'label' => __('messages.nav_downloads'),
+            //     'url' => '#',
+            // ],
+            // Vendor catalogs menu item disabled by request.
+            // Support center menu item disabled by request.
+            // [
+            //     'key' => 'support',
+            //     'label' => __('messages.nav_support_center'),
+            //     'url' => 'mailto:eegidia@gmail.com',
+            // ],
         ])->filter(fn($link) => !empty($link['url']));
     @endphp
 
@@ -112,12 +110,14 @@
 
             <div class="hidden md:flex items-center gap-5">
                 <x-language-switcher class="!text-dark hover:!text-stone hover:!bg-transparent !p-0" />
+                {{--
                 <a href="#" class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v14H4zM8 9h8M8 13h5" />
                     </svg>
                     <span class="hidden sm:block">{{ __('frontend.header.topbar.news') }}</span>
                 </a>
+                --}}
                 <a href="#" class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -195,7 +195,7 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.749 0-5.353-.62-7.499-1.632z" />
                                         </svg>
-                                        <span class="max-w-[100px] truncate">{{ auth()->user()->name }}</span>
+                                        <span class="header-action-button__user-name max-w-[100px] truncate">{{ auth()->user()->name }}</span>
                                         <svg class="h-4 w-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
                                         </svg>
@@ -215,15 +215,17 @@
                                     @if(Route::has('account.addresses'))
                                         <a href="{{ route('account.addresses') }}" class="block px-4 py-2 text-sm @if(request()->routeIs('account.addresses*')) bg-gray-100 text-gray-900 @else text-gray-700 hover:bg-gray-100 @endif" role="menuitem" tabindex="-1" id="user-menu-item-3">{{ __('frontend.account.navigation.addresses') }}</a>
                                     @endif
-                                    @if(Route::has('account.notifications'))
-                                        <a href="{{ route('account.notifications') }}" class="block px-4 py-2 text-sm @if(request()->routeIs('account.notifications*')) bg-gray-100 text-gray-900 @else text-gray-700 hover:bg-gray-100 @endif" role="menuitem" tabindex="-1" id="user-menu-item-5">{{ __('frontend.account.navigation.notifications') }}</a>
-                                    @endif
+                                    {{-- Notifications dropdown item disabled by request.
+                                    <a href="https://egistatyba.test/account/notifications" class="block px-4 py-2 text-sm  text-gray-700 hover:bg-gray-100 " role="menuitem" tabindex="-1" id="user-menu-item-5">Pranešimai</a>
+                                    --}}
                                     @if(Route::has('referrals.index'))
+                                        {{-- Referrals dropdown item disabled by request.
                                         <a href="{{ route('referrals.index') }}" class="block px-4 py-2 text-sm @if(request()->routeIs('referrals.*')) bg-gray-100 text-gray-900 @else text-gray-700 hover:bg-gray-100 @endif" role="menuitem" tabindex="-1" id="user-menu-item-6">{{ __('frontend.account.navigation.referrals') }}</a>
+                                        --}}
                                     @endif
-                                    <form method="POST" action="{{ route('filament.admin.auth.logout') }}" x-data>
+                                    <form method="POST" action="{{ route('logout') }}" x-data>
                                         @csrf
-                                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" role="menuitem" tabindex="-1" id="user-menu-item-7">
+                                        <button type="submit" class="block w-full cursor-pointer text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50" role="menuitem" tabindex="-1" id="user-menu-item-7">
                                             {{ __('frontend.account.navigation.logout') }}
                                         </button>
                                     </form>
@@ -361,21 +363,15 @@
                                         <p class="capitalize font-normal font-montserrat">{{ __('frontend.account.navigation.addresses') }}</p>
                                     </a>
                                 @endif
-                                @if(Route::has('account.notifications'))
-                                    <a href="{{ route('account.notifications') }}" class="w-full flex items-center gap-5 py-2 transition-colors @if(request()->routeIs('account.notifications*')) text-stone font-semibold @else text-dark hover:text-stone @endif" wire:click="toggleMobileMenu">
-                                        <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
-                                        <p class="capitalize font-normal font-montserrat">{{ __('frontend.account.navigation.notifications') }}</p>
-                                    </a>
-                                @endif
                                 @if(Route::has('referrals.index'))
                                     <a href="{{ route('referrals.index') }}" class="w-full flex items-center gap-5 py-2 transition-colors @if(request()->routeIs('referrals.*')) text-stone font-semibold @else text-dark hover:text-stone @endif" wire:click="toggleMobileMenu">
                                         <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"/></svg>
                                         <p class="capitalize font-normal font-montserrat">{{ __('frontend.account.navigation.referrals') }}</p>
                                     </a>
                                 @endif
-                                <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
+                                <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="w-full flex items-center gap-5 text-red-600 py-2 hover:text-red-700 transition-colors" wire:click="toggleMobileMenu">
+                                    <button type="submit" class="w-full cursor-pointer flex items-center gap-5 text-red-600 py-2 hover:text-red-700 transition-colors" wire:click="toggleMobileMenu">
                                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                                         <p class="capitalize font-normal font-montserrat">{{ __('frontend.account.navigation.logout') }}</p>
                                     </button>

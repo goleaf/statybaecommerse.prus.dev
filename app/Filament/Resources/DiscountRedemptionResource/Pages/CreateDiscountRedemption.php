@@ -17,6 +17,25 @@ class CreateDiscountRedemption extends CreateRecord
      */
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        if (! is_numeric($data['user_id'] ?? null)) {
+            $requestedUserId = request()->integer('user_id');
+
+            if ($requestedUserId > 0) {
+                $data['user_id'] = $requestedUserId;
+            }
+        }
+
         return DiscountRedemptionResource::normalizePayload($data);
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        $redirectUrl = request()->query('redirect');
+
+        if (is_string($redirectUrl) && $redirectUrl !== '') {
+            return $redirectUrl;
+        }
+
+        return parent::getRedirectUrl();
     }
 }

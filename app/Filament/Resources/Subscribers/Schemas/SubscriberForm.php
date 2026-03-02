@@ -27,7 +27,8 @@ class SubscriberForm
                             ->label(__('admin.navigation.users'))
                             ->relationship('user', 'name')
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->default(static fn (): ?int => request()->integer('user_id') ?: null),
                     ])->columns(2),
 
                 Section::make(__('messages.profile'))

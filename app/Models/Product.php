@@ -33,6 +33,7 @@ use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Throwable;
 
 /**
  * Product
@@ -1284,9 +1285,23 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             ->orderBy('id')
             ->get()
             ->map(function (ProductImage $img) {
-            $url = $this->resolvePublicUrl($img->path);
+                $url = $this->resolvePublicUrl($img->path);
+                [$width, $height] = $this->resolveImageDimensions($img->path);
 
-            return ['original' => $url, 'xl' => $url, 'lg' => $url, 'md' => $url, 'sm' => $url, 'xs' => $url, 'alt' => $img->alt_text ?: $this->name, 'title' => $this->name, 'generated' => true];
+                return [
+                    'original'   => $url,
+                    'xl'         => $url,
+                    'lg'         => $url,
+                    'md'         => $url,
+                    'sm'         => $url,
+                    'xs'         => $url,
+                    'alt'        => $img->alt_text ?: $this->name,
+                    'title'      => $this->name,
+                    'generated'  => true,
+                    'is_default' => (bool) $img->is_default,
+                    'width'      => $width,
+                    'height'     => $height,
+                ];
             })->toArray();
     }
 
@@ -1377,6 +1392,47 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
         // Fall back to the public disk URL even if the file is missing so the UI has a consistent path format
         return Storage::disk('public')->url($path);
+    }
+
+    /**
+     * Resolve local image dimensions for product images stored on filesystem disks.
+     *
+     * @return array{0:int,1:int}
+     */
+    private function resolveImageDimensions(string $path): array
+    {
+        if ($path === '') {
+            return [0, 0];
+        }
+
+        $defaultDisk = config('filesystems.default', 'public');
+        $disksToCheck = array_unique([$defaultDisk, 'public']);
+
+        foreach ($disksToCheck as $disk) {
+            $filesystem = Storage::disk($disk);
+
+            if (! $filesystem->exists($path) || ! method_exists($filesystem, 'path')) {
+                continue;
+            }
+
+            try {
+                $absolutePath = $filesystem->path($path);
+            } catch (Throwable) {
+                continue;
+            }
+
+            if (! is_string($absolutePath) || $absolutePath === '' || ! is_file($absolutePath)) {
+                continue;
+            }
+
+            $imageSize = @getimagesize($absolutePath);
+
+            if (is_array($imageSize) && isset($imageSize[0], $imageSize[1])) {
+                return [(int) $imageSize[0], (int) $imageSize[1]];
+            }
+        }
+
+        return [0, 0];
     }
 
     // Translation methods

@@ -176,7 +176,8 @@
                             </div>
                         </div>
                     </div>
-                @endif`r`n            <!-- Sidebar -->
+                @endif
+             <!-- Sidebar -->
             <div class="space-y-6">
                 <!-- Order Summary -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">

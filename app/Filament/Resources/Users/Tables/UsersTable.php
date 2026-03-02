@@ -8,10 +8,9 @@ use App\Enums\ExportType;
 use App\Filament\Actions\RequestExportBulkAction;
 use App\Filament\Resources\UserResource;
 use App\Models\User;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -151,8 +150,12 @@ class UsersTable
             ])
             ->recordUrl(fn (User $record): string => UserResource::getUrl('edit', ['record' => $record]))
             ->recordActions([
-                EditAction::make(),
-                ViewAction::make(),
+                Action::make('view')
+                    ->icon('heroicon-m-eye')
+                    ->url(fn (User $record): string => UserResource::getUrl('view', ['record' => $record])),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->url(fn (User $record): string => UserResource::getUrl('edit', ['record' => $record])),
             ])
             ->bulkActions([
                 RequestExportBulkAction::make(ExportType::USERS),

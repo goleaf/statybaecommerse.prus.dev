@@ -1,14 +1,21 @@
 <div class="product-image-gallery">
     @if ($this->hasImages)
+        @php
+            $currentImage = $this->currentImage;
+            $imageWidth = (int) ($currentImage['width'] ?? 0);
+            $imageHeight = (int) ($currentImage['height'] ?? 0);
+            $isLowResolution = max($imageWidth, $imageHeight) > 0 && max($imageWidth, $imageHeight) < 400;
+        @endphp
+
         {{-- Main Image Display --}}
-        <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 relative group">
-            @if ($this->currentImage)
+        <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 relative group flex items-center justify-center">
+            @if ($currentImage)
                 <img
-                     src="{{ $this->currentImage[$this->imageSize] ?? $this->currentImage['md'] }}"
-                     srcset="{{ $this->currentImage['xs'] }} 150w, {{ $this->currentImage['sm'] }} 300w, {{ $this->currentImage['md'] }} 500w, {{ $this->currentImage['lg'] }} 800w, {{ $this->currentImage['xl'] }} 1200w"
+                     src="{{ $currentImage[$this->imageSize] ?? $currentImage['md'] }}"
+                     srcset="{{ $currentImage['xs'] }} 150w, {{ $currentImage['sm'] }} 300w, {{ $currentImage['md'] }} 500w, {{ $currentImage['lg'] }} 800w, {{ $currentImage['xl'] }} 1200w"
                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
-                     alt="{{ $this->currentImage['alt'] }}"
-                     class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-zoom-in"
+                     alt="{{ $currentImage['alt'] }}"
+                     class="{{ $isLowResolution ? 'max-h-full max-w-full object-contain' : 'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105' }} cursor-zoom-in"
                      loading="lazy"
                      wire:click="toggleLightbox" 
                      wire:confirm="{{ __('translations.confirm_toggle_lightbox') }}" />
@@ -62,13 +69,6 @@
                 @endforeach
             </div>
         @endif
-
-        {{-- Image Information --}}
-        <div class="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div class="text-sm text-gray-600 dark:text-gray-400">
-                {{ __('translations.images') }}: {{ count($this->images) }}
-            </div>
-        </div>
 
         {{-- Lightbox Modal --}}
         @if ($showLightbox && $this->currentImage)

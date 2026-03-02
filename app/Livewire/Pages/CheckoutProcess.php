@@ -15,6 +15,7 @@ use App\Models\Country;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderShipping;
+use App\Models\Product;
 use App\Models\ShippingOption;
 use App\Models\User;
 use App\Services\Cart\CartLifecycleService;
@@ -23,7 +24,9 @@ use App\Services\Pricing\PriceCalculator;
 use App\Services\Shipping\ShippingOptionResolver;
 use Exception;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
@@ -342,8 +345,103 @@ final class CheckoutProcess extends Component
      */
     private function getCartItems(): EloquentCollection
     {
-        // Retrieve cart items with their related products so shipping logic can inspect weights and totals.
-        return CartItem::with('product')->where('session_id', Session::getId())->get();
+        $sessionId = (string) Session::getId();
+        $authId = auth()->id();
+        $userId = is_numeric($authId) ? (int) $authId : null;
+
+        // Resolve persisted cart rows using both ownership contexts so authenticated
+        // users keep seeing items that were attached before/after session rotation.
+        $items = CartItem::withoutGlobalScopes()
+            ->with(['product', 'productVariant', 'variant'])
+            ->where(function (Builder $query) use ($sessionId, $userId): void {
+                $hasCondition = false;
+
+                if ($sessionId !== '') {
+                    $query->where('session_id', $sessionId);
+                    $hasCondition = true;
+                }
+
+                if ($userId !== null) {
+                    if ($hasCondition) {
+                        $query->orWhere('user_id', $userId);
+                    } else {
+                        $query->where('user_id', $userId);
+                        $hasCondition = true;
+                    }
+                }
+
+                if (! $hasCondition) {
+                    $query->whereRaw('1 = 0');
+                }
+            })
+            ->orderBy('created_at')
+            ->get();
+
+        if ($items->isNotEmpty()) {
+            return $items;
+        }
+
+        // Fall back to the serialized session cart so checkout stays in sync with
+        // `/lt/cart` even when rows have not been persisted yet.
+        $sessionCart = Session::get('cart', []);
+        if (! is_array($sessionCart) || $sessionCart === []) {
+            return new EloquentCollection;
+        }
+
+        $productIds = collect($sessionCart)
+            ->pluck('product_id')
+            ->filter(static fn ($value): bool => is_numeric($value) && (int) $value > 0)
+            ->map(static fn ($value): int => (int) $value)
+            ->unique()
+            ->values();
+
+        /** @var SupportCollection<int, Product> $products */
+        $products = Product::withoutGlobalScopes()
+            ->whereIn('id', $productIds)
+            ->get()
+            ->keyBy('id');
+
+        $hydrated = collect($sessionCart)
+            ->filter(static fn ($item): bool => is_array($item) && isset($item['product_id']) && is_numeric($item['product_id']))
+            ->map(static function (array $item) use ($products): CartItem {
+                $productId = (int) $item['product_id'];
+                $price = isset($item['price']) && is_numeric($item['price'])
+                    ? (float) $item['price']
+                    : (float) ($item['unit_price'] ?? 0.0);
+                $quantity = isset($item['quantity']) && is_numeric($item['quantity'])
+                    ? max(1, (int) $item['quantity'])
+                    : 1;
+
+                $model = CartItem::make([
+                    'product_id'         => $productId,
+                    'product_variant_id' => isset($item['product_variant_id']) && is_numeric($item['product_variant_id'])
+                        ? (int) $item['product_variant_id']
+                        : null,
+                    'variant_id' => isset($item['variant_id']) && is_numeric($item['variant_id'])
+                        ? (int) $item['variant_id']
+                        : null,
+                    'quantity' => $quantity,
+                    'price' => $price,
+                    'unit_price' => $price,
+                    'product_snapshot' => [
+                        'name'  => $item['name'] ?? null,
+                        'sku'   => $item['sku'] ?? null,
+                        'image' => $item['image'] ?? null,
+                    ],
+                    'notes' => $item['notes'] ?? null,
+                ]);
+
+                $product = $products->get($productId);
+                if ($product instanceof Product) {
+                    $model->setRelation('product', $product);
+                }
+
+                return $model;
+            })
+            ->values()
+            ->all();
+
+        return new EloquentCollection($hydrated);
     }
 
     /**

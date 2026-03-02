@@ -60,10 +60,6 @@
                 </div>
             @endif
 
-            {{-- WebP Format Badge --}}
-            <div class="absolute top-2 left-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
-                WebP
-            </div>
         @else
             {{-- No Image Placeholder --}}
             <div class="w-full h-full bg-gray-200 dark:bg-gray-700 flex flex-col items-center justify-center">

@@ -312,7 +312,7 @@
 
 <script>
     function orderTracking() {
-        return {`r`n
+        return {
             reorder() {
                 // Reorder logic
                 fetch('/orders/{{ $order->id ?? 0 }}/reorder', {

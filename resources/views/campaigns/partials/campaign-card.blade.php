@@ -11,7 +11,7 @@
             @if($featured)
                 <div class="absolute top-2 right-2">
                     <span class="bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-semibold">
-                        <i class="fas fa-star mr-1"></i>{{ __('campaigns.featured.title') }}
+                        {{ __('campaigns.featured.title') }}
                     </span>
                 </div>
             @endif
@@ -45,7 +45,6 @@
             
             @if($campaign->display_priority > 0)
                 <div class="flex items-center text-yellow-500 ml-2">
-                    <i class="fas fa-star text-sm"></i>
                     <span class="text-xs ml-1">{{ $campaign->display_priority }}</span>
                 </div>
             @endif

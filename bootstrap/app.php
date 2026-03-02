@@ -268,12 +268,26 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     return response()->json(['message' => $exception->getMessage()], 401);
                 }
 
-                if (Route::has('filament.admin.auth.login')) {
-                    // Mirror Filament's default behaviour by redirecting guests to the admin login screen.
+                $routeName = (string) optional($request->route())->getName();
+                $path = ltrim((string) $request->path(), '/');
+                $isAdminRequest = str_starts_with($path, 'admin')
+                    || str_starts_with($routeName, 'filament.admin.')
+                    || str_starts_with($routeName, 'admin.');
+                $isFrontendCheckoutRequest = str_starts_with($path, 'checkout')
+                    || str_starts_with($routeName, 'frontend.checkout.')
+                    || $routeName === 'checkout.index';
+
+                if ($isAdminRequest && Route::has('filament.admin.auth.login')) {
+                    // Keep admin routes on Filament's login page.
                     return redirect()->guest(route('filament.admin.auth.login'));
                 }
 
-                // Fallback to the default login route so other guards keep working in tests.
+                if ($isFrontendCheckoutRequest && Route::has('register')) {
+                    // When guests attempt checkout, send them to storefront registration first.
+                    return redirect()->guest(route('register'));
+                }
+
+                // Fallback to the default login route for other protected storefront pages.
                 return redirect()->guest(Route::has('login') ? route('login') : '/login');
             }
 

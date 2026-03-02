@@ -33,6 +33,17 @@
     $returnsUrl = \Illuminate\Support\Facades\Route::has('frontend.legal.returns')
         ? route('frontend.legal.returns')
         : (\Illuminate\Support\Facades\Route::has('legal.show') ? route('legal.show', 'refund') : url('/legal/returns'));
+    $footerLogoUrl = asset('images/logo.png');
+
+    if (file_exists(public_path('images/logo-white.png'))) {
+        $footerLogoUrl = asset('images/logo-white.png');
+    } elseif (\App\Support\ViteManifest::isPopulated()) {
+        try {
+            $footerLogoUrl = \Illuminate\Support\Facades\Vite::asset('resources/images/logo-white.png');
+        } catch (\Throwable $exception) {
+            // Keep fallback logo URL when the Vite manifest does not include this asset.
+        }
+    }
 @endphp
 
 <footer aria-labelledby="footer-heading" class="bg-dark text-sage relative">
@@ -50,7 +61,7 @@
             <div class="md:col-span-4 text-center md:text-left">
                 <div class="mb-6 text-center md:text-left">
                     <a href="{{ $homeUrl }}" class="group" aria-label="{{ __('messages.frontend') }}">
-                        <img src="{{ asset('images/logo-white.png') }}" alt="{{ config('app.name') }}"
+                        <img src="{{ $footerLogoUrl }}" alt="{{ config('app.name') }}"
                             class="h-16 w-auto mx-auto md:mx-0 object-contain">
                     </a>
                 </div>

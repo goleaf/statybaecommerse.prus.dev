@@ -178,7 +178,6 @@
                         <option value="price_asc">{{ __('frontend.filters.sort.price_low_high') }}</option>
                         <option value="price_desc">{{ __('frontend.filters.sort.price_high_low') }}</option>
                         <option value="created_at">{{ __('frontend.search_results.sort.newest') }}</option>
-                        <option value="rating">{{ __('frontend.search_results.sort.highest_rated') }}</option>
                     </select>
                 </div>
             </div>

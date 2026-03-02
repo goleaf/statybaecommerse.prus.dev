@@ -78,7 +78,9 @@
                         </a>
                         <a wire:navigate
                            {{-- Preserve cart totals when moving straight into checkout --}}
-                            href="{{ \Illuminate\Support\Facades\Route::has('frontend.checkout.index') ? route('frontend.checkout.index') : '/checkout' }}"
+                            href="{{ auth()->check()
+                                ? (\Illuminate\Support\Facades\Route::has('frontend.checkout.index') ? route('frontend.checkout.index') : '/checkout')
+                                : route('register') }}"
                            class="flex-1 btn-gradient px-4 py-2 rounded-lg text-center font-medium">
                             {{ __('messages.frontend') }}
                         </a>

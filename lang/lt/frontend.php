@@ -1022,6 +1022,38 @@ return [
             'shipping' => 'Pristatymas',
             'terms'    => 'Sąlygos',
         ],
+        'defaults' => [
+            'terms' => [
+                'sections' => [
+                    [
+                        'title' => '1. Sąlygų priėmimas',
+                        'paragraphs' => [
+                            'Naudodamiesi šia svetaine ir pateikdami užsakymus, sutinkate su šiomis sąlygomis bei taikomais teisės aktais.',
+                        ],
+                    ],
+                    [
+                        'title' => '2. Užsakymai ir kainos',
+                        'paragraphs' => [
+                            'Visa produktų informacija ir kainos pateikiamos sąžiningai ir gali būti atnaujinamos be išankstinio įspėjimo.',
+                            'Užsakymas laikomas galutiniu tik po jo patvirtinimo ir sėkmingo apmokėjimo.',
+                        ],
+                    ],
+                    [
+                        'title' => '3. Pristatymas ir grąžinimas',
+                        'paragraphs' => [
+                            'Pristatymo terminai priklauso nuo prekių likučio, vežėjo grafiko ir pristatymo vietos.',
+                            'Grąžinimai vykdomi pagal grąžinimo politiką ir galiojančias vartotojų teises.',
+                        ],
+                    ],
+                    [
+                        'title' => '4. Kontaktai ir pagalba',
+                        'paragraphs' => [
+                            'Jeigu turite klausimų dėl šių sąlygų, susisiekite su mūsų klientų aptarnavimo komanda.',
+                        ],
+                    ],
+                ],
+            ],
+        ],
         'document_unavailable'     => 'Šiuo metu dokumentas „:document“ nepasiekiamas.',
         'last_reviewed'            => 'Atnaujinta',
         'no_documents'             => 'Dokumentų nėra',

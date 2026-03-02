@@ -228,15 +228,6 @@
                                 <span>{{ __('frontend.home.sections.cta.secondary') }}</span>
                             </a>
                         </div>
-                        <div class="flex flex-col gap-3 text-sm text-gray-300 sm:flex-row sm:items-center">
-                            <span class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-200">
-                                <x-untitledui-shield-tick class="h-4 w-4" />
-                                {{ __('frontend.home.sections.cta.review_badge') }}
-                            </span>
-                            <p class="max-w-lg">
-                                {{ __('frontend.home.sections.cta.review_copy') }}
-                            </p>
-                        </div>
                     </div>
                     <div class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-xl backdrop-blur">
                         @php($homeStats = $stats ?? [])
@@ -256,17 +247,7 @@
                                 <dd class="mt-1 text-3xl font-bold text-white">{{ number_format($homeStats['brands_count'] ?? 0) }}</dd>
                                 <p class="mt-1 text-xs text-gray-400">{{ __('frontend.home.stats.brands.caption') }}</p>
                             </div>
-                            <div>
-                                <dt class="text-sm font-semibold text-gray-200">{{ __('frontend.home.stats.reviews.label') }}</dt>
-                                <dd class="mt-1 text-3xl font-bold text-white">{{ number_format($homeStats['reviews_count'] ?? 0) }}</dd>
-                                <p class="mt-1 text-xs text-gray-400">
-                                    {{ __('frontend.home.stats.reviews.caption', ['rating' => number_format($homeStats['avg_rating'] ?? 0, 1)]) }}
-                                </p>
-                            </div>
                         </dl>
-                        <p class="mt-6 text-xs text-gray-400">
-                            {{ __('frontend.home.sections.cta.review_caption', ['count' => number_format($homeStats['reviews_count'] ?? 0)]) }}
-                        </p>
                     </div>
                 </div>
             </div>

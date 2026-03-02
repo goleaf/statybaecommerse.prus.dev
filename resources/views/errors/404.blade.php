@@ -8,10 +8,7 @@
     'searchPlaceholder' => __('frontend.errors.error_404.search_placeholder'),
     'topCategories' => [],
     'topCategoriesTitle' => __('frontend.errors.error_404.top_categories_title'),
-    'primaryAction' => [
-        'label' => __('frontend.errors.actions.go_home'),
-        'url' => url('/'),
-    ],
+    'primaryAction' => false,
     'secondaryAction' => [
         'label' => __('frontend.errors.actions.go_back'),
         'type' => 'back',
