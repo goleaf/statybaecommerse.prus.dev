@@ -355,8 +355,7 @@ final class SingleProduct extends Component
                 'product_snapshot' => [
                     'name'  => $product->name,
                     'sku'   => $product->sku,
-                    'image' => $product->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb')
-                        ?: $product->getFirstMediaUrl(config('media.storage.collection_name')),
+                    'image' => $this->resolveProductCartImage($product),
                 ],
             ]
         );
@@ -365,6 +364,27 @@ final class SingleProduct extends Component
         $this->trackAddToCartHistory($product, $quantity);
         $this->dispatch('add-to-cart', productId: $productId, quantity: $quantity);
         $this->dispatch('cart-updated');
+    }
+
+    private function resolveProductCartImage(Product $product): ?string
+    {
+        $candidates = [
+            $product->main_image,
+            $product->thumbnail,
+            $product->getImageUrl(),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate) && $candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        $collection = (string) config('media.storage.collection_name', 'images');
+        $mediaImage = $product->getFirstMediaUrl($collection, 'thumb')
+            ?: $product->getFirstMediaUrl($collection);
+
+        return is_string($mediaImage) && $mediaImage !== '' ? $mediaImage : null;
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Cart;
 
 use App\Models\CartItem;
+use App\Models\Product;
 use Illuminate\Contracts\Session\Session as SessionStore;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
@@ -320,8 +321,12 @@ final class CartService
                 );
 
                 $image = null;
+                if ($associatedModel instanceof Product) {
+                    $image = $this->resolveProductMainImage($associatedModel);
+                }
+
                 if (is_object($associatedModel) && method_exists($associatedModel, 'getFirstMediaUrl')) {
-                    $image = $associatedModel->getFirstMediaUrl('images');
+                    $image = $image ?: ($associatedModel->getFirstMediaUrl('images') ?: null);
                 }
 
                 $items[] = [
@@ -340,7 +345,11 @@ final class CartService
                 $count += $quantity;
             }
 
-            return $this->finalizeSummary($items, $count, $subtotal);
+            return $this->finalizeSummary(
+                $this->hydrateMissingImagesByProductId($items),
+                $count,
+                $subtotal,
+            );
         } catch (Throwable $throwable) {
             report($throwable);
 
@@ -406,7 +415,11 @@ final class CartService
             $count += $quantity;
         }
 
-        return $this->finalizeSummary($items, $count, $subtotal);
+        return $this->finalizeSummary(
+            $this->hydrateMissingImagesByProductId($items),
+            $count,
+            $subtotal,
+        );
     }
 
     /**
@@ -444,6 +457,11 @@ final class CartService
                     $query->orWhere('user_id', $userId);
                 }
             })
+            ->with([
+                'product' => static function ($query): void {
+                    $query->withoutGlobalScopes()->with('primaryImage');
+                },
+            ])
             ->get();
 
         foreach ($cartItems as $item) {
@@ -455,7 +473,7 @@ final class CartService
             $name = Arr::get($snapshot, 'name');
             $name = is_string($name) ? $name : '';
             $image = Arr::get($snapshot, 'image');
-            $image = is_string($image) ? $image : null;
+            $image = is_string($image) && $image !== '' ? $image : $this->resolveProductMainImage($item->product);
             $attributesSource = $item->getAttribute('attributes');
             if (! is_array($attributesSource) || $attributesSource === []) {
                 $attributesSource = Arr::get($snapshot, 'attributes', []);
@@ -478,7 +496,11 @@ final class CartService
             $count += $quantity;
         }
 
-        return $this->finalizeSummary($items, $count, $subtotal);
+        return $this->finalizeSummary(
+            $this->hydrateMissingImagesByProductId($items),
+            $count,
+            $subtotal,
+        );
     }
 
     /**
@@ -578,6 +600,100 @@ final class CartService
         unset($attributes['variant_id']);
 
         return $attributes;
+    }
+
+    private function resolveProductMainImage(?Product $product): ?string
+    {
+        if (! $product instanceof Product) {
+            return null;
+        }
+
+        $candidates = [
+            $product->main_image,
+            $product->thumbnail,
+            $product->getImageUrl(),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate) && $candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        $collection = (string) config('media.storage.collection_name', 'images');
+        $fromMedia = $product->getFirstMediaUrl($collection, 'thumb')
+            ?: $product->getFirstMediaUrl($collection);
+
+        return is_string($fromMedia) && $fromMedia !== '' ? $fromMedia : null;
+    }
+
+    /**
+     * @param  array<int, array{
+     *     id:int|null,
+     *     product_id:int|null,
+     *     variant_id:int|null,
+     *     name:string,
+     *     price:float,
+     *     quantity:int,
+     *     total:float,
+     *     image:?string,
+     *     attributes: array<string, mixed>
+     * }> $items
+     * @return array<int, array{
+     *     id:int|null,
+     *     product_id:int|null,
+     *     variant_id:int|null,
+     *     name:string,
+     *     price:float,
+     *     quantity:int,
+     *     total:float,
+     *     image:?string,
+     *     attributes: array<string, mixed>
+     * }>
+     */
+    private function hydrateMissingImagesByProductId(array $items): array
+    {
+        $missingIndexesByProductId = [];
+
+        foreach ($items as $index => $item) {
+            $image = $item['image'] ?? null;
+            $productId = $item['product_id'] ?? null;
+
+            if (! is_numeric($productId) || (int) $productId <= 0) {
+                continue;
+            }
+
+            if (is_string($image) && $image !== '') {
+                continue;
+            }
+
+            $missingIndexesByProductId[(int) $productId][] = $index;
+        }
+
+        if ($missingIndexesByProductId === []) {
+            return $items;
+        }
+
+        $products = Product::withoutGlobalScopes()
+            ->with('primaryImage')
+            ->whereIn('id', array_keys($missingIndexesByProductId))
+            ->get()
+            ->keyBy('id');
+
+        foreach ($missingIndexesByProductId as $productId => $indexes) {
+            $product = $products->get($productId);
+            $image = $this->resolveProductMainImage($product instanceof Product ? $product : null);
+
+            if (! is_string($image) || $image === '') {
+                continue;
+            }
+
+            foreach ($indexes as $index) {
+                $items[$index]['image'] = $image;
+            }
+        }
+
+        return $items;
     }
 
     /**

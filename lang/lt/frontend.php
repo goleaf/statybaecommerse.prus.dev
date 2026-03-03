@@ -41,7 +41,7 @@ return [
                 ],
             ],
             'values' => [
-                'items'    => [
+                'items' => [
                     [
                         'description' => 'Kiekvienam projektui parenkame patikimus produktus ir laiko patikrintus techninius sprendimus.',
                         'title'       => 'Kokybė pirmoje vietoje',
@@ -195,6 +195,17 @@ return [
             'sort_by'       => 'Rikiuoti pagal',
             'visit_website' => 'Aplankyti svetainę',
         ],
+    ],
+    'brochures' => [
+        'meta' => [
+            'title'       => 'Atsisiuntimai',
+            'description' => 'Atsisiųskite brošiūras ir kitus su produktais susijusius PDF failus.',
+        ],
+        'heading'           => 'Atsisiuntimai',
+        'subheading'        => 'Peržiūrėkite ir atsisiųskite naujausias brošiūras PDF formatu.',
+        'empty_title'       => 'Atsisiuntimų nėra',
+        'empty_description' => 'Šiuo metu publikuotų brošiūrų failų nėra.',
+        'download_cta'      => 'Atsisiųsti PDF',
     ],
     'buttons' => [
         'back_to_collections' => 'Atgal į kolekcijas',
@@ -1026,27 +1037,27 @@ return [
             'terms' => [
                 'sections' => [
                     [
-                        'title' => '1. Sąlygų priėmimas',
+                        'title'      => '1. Sąlygų priėmimas',
                         'paragraphs' => [
                             'Naudodamiesi šia svetaine ir pateikdami užsakymus, sutinkate su šiomis sąlygomis bei taikomais teisės aktais.',
                         ],
                     ],
                     [
-                        'title' => '2. Užsakymai ir kainos',
+                        'title'      => '2. Užsakymai ir kainos',
                         'paragraphs' => [
                             'Visa produktų informacija ir kainos pateikiamos sąžiningai ir gali būti atnaujinamos be išankstinio įspėjimo.',
                             'Užsakymas laikomas galutiniu tik po jo patvirtinimo ir sėkmingo apmokėjimo.',
                         ],
                     ],
                     [
-                        'title' => '3. Pristatymas ir grąžinimas',
+                        'title'      => '3. Pristatymas ir grąžinimas',
                         'paragraphs' => [
                             'Pristatymo terminai priklauso nuo prekių likučio, vežėjo grafiko ir pristatymo vietos.',
                             'Grąžinimai vykdomi pagal grąžinimo politiką ir galiojančias vartotojų teises.',
                         ],
                     ],
                     [
-                        'title' => '4. Kontaktai ir pagalba',
+                        'title'      => '4. Kontaktai ir pagalba',
                         'paragraphs' => [
                             'Jeigu turite klausimų dėl šių sąlygų, susisiekite su mūsų klientų aptarnavimo komanda.',
                         ],
@@ -1503,6 +1514,13 @@ return [
                 'product'  => 'Telefono dėklas',
             ],
         ],
+    ],
+    'news_page' => [
+        'subtitle'          => 'Naujausi publikuoti straipsniai.',
+        'loading'           => 'Kraunama...',
+        'load_more'         => 'Įkelti daugiau',
+        'no_more_results'   => 'Daugiau rezultatų nėra',
+        'empty_description' => 'Naujienų įrašų nerasta.',
     ],
     'view_cart' => 'Peržiūrėti krepšelį',
 ];

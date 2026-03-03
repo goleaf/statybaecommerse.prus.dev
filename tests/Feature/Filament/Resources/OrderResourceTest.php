@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\PdfFixture;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -230,7 +231,7 @@ it('can generate an invoice pdf from order view header action', function (): voi
     $orderMarker = "order_number:{$order->number};order_id:{$order->getKey()}";
 
     Http::fake([
-        'https://saskaita.vercel.app/api/initiate' => Http::response('%PDF-1.4 header-action-binary', 200, [
+        'https://saskaita.vercel.app/api/initiate' => Http::response(PdfFixture::binary('Order view header action'), 200, [
             'Content-Type' => 'application/pdf',
         ]),
         'https://saskaita.vercel.app/api/actions/list-invoices' => Http::response([

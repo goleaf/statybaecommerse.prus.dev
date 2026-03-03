@@ -113,7 +113,7 @@ final class VariantInventory extends Model
 
     public function supplier(): BelongsTo
     {
-        return $this->belongsTo(Partner::class, 'supplier_id');
+        return $this->belongsTo(Supplier::class, 'supplier_id');
     }
 
     /**

@@ -11,6 +11,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File as FileSystem;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\PdfFixture;
 
 use function Pest\Laravel\artisan;
 
@@ -111,7 +112,7 @@ it('imports legacy disk pdfs and links them to orders when filename contains ord
     ]);
 
     $legacyPath = "documents/{$order->getKey()}_2026-02-27_14-20-00.pdf";
-    Storage::disk(SecureStorage::disk())->put($legacyPath, 'legacy-pdf-content');
+    Storage::disk(SecureStorage::disk())->put($legacyPath, PdfFixture::binary('Legacy linked invoice'));
 
     artisan('orders:invoices:link-pdfs')->assertExitCode(0);
 
@@ -134,7 +135,7 @@ it('imports legacy disk pdfs and links them to orders when filename contains ord
 });
 
 it('creates unresolved legacy pdf report for files that cannot be mapped from storage', function (): void {
-    Storage::disk(SecureStorage::disk())->put('documents/legacy-orphan.pdf', 'dummy-pdf-content');
+    Storage::disk(SecureStorage::disk())->put('documents/legacy-orphan.pdf', PdfFixture::binary('Legacy orphan invoice'));
 
     $reportPath = storage_path('app/reports/test-unresolved-order-invoice-pdfs.csv');
     if (is_file($reportPath)) {

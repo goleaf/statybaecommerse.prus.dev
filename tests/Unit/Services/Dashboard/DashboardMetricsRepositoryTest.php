@@ -203,14 +203,14 @@ final class DashboardMetricsRepositoryTest extends TestCase
         Product::factory()->create([
             'manage_stock'        => true,
             'stock_quantity'      => 2,
-            'low_stock_threshold' => null,
+            'low_stock_threshold' => 0,
         ]);
 
         // Product without custom threshold, above global threshold
         Product::factory()->create([
             'manage_stock'        => true,
             'stock_quantity'      => 5,
-            'low_stock_threshold' => null,
+            'low_stock_threshold' => 0,
         ]);
 
         $result = $this->repository->lowStockItems();

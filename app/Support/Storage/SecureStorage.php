@@ -28,6 +28,14 @@ final class SecureStorage
         ]));
     }
 
+    public static function signedUrl(string $path, bool $download = false): string
+    {
+        return URL::signedRoute('media.secure-download', array_filter([
+            'encodedPath' => self::encodePath($path),
+            'download'    => $download ? '1' : null,
+        ]));
+    }
+
     public static function encodePath(string $path): string
     {
         $normalized = trim(str_replace('\\', '/', $path), '/');

@@ -12,6 +12,7 @@ use Tests\Support\TestingDatabase;
 
 // Centralise dataset registrations so Pest automatically discovers shared model datasets.
 require __DIR__ . '/Support/ModelDatasets.php';
+require_once __DIR__ . '/Support/PdfFixture.php';
 
 // Register the base TestCase for top-level feature, unit, and panel test suites.
 uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');

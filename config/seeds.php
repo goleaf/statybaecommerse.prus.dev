@@ -7,12 +7,14 @@ use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\AllSeedersSeeder;
 use Database\Seeders\AttributeSeeder;
 use Database\Seeders\AttributeValueSeeder;
+use Database\Seeders\BrochureSeeder;
 use Database\Seeders\Cities\CitiesMergedSeeder;
 use Database\Seeders\CountrySeeder;
 use Database\Seeders\CurrencySeeder;
 use Database\Seeders\CustomerGroupSeeder;
 use Database\Seeders\FeatureFlagSeeder;
 use Database\Seeders\InventorySeeder;
+use Database\Seeders\NewsSeeder;
 use Database\Seeders\OptimizedFullSeeder;
 use Database\Seeders\ServiceSeeder;
 use Database\Seeders\SettingsSeeder;
@@ -61,6 +63,17 @@ return [
             static fn (string $locale): string => strtolower(trim($locale)),
             explode(',', (string) env('DB_SEED_FAST_LOCALES', 'lt,en'))
         ))),
+        'generate_media' => (bool) env('DB_SEED_FAST_GENERATE_MEDIA', false),
+    ],
+
+    /*
+     * Brochure PDF fixture volume for default seed profiles.
+     */
+    'brochures' => [
+        'count'                       => max(1, (int) env('DB_SEED_BROCHURES_COUNT', 12)),
+        'files_per_brochure'          => max(1, (int) env('DB_SEED_BROCHURE_FILES_PER_BROCHURE', 4)),
+        'inactive_brochure_count'     => max(0, (int) env('DB_SEED_BROCHURES_INACTIVE_COUNT', 3)),
+        'inactive_files_per_brochure' => max(0, (int) env('DB_SEED_BROCHURE_INACTIVE_FILES_PER_BROCHURE', 1)),
     ],
 
     /*
@@ -77,6 +90,7 @@ return [
         CitiesMergedSeeder::class,
         AdminAuthorizationSeeder::class,
         AdminUserSeeder::class,
+        NewsSeeder::class,
         CustomerGroupSeeder::class,
         UsersCompanyTabSeeder::class,
         UsersCustomerGroupsTabSeeder::class,
@@ -87,6 +101,7 @@ return [
         WarehouseSeeder::class,
         InventorySeeder::class,
         FeatureFlagSeeder::class,
+        BrochureSeeder::class,
         SettingsSeeder::class,
     ],
 

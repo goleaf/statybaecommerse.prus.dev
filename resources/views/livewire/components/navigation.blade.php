@@ -48,6 +48,11 @@
             : (Route::has('home')
                 ? route('home')
                 : url('/'));
+        $newsTopbarUrl = Route::has('localized.news.index')
+            ? route('localized.news.index', ['locale' => $locale])
+            : (Route::has('frontend.news.index')
+                ? route('frontend.news.index')
+                : url('/news'));
         $quickLinks = collect([
             [
                 'key' => 'categories',
@@ -70,12 +75,13 @@
                     ? route('localized.brands.index', ['locale' => $locale])
                     : url('/' . $locale . '/brands'),
             ],
-            // Downloads menu item disabled by request.
-            // [
-            //     'key' => 'downloads',
-            //     'label' => __('messages.nav_downloads'),
-            //     'url' => '#',
-            // ],
+            [
+                'key' => 'downloads',
+                'label' => __('messages.nav_downloads'),
+                'url' => Route::has('localized.brochures.index')
+                    ? route('localized.brochures.index', ['locale' => $locale])
+                    : url('/' . $locale . '/brochures'),
+            ],
             // Vendor catalogs menu item disabled by request.
             // Support center menu item disabled by request.
             // [
@@ -110,14 +116,12 @@
 
             <div class="hidden md:flex items-center gap-5">
                 <x-language-switcher class="!text-dark hover:!text-stone hover:!bg-transparent !p-0" />
-                {{--
-                <a href="#" class="flex items-center group gap-2 hover:text-stone transition-colors">
+                <a href="{{ $newsTopbarUrl }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v14H4zM8 9h8M8 13h5" />
                     </svg>
                     <span class="hidden sm:block">{{ __('frontend.header.topbar.news') }}</span>
                 </a>
-                --}}
                 <a href="#" class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"

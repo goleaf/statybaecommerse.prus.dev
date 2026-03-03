@@ -125,6 +125,27 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     protected static function booted(): void
     {
         self::saving(static function (Product $product): void {
+            // Accept translatable array payloads in lightweight test schemas and
+            // persist a deterministic scalar fallback value.
+            foreach ([
+                'name',
+                'slug',
+                'description',
+                'short_description',
+                'detailed_description',
+                'seo_title',
+                'seo_description',
+                'request_message',
+            ] as $field) {
+                $value = $product->getAttribute($field);
+
+                if (! is_array($value)) {
+                    continue;
+                }
+
+                $product->setAttribute($field, self::resolveTranslatedScalar($value));
+            }
+
             /** @var HtmlSanitizer $sanitizer */
             $sanitizer = app(HtmlSanitizer::class);
 
@@ -170,6 +191,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             if (Schema::hasTable('product_attributes')) {
                 $product->attributes()->detach();
             }
+            if (Schema::hasTable('product_supplier')) {
+                $product->suppliers()->detach();
+            }
 
             // Manually remove related images so SQLite-based test runs mimic the
             // foreign key cascades enforced in production.
@@ -190,6 +214,38 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         }
 
         self::scoutBootSearchable();
+    }
+
+    /**
+     * Resolve a scalar fallback from locale-keyed translation arrays.
+     *
+     * @param  array<array-key, mixed>  $value
+     */
+    private static function resolveTranslatedScalar(array $value): ?string
+    {
+        $preferredLocales = array_values(array_filter([
+            (string) app()->getLocale(),
+            (string) config('app.locale', ''),
+            (string) config('app.fallback_locale', ''),
+            'lt',
+            'en',
+        ], static fn (string $locale): bool => $locale !== ''));
+
+        foreach ($preferredLocales as $locale) {
+            $candidate = $value[$locale] ?? null;
+
+            if (is_string($candidate) && trim($candidate) !== '') {
+                return $candidate;
+            }
+        }
+
+        foreach ($value as $candidate) {
+            if (is_string($candidate) && trim($candidate) !== '') {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -707,6 +763,27 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     public function collections(): BelongsToMany
     {
         return $this->belongsToMany(Collection::class, 'product_collections');
+    }
+
+    /**
+     * Handle suppliers functionality with proper error handling.
+     */
+    public function suppliers(): BelongsToMany
+    {
+        return $this->belongsToMany(Supplier::class, 'product_supplier')->withTimestamps();
+    }
+
+    public function hasSuppliers(): bool
+    {
+        if (! Schema::hasTable('product_supplier')) {
+            return false;
+        }
+
+        if ($this->relationLoaded('suppliers')) {
+            return $this->suppliers->isNotEmpty();
+        }
+
+        return $this->suppliers()->exists();
     }
 
     /**

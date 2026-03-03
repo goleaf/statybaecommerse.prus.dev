@@ -15,7 +15,7 @@ final class DashboardTableRepository
     public function recentOrdersQuery(): Builder
     {
         return Order::query()
-            ->withoutGlobalScopes([ActiveScope::class])
+            ->withoutGlobalScopes()
             ->with('user')
             ->whereNull('deleted_at')
             ->latest('created_at');
@@ -26,17 +26,22 @@ final class DashboardTableRepository
         $threshold = (int) Config::get('inventory.low_stock_threshold', 5);
 
         return Product::query()
-            ->withoutGlobalScopes([ActiveScope::class])
+            ->withoutGlobalScopes()
             ->where('manage_stock', true)
             ->whereNull('deleted_at')
             ->where(function ($query) use ($threshold) {
                 $query->where(function ($innerQuery) {
                     $innerQuery
                         ->whereNotNull('low_stock_threshold')
+                        ->where('low_stock_threshold', '>', 0)
                         ->whereColumn('stock_quantity', '<=', 'low_stock_threshold');
                 })->orWhere(function ($innerQuery) use ($threshold) {
                     $innerQuery
-                        ->whereNull('low_stock_threshold')
+                        ->where(function ($fallbackQuery) {
+                            $fallbackQuery
+                                ->whereNull('low_stock_threshold')
+                                ->orWhere('low_stock_threshold', '<=', 0);
+                        })
                         ->where('stock_quantity', '<=', $threshold);
                 });
             })

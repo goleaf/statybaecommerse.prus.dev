@@ -27,6 +27,7 @@ final class OptimizedFullSeeder extends BaseSeeder
         \Database\Seeders\Cities\CitiesMergedSeeder::class,
         AdminAuthorizationSeeder::class,
         AdminUserSeeder::class,
+        NewsSeeder::class,
         CustomerGroupSeeder::class,
         ServiceSeeder::class,
         AttributeSeeder::class,
@@ -34,6 +35,7 @@ final class OptimizedFullSeeder extends BaseSeeder
         WarehouseSeeder::class,
         InventorySeeder::class,
         FeatureFlagSeeder::class,
+        BrochureSeeder::class,
         SettingsSeeder::class,
     ];
 

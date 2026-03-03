@@ -16,6 +16,7 @@
         ->filter(static fn (string $locale): bool => $locale !== '')
         ->unique()
         ->values();
+    $hiddenAdminLocales = collect(['ru']);
 
     $availableLocales = $directoryLocales
         ->merge($jsonLocales)
@@ -30,11 +31,16 @@
     }
 
     $availableLocales = $availableLocales
+        ->reject(static fn (string $locale): bool => $hiddenAdminLocales->contains($locale))
         ->values();
 
     $currentLocale = strtolower((string) app()->getLocale());
 
-    if (! $availableLocales->contains($currentLocale) && $currentLocale !== '') {
+    if (
+        ! $availableLocales->contains($currentLocale)
+        && $currentLocale !== ''
+        && ! $hiddenAdminLocales->contains($currentLocale)
+    ) {
         $availableLocales = $availableLocales->prepend($currentLocale)->unique()->values();
     }
 

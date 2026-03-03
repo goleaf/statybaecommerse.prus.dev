@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Location;
-use App\Models\Partner;
 use App\Models\ProductVariant;
+use App\Models\Supplier;
 use App\Models\VariantInventory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -35,7 +35,7 @@ class VariantInventoryFactory extends Factory
             'reorder_quantity'  => $this->faker->numberBetween(25, 100),
             'max_stock_level'   => $this->faker->numberBetween(200, 500),
             'cost_per_unit'     => $this->faker->randomFloat(2, 5, 150),
-            'supplier_id'       => Partner::factory(),
+            'supplier_id'       => Supplier::factory(),
             'batch_number'      => $this->faker->optional()->regexify('[A-Z0-9]{8}'),
             'expiry_date'       => $this->faker->optional()->dateTimeBetween('+1 month', '+1 year'),
             'status'            => $this->faker->randomElement(['active', 'inactive', 'discontinued']),

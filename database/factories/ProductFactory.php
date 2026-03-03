@@ -168,8 +168,14 @@ class ProductFactory extends Factory
             })
             ->afterCreating(function (Product $product): void {
                 $brandTable = (new Brand)->getTable();
+                $productTable = $product->getTable();
 
-                if ($product->brand_id === null && Schema::hasTable($brandTable)) {
+                if (
+                    $product->brand_id === null
+                    && Schema::hasTable($brandTable)
+                    && Schema::hasTable($productTable)
+                    && Schema::hasColumn($productTable, 'brand_id')
+                ) {
                     $brand = Brand::factory()->create();
                     $product->brand()->associate($brand);
                     $product->save();

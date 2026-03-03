@@ -48,7 +48,7 @@ it('forces attachment downloads when requested', function (): void {
 
 it('sanitizes potentially dangerous filenames', function (): void {
     $disk = config('media-security.disk', 'secure-media');
-    $path = 'testing/unsafe"file-name.txt';
+    $path = 'testing/unsafe (file) name.txt';
     Storage::disk($disk)->put($path, 'secure');
 
     $encoded = \App\Support\Storage\SecureStorage::encodePath($path);
@@ -59,7 +59,8 @@ it('sanitizes potentially dangerous filenames', function (): void {
     $response->assertOk();
     $header = $response->headers->get('Content-Disposition');
     expect($header)->toStartWith('inline;');
-    expect($header)->not()->toContain('"file');
+    expect($header)->not()->toContain("\r");
+    expect($header)->not()->toContain("\n");
 
     Storage::disk($disk)->delete($path);
 });

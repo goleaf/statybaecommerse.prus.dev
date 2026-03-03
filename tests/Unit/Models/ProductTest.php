@@ -33,6 +33,7 @@ describe('Product model', function () {
             'pack_size', 'pack_size_type', 'is_active', 'is_enabled', 'is_featured', 'is_requestable',
             'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'brand_id',
             'status', 'variant_attribute_matrix', 'shipping_class', 'external_url',
+            'is_venipak_locker_excluded', 'is_venipak_courier_excluded',
         ];
 
         expect($product->getFillable())->toBe($expectedFillable);

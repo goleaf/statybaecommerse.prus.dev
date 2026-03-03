@@ -133,7 +133,7 @@ trait WithCart
                 'name'       => $variant?->name ?: $product->name,
                 'price'      => $unitPrice,
                 'quantity'   => $quantity,
-                'image'      => $product->getFirstMediaUrl('images'),
+                'image'      => $this->resolveProductCartImage($product),
                 'sku'        => $variant?->sku ?? $product->sku,
                 'attributes' => $variantAttributes,
             ];
@@ -207,6 +207,27 @@ trait WithCart
         session()->forget('cart');
         $this->dispatch('cart-updated');
         $this->notifySuccess(__('messages.cart_cleared'));
+    }
+
+    private function resolveProductCartImage(Product $product): ?string
+    {
+        $candidates = [
+            $product->main_image,
+            $product->thumbnail,
+            $product->getImageUrl(),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate) && $candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        $collection = (string) config('media.storage.collection_name', 'images');
+        $mediaImage = $product->getFirstMediaUrl($collection, 'thumb')
+            ?: $product->getFirstMediaUrl($collection);
+
+        return is_string($mediaImage) && $mediaImage !== '' ? $mediaImage : null;
     }
 
     private function resolveCartKey(int $productId, ?int $variantId): string

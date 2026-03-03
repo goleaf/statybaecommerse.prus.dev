@@ -27,7 +27,7 @@ class ProductsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['brand', 'primaryImage']))
+            ->modifyQueryUsing(fn ($query) => $query->with(['brand', 'primaryImage', 'suppliers']))
             ->columns([
                 ImageColumn::make('main_image')
                     ->label(__('messages.image'))
@@ -51,6 +51,11 @@ class ProductsTable
                 TextColumn::make('brand.name')
                     ->label(__('messages.brand'))
                     ->sortable(),
+                TextColumn::make('suppliers_list')
+                    ->label(__('admin.suppliers.navigation_label'))
+                    ->state(static fn (Product $record): string => $record->suppliers->pluck('name')->implode(', '))
+                    ->placeholder('—')
+                    ->wrap(),
                 TextColumn::make('price')
                     ->label(__('messages.price'))
                     ->money('EUR')
@@ -139,6 +144,12 @@ class ProductsTable
                     ->multiple()
                     ->searchable()
                     ->preload(),
+                SelectFilter::make('suppliers')
+                    ->label(__('admin.suppliers.navigation_label'))
+                    ->relationship('suppliers', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('collections')
                     ->label(__('messages.collections'))
                     ->relationship('collections', 'name')
@@ -176,18 +187,44 @@ class ProductsTable
                         ->label(__('admin.products.bulk_publish'))
                         ->icon('heroicon-o-check-circle')
                         ->action(function (Collection $records): void {
-                            $records->each(static function (Product $product): void {
+                            $published = 0;
+                            $skipped = 0;
+
+                            $records->each(static function (Product $product) use (&$published, &$skipped): void {
+                                if (! $product->hasSuppliers()) {
+                                    $skipped++;
+
+                                    return;
+                                }
+
                                 $product->forceFill([
                                     'status'       => 'published',
                                     'is_enabled'   => true,
                                     'published_at' => $product->published_at ?? now(),
                                 ])->save();
+
+                                $published++;
                             });
 
-                            Notification::make()
-                                ->title(__('admin.products.bulk_publish_success'))
-                                ->success()
-                                ->send();
+                            if ($published > 0) {
+                                $notification = Notification::make()
+                                    ->title(__('admin.products.bulk_publish_success'))
+                                    ->success();
+
+                                if ($skipped > 0) {
+                                    $notification->body(__('admin.suppliers.bulk_publish_skipped', ['count' => $skipped]));
+                                }
+
+                                $notification->send();
+                            }
+
+                            if ($published === 0 && $skipped > 0) {
+                                Notification::make()
+                                    ->title(__('admin.suppliers.publish_requires_supplier'))
+                                    ->body(__('admin.suppliers.bulk_publish_skipped', ['count' => $skipped]))
+                                    ->warning()
+                                    ->send();
+                            }
                         }),
                     BulkAction::make('unpublish')
                         ->label(__('admin.products.bulk_unpublish'))

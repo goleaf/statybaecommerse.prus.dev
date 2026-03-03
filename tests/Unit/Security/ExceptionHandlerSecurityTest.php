@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Exceptions\Handler;
+use App\Support\Exceptions\BootErrorRateLimiter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -22,7 +23,37 @@ class ExceptionHandlerSecurityTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Handler::resetCache();
+        BootErrorRateLimiter::reset();
+
+        Config::set('exception-handling.boot_error_detection.enabled', true);
+        Config::set('exception-handling.boot_error_detection.patterns', [
+            'Interface',
+            'not found',
+            'undefined method',
+            'Cannot declare class',
+            'Fatal error',
+            'Parse error',
+            'Syntax error',
+            'translations()',
+            'TranslatableRecord',
+        ]);
+        Config::set('exception-handling.boot_error_detection.paths', [
+            '/Models/',
+            '/Contracts/',
+            '/Providers/',
+            '/bootstrap/',
+        ]);
+        Config::set('exception-handling.security.rate_limit_enabled', true);
+        Config::set('exception-handling.security.max_boot_errors_per_minute', 10);
         $this->handler = app(Handler::class);
+    }
+
+    protected function tearDown(): void
+    {
+        Handler::resetCache();
+        BootErrorRateLimiter::reset();
+        parent::tearDown();
     }
 
     /** @test */
@@ -86,9 +117,10 @@ class ExceptionHandlerSecurityTest extends TestCase
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
                 $message = $context['message'] ?? '';
 
-                // Should not contain newlines that could inject fake log entries
-                return ! str_contains($message, "\n[2024-01-01]") &&
-                       ! str_contains($message, 'Admin access granted');
+                // Should not contain newlines that could inject fake log entries.
+                return ! str_contains($message, "\n[2024-01-01]")
+                    && ! str_contains($message, "\n")
+                    && ! str_contains($message, "\r");
             }));
     }
 
@@ -305,8 +337,8 @@ class ExceptionHandlerSecurityTest extends TestCase
             ->with('Application boot failure detected', \Mockery::on(function ($context) {
                 $message = $context['message'] ?? '';
 
-                // Should respect security configuration
-                return strlen($message) <= 100;
+                // Truncation appends a suffix marker after the configured maximum.
+                return strlen($message) <= 120 && str_contains($message, '[truncated]');
             }));
     }
 }

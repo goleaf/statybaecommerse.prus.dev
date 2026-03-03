@@ -9,9 +9,13 @@ use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Supplier;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -20,9 +24,80 @@ beforeEach(function () {
     $this->admin = AdminUser::factory()->create();
     $this->actingAs($this->admin, 'admin');
 
+    if (! Schema::hasTable('suppliers')) {
+        Schema::create('suppliers', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->string('code')->unique();
+            $table->string('contact_email')->nullable();
+            $table->string('contact_phone')->nullable();
+            $table->text('notes')->nullable();
+            $table->boolean('is_enabled')->default(true);
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    if (! Schema::hasTable('product_supplier')) {
+        Schema::create('product_supplier', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignId('supplier_id')->constrained('suppliers')->cascadeOnDelete();
+            $table->timestamps();
+            $table->unique(['product_id', 'supplier_id']);
+        });
+    }
+
+    if (Schema::hasTable('products')) {
+        Schema::table('products', function (Blueprint $table): void {
+            if (! Schema::hasColumn('products', 'barcode')) {
+                $table->string('barcode')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'detailed_description')) {
+                $table->text('detailed_description')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'cost_price')) {
+                $table->decimal('cost_price', 10, 2)->nullable();
+            }
+            if (! Schema::hasColumn('products', 'allow_backorder')) {
+                $table->boolean('allow_backorder')->default(false);
+            }
+            if (! Schema::hasColumn('products', 'size')) {
+                $table->string('size')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'size_type')) {
+                $table->string('size_type')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'color')) {
+                $table->string('color')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'pack_size')) {
+                $table->string('pack_size')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'pack_size_type')) {
+                $table->string('pack_size_type')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'is_venipak_locker_excluded')) {
+                $table->boolean('is_venipak_locker_excluded')->default(false);
+            }
+            if (! Schema::hasColumn('products', 'is_venipak_courier_excluded')) {
+                $table->boolean('is_venipak_courier_excluded')->default(false);
+            }
+        });
+    }
+
+    if (Schema::hasTable('product_supplier')) {
+        DB::table('product_supplier')->delete();
+    }
+
+    if (Schema::hasTable('suppliers')) {
+        DB::table('suppliers')->delete();
+    }
+
     $this->brand = Brand::factory()->create(['name' => 'Test Brand']);
     $this->category = Category::factory()->create(['name' => 'Test Category']);
     $this->collection = Collection::factory()->create(['name' => 'Test Collection']);
+    $this->supplier = Supplier::factory()->create(['name' => 'Primary Supplier']);
 
     $this->product = Product::factory()->create([
         'name'           => 'Test Product',
@@ -41,6 +116,7 @@ beforeEach(function () {
 
     $this->product->categories()->attach($this->category->id);
     $this->product->collections()->attach($this->collection->id);
+    $this->product->suppliers()->attach($this->supplier->id);
 });
 
 it('can render product resource index page', function () {
@@ -72,9 +148,9 @@ it('can create product', function () {
         'stock_quantity' => 50,
         'manage_stock'   => true,
         'is_featured'    => true,
-        'status'         => 'published',
-        'published_at'   => now()->toDateTimeString(),
+        'status'         => 'draft',
         'brand_id'       => $this->brand->id,
+        'suppliers'      => [$this->supplier->id],
     ];
 
     Livewire::test(ProductResource\Pages\CreateProduct::class)
@@ -88,8 +164,46 @@ it('can create product', function () {
     ]);
 
     // Check price separately due to decimal handling
-    $createdProduct = Product::where('sku', 'NEW-001')->first();
+    $createdProduct = Product::withoutGlobalScopes()->where('sku', 'NEW-001')->first();
     expect((float) $createdProduct->price)->toBe(149.99);
+});
+
+it('prevents creating a published product from the create form', function () {
+    Livewire::test(ProductResource\Pages\CreateProduct::class)
+        ->fillForm([
+            'name'      => 'Blocked Publish Product',
+            'slug'      => 'blocked-publish-product',
+            'sku'       => 'BLOCKED-001',
+            'price'     => 49.99,
+            'status'    => 'published',
+            'brand_id'  => $this->brand->id,
+            'suppliers' => [$this->supplier->id],
+        ])
+        ->call('create');
+
+    $this->assertDatabaseMissing('products', [
+        'sku' => 'BLOCKED-001',
+    ]);
+});
+
+it('requires a supplier before publishing from the edit form', function () {
+    $draftProduct = Product::factory()->create([
+        'status'       => 'draft',
+        'published_at' => null,
+        'brand_id'     => $this->brand->id,
+    ]);
+
+    Livewire::test(ProductResource\Pages\EditProduct::class, [
+        'record' => $draftProduct->getRouteKey(),
+    ])
+        ->fillForm([
+            'status'    => 'published',
+            'suppliers' => [],
+        ])
+        ->call('save');
+
+    expect($draftProduct->fresh())
+        ->status->toBe('draft');
 });
 
 it('validates required fields when creating product', function () {
@@ -201,6 +315,17 @@ it('can filter products by brand', function () {
         ->assertCanNotSeeTableRecords([$productWithAnotherBrand]);
 });
 
+it('can filter products by suppliers', function () {
+    $otherSupplier = Supplier::factory()->create(['name' => 'Secondary Supplier']);
+    $productWithOtherSupplier = Product::factory()->create();
+    $productWithOtherSupplier->suppliers()->attach($otherSupplier->id);
+
+    Livewire::test(ProductResource\Pages\ListProducts::class)
+        ->filterTable('suppliers', [$this->supplier->id])
+        ->assertCanSeeTableRecords([$this->product])
+        ->assertCanNotSeeTableRecords([$productWithOtherSupplier]);
+});
+
 it('can filter products by status', function () {
     Product::factory()->create(['status' => 'draft']);
 
@@ -247,6 +372,7 @@ it('can sort products by price', function () {
 
 it('can bulk publish products', function () {
     $draftProducts = Product::factory()->count(3)->create(['status' => 'draft', 'is_enabled' => false]);
+    $draftProducts->each(fn (Product $product) => $product->suppliers()->sync([$this->supplier->id]));
 
     Livewire::test(ProductResource\Pages\ListProducts::class)
         ->callTableBulkAction('publish', $draftProducts)
@@ -332,6 +458,7 @@ it('has correct form fields in create page', function () {
         ->assertFormFieldExists('stock_quantity')
         ->assertFormFieldExists('low_stock_threshold')
         ->assertFormFieldExists('brand_id')
+        ->assertFormFieldExists('suppliers')
         ->assertFormFieldExists('status')
         ->assertFormFieldExists('is_featured')
         ->assertFormFieldExists('allow_backorder')

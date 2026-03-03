@@ -12,6 +12,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\PdfFixture;
 
 uses(RefreshDatabase::class);
 
@@ -49,7 +50,7 @@ it('generates and stores an invoice PDF for a paid order', function (): void {
     $orderMarker = "order_number:{$order->number};order_id:{$order->getKey()}";
 
     Http::fake([
-        'https://saskaita.vercel.app/api/initiate' => Http::response('%PDF-1.4 fake-binary', 200, [
+        'https://saskaita.vercel.app/api/initiate' => Http::response(PdfFixture::binary('Invoice ready'), 200, [
             'Content-Type'        => 'application/pdf',
             'Content-Disposition' => 'inline; filename="SER-0001.pdf"',
         ]),
@@ -143,7 +144,7 @@ it('stores regenerated invoice PDFs as unique files and keeps document type meta
         if (str_ends_with($request->url(), '/api/initiate')) {
             $attempt++;
 
-            return Http::response("%PDF-1.4 unique-binary-{$attempt}", 200, [
+            return Http::response(PdfFixture::binary("Unique attempt {$attempt}"), 200, [
                 'Content-Type' => 'application/pdf',
             ]);
         }
@@ -218,7 +219,7 @@ it('falls back to provider-safe seller website when local domain is configured',
     $orderMarker = "order_number:{$order->number};order_id:{$order->getKey()}";
 
     Http::fake([
-        'https://saskaita.vercel.app/api/initiate' => Http::response('%PDF-1.4 seller-url-binary', 200, [
+        'https://saskaita.vercel.app/api/initiate' => Http::response(PdfFixture::binary('Seller url'), 200, [
             'Content-Type' => 'application/pdf',
         ]),
         'https://saskaita.vercel.app/api/actions/list-invoices' => Http::response([
@@ -273,7 +274,7 @@ it('falls back to invoice listing by amount and payer email when note marker is 
     $expectedPayerEmail = (string) ($billing['email'] ?? $shipping['email'] ?? $order->user?->email ?? '');
 
     Http::fake([
-        'https://saskaita.vercel.app/api/initiate' => Http::response('%PDF-1.4 fallback-binary', 200, [
+        'https://saskaita.vercel.app/api/initiate' => Http::response(PdfFixture::binary('Fallback by amount'), 200, [
             'Content-Type' => 'application/pdf',
         ]),
         'https://saskaita.vercel.app/api/actions/list-invoices' => Http::response([
@@ -350,7 +351,7 @@ it('supports generating invoice with explicit invoice type', function (): void {
     $orderMarker = "order_number:{$order->number};order_id:{$order->getKey()}";
 
     Http::fake([
-        'https://saskaita.vercel.app/api/initiate' => Http::response('%PDF-1.4 typed-binary', 200, [
+        'https://saskaita.vercel.app/api/initiate' => Http::response(PdfFixture::binary('Typed invoice'), 200, [
             'Content-Type' => 'application/pdf',
         ]),
         'https://saskaita.vercel.app/api/actions/list-invoices' => Http::response([
@@ -445,7 +446,7 @@ it('allows manual invoice generation for pending orders', function (): void {
     $orderMarker = "order_number:{$order->number};order_id:{$order->getKey()}";
 
     Http::fake([
-        'https://saskaita.vercel.app/api/initiate' => Http::response('%PDF-1.4 pending-manual-binary', 200, [
+        'https://saskaita.vercel.app/api/initiate' => Http::response(PdfFixture::binary('Pending manual'), 200, [
             'Content-Type' => 'application/pdf',
         ]),
         'https://saskaita.vercel.app/api/actions/list-invoices' => Http::response([
@@ -535,7 +536,7 @@ it('builds invoice products from attached services when order items are not bill
     $orderMarker = "order_number:{$order->number};order_id:{$order->getKey()}";
 
     Http::fake([
-        'https://saskaita.vercel.app/api/initiate' => Http::response('%PDF-1.4 service-binary', 200, [
+        'https://saskaita.vercel.app/api/initiate' => Http::response(PdfFixture::binary('Service-only invoice'), 200, [
             'Content-Type' => 'application/pdf',
         ]),
         'https://saskaita.vercel.app/api/actions/list-invoices' => Http::response([

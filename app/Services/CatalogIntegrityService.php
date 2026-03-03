@@ -167,16 +167,26 @@ final class CatalogIntegrityService
      */
     private function detectVariantAttributeGroupMismatches(): array
     {
+        $schema = DB::connection()->getSchemaBuilder();
+        $hasProductSlug = $schema->hasTable('products') && $schema->hasColumn('products', 'slug');
+
+        $select = [
+            'p.id as product_id',
+            'pv.id as variant_id',
+            'a.group_name',
+        ];
+
+        if ($hasProductSlug) {
+            $select[] = 'p.slug as product_slug';
+        } else {
+            $select[] = DB::raw('NULL as product_slug');
+        }
+
         $rows = DB::table('product_variant_attributes as pva')
             ->join('product_variants as pv', 'pv.id', '=', 'pva.variant_id')
             ->join('products as p', 'p.id', '=', 'pv.product_id')
             ->join('attributes as a', 'a.id', '=', 'pva.attribute_id')
-            ->select([
-                'p.id as product_id',
-                'p.slug as product_slug',
-                'pv.id as variant_id',
-                'a.group_name',
-            ])
+            ->select($select)
             ->get();
 
         /** @var array<int, array{slug: string|null, variants?: array<int, array<string, true>>}> $grouped */

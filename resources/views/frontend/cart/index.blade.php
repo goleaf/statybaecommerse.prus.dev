@@ -78,7 +78,7 @@
                                             </div>
 
                                             <div class="min-w-0">
-                                                <h3 class="truncate text-base font-semibold text-gray-900">{{ $productName }}</h3>
+                                                <h3 class="whitespace-normal break-words text-base font-semibold text-gray-900">{{ $productName }}</h3>
                                                 <p class="mt-1 text-sm text-gray-600">
                                                     {{ __('frontend.cart.unit_price', ['price' => app_money_format($unitPrice)]) }}
                                                 </p>

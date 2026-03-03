@@ -11,7 +11,7 @@ final class FeatureFlagSeeder extends BaseSeeder
     public function run(): void
     {
         // UI Category Feature Flags
-        FeatureFlag::factory()->create([
+        $this->upsert([
             'name'        => 'New Product Search',
             'key'         => 'new_product_search',
             'description' => 'Enable the new advanced product search functionality',
@@ -30,7 +30,7 @@ final class FeatureFlagSeeder extends BaseSeeder
             ],
         ]);
 
-        FeatureFlag::factory()->create([
+        $this->upsert([
             'name'        => 'Mobile App Features',
             'key'         => 'mobile_app_features',
             'description' => 'Enable mobile app specific features',
@@ -47,7 +47,7 @@ final class FeatureFlagSeeder extends BaseSeeder
             ],
         ]);
 
-        FeatureFlag::factory()->create([
+        $this->upsert([
             'name'        => 'Dark Mode',
             'key'         => 'dark_mode',
             'description' => 'Enable dark mode theme for the application',
@@ -64,7 +64,7 @@ final class FeatureFlagSeeder extends BaseSeeder
             ],
         ]);
 
-        FeatureFlag::factory()->create([
+        $this->upsert([
             'name'        => 'Multi-language Support',
             'key'         => 'multi_language_support',
             'description' => 'Enable multi-language support for the application',
@@ -81,7 +81,7 @@ final class FeatureFlagSeeder extends BaseSeeder
             ],
         ]);
 
-        FeatureFlag::factory()->create([
+        $this->upsert([
             'name'        => 'Beta Features',
             'key'         => 'beta_features',
             'description' => 'Enable beta features for testing',
@@ -101,7 +101,7 @@ final class FeatureFlagSeeder extends BaseSeeder
         ]);
 
         // Payment Category Feature Flags
-        FeatureFlag::factory()->create([
+        $this->upsert([
             'name'        => 'Payment Gateway V2',
             'key'         => 'payment_gateway_v2',
             'description' => 'Enable the new payment gateway integration',
@@ -120,7 +120,7 @@ final class FeatureFlagSeeder extends BaseSeeder
             ],
         ]);
 
-        FeatureFlag::factory()->create([
+        $this->upsert([
             'name'        => 'Real-time Notifications',
             'key'         => 'real_time_notifications',
             'description' => 'Enable real-time push notifications',
@@ -140,7 +140,7 @@ final class FeatureFlagSeeder extends BaseSeeder
         ]);
 
         // Security Category Feature Flags
-        FeatureFlag::factory()->create([
+        $this->upsert([
             'name'        => 'Advanced Security',
             'key'         => 'advanced_security',
             'description' => 'Enable advanced security features',
@@ -156,5 +156,22 @@ final class FeatureFlagSeeder extends BaseSeeder
                 'author'  => 'Security Team',
             ],
         ]);
+    }
+
+    /**
+     * @param array<string, mixed> $attributes
+     */
+    private function upsert(array $attributes): void
+    {
+        $key = (string) ($attributes['key'] ?? '');
+
+        if ($key === '') {
+            return;
+        }
+
+        FeatureFlag::query()->withoutGlobalScopes()->updateOrCreate(
+            ['key' => $key],
+            $attributes,
+        );
     }
 }

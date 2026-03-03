@@ -4,17 +4,13 @@ declare(strict_types=1);
 
 namespace App\Support\Filament\Components;
 
+use App\Support\Filament\Schemas\TestingSchemaHost;
 use Closure;
-use Filament\Forms\ComponentContainer;
 use Filament\Forms\Components\Component as SchemaComponent;
-use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Set;
 use Filament\Schemas\Schema;
-use Filament\Support\Contracts\TranslatableContentDriver;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
-use Livewire\Component as LivewireComponent;
-use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
@@ -519,84 +515,7 @@ final class SearchableComponentHelper
             return;
         }
 
-        $host = new class extends LivewireComponent implements HasForms
-        {
-            public function dispatchFormEvent(mixed ...$args): void {}
-
-            public function getActiveFormsLocale(): ?string
-            {
-                return null;
-            }
-
-            public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
-            {
-                return null;
-            }
-
-            public function getForm(string $name): ?Schema
-            {
-                return null;
-            }
-
-            public function getFormComponentFileAttachment(string $statePath): ?TemporaryUploadedFile
-            {
-                return null;
-            }
-
-            public function getFormComponentFileAttachmentUrl(string $statePath): ?string
-            {
-                return null;
-            }
-
-            public function getFormSelectOptionLabels(string $statePath): array
-            {
-                return [];
-            }
-
-            public function getFormSelectOptionLabel(string $statePath): ?string
-            {
-                return null;
-            }
-
-            public function getFormSelectOptions(string $statePath): array
-            {
-                return [];
-            }
-
-            public function getFormSelectSearchResults(string $statePath, string $search): array
-            {
-                return [];
-            }
-
-            public function getFormUploadedFiles(string $statePath): ?array
-            {
-                return null;
-            }
-
-            public function getOldFormState(string $statePath): mixed
-            {
-                return data_get($this, $statePath);
-            }
-
-            public function isCachingForms(): bool
-            {
-                return false;
-            }
-
-            public function removeFormUploadedFile(string $statePath, string $fileKey): void {}
-
-            public function reorderFormUploadedFiles(string $statePath, array $fileKeys): void {}
-
-            public function validate($rules = null, $messages = [], $attributes = []): array
-            {
-                return [];
-            }
-
-            public function currentlyValidatingForm(?ComponentContainer $form): void
-            {
-                // No-op for isolated form host.
-            }
-        };
+        $host = new TestingSchemaHost;
 
         Schema::make($host)
             ->schema([$component])

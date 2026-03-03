@@ -48,7 +48,7 @@ it('unit: hydrates the searchable component with the canonical payload tuple', f
     );
 
     // Assert: the helper persists state/options and injects canonical payload keys.
-    expect($component->getState())->toBe('42');
+    expect((string) $component->getState())->toBe('42');
     expect($component->getOptions())->toBe(['42' => 'Example Product']);
     expect($component->getPayload())->toBe([
         'sku'   => 'SKU-42',
@@ -105,7 +105,7 @@ it('unit: synchronises identifiers and payload metadata when selections change',
         'id'    => '55',
         'label' => 'Cached Product',
     ]);
-    expect($component->getState())->toBe('55');
+    expect((string) $component->getState())->toBe('55');
     expect($component->getOptions())->toBe(['55' => 'Cached Product']);
     expect($component->getPayload())->toBe([
         'sku'   => 'SYNC-55',

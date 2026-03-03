@@ -15,6 +15,13 @@ it('provides critical admin translation keys and does not expose deprecated mess
         'admin.navigation.coupons',
         'admin.inventory.stock_reservations',
         'admin.products.similar_products',
+        'admin.suppliers.model_label',
+        'admin.suppliers.navigation_label',
+        'admin.suppliers.publish_on_create_not_allowed',
+        'admin.suppliers.publish_requires_supplier',
+        'admin.brochures.model_label',
+        'admin.brochures.navigation_label',
+        'admin.brochures.requires_active_file',
     ];
 
     foreach ($requiredKeys as $key) {

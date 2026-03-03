@@ -20,10 +20,10 @@ final class InventoryFactory extends Factory
     {
         return [
             // Link the inventory record to both the product and its warehouse.
-            'product_id'   => Product::factory(),
-            'warehouse_id' => Location::factory(),
+            'product_id'  => Product::factory(),
+            'location_id' => Location::factory(),
             // Provide a predictable SKU-like identifier to exercise ordering logic.
-            'sku' => $this->faker->unique()->bothify('INV-####'),
+            'sku' => $this->faker->unique()->bothify('INV-########'),
             // Seed an integer quantity via the modern qty attribute.
             'qty' => $this->faker->numberBetween(0, 1000),
             // Bundle secondary stock metrics inside the metadata payload.

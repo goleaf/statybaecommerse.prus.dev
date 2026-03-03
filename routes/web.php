@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\LegalTranslationController;
 use App\Http\Controllers\Admin\ProductTranslationController;
 use App\Http\Controllers\Api\NotificationStreamController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Frontend\BrochureController;
 use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NewsController;
@@ -710,6 +711,10 @@ Route::get('/locations/{id}', function ($id) {
     return redirect()->route('locations.view', ['slug' => $slug]);
 })->whereNumber('id')->name('locations.show.legacy');
 
+Route::get('/brochures', function () {
+    return redirect()->route('localized.brochures.index', ['locale' => app()->getLocale()]);
+})->name('brochures.index');
+
 // --- Locale-prefixed public routes used in tests ---
 Route::prefix('{locale}')
     ->where(['locale' => '[A-Za-z\-_]+'])
@@ -783,6 +788,9 @@ Route::prefix('{locale}')
         Route::get('/collections', \App\Livewire\Pages\Collection\Index::class)->name('localized.collections.index');
         Route::get('/collections/{collection}', \App\Livewire\Pages\Collection\Show::class)->name('localized.collections.show');
 
+        // Brochure downloads
+        Route::get('/brochures', [BrochureController::class, 'index'])->name('localized.brochures.index');
+
         // Legal pages
         Route::prefix('legal')->name('localized.legal.')->group(function (): void {
             Route::get('/privacy', [App\Http\Controllers\Frontend\LegalController::class, 'privacy'])->name('privacy');
@@ -804,95 +812,6 @@ Route::prefix('{locale}')
             return redirect('/');
         })->name('localized.order.confirmed');
     });
-
-// --- Admin News helper endpoints (HTTP verbs for tests) ---
-Route::middleware('auth')->group(function (): void {
-    // Index placeholder
-    Route::get('/admin/news', function () {
-        return response('OK');
-    })->name('filament.admin.resources.news.index');
-
-    // Store
-    Route::post('/admin/news', function (\Illuminate\Http\Request $request) {
-        $data = $request->validate([
-            'is_visible'   => ['nullable', 'boolean'],
-            'published_at' => ['nullable', 'date'],
-            'author_name'  => ['nullable', 'string', 'max:255'],
-            'translations' => ['nullable', 'array'],
-        ]);
-
-        /** @var \App\Models\News $news */
-        $news = \App\Models\News::query()->create([
-            'is_visible'   => (bool) ($data['is_visible'] ?? true),
-            'published_at' => $data['published_at'] ?? null,
-            'author_name'  => $data['author_name'] ?? null,
-        ]);
-
-        foreach ((array) ($data['translations'] ?? []) as $t) {
-            if (! is_array($t)) {
-                continue;
-            }
-            $locale = $t['locale'] ?? null;
-            if (! is_string($locale) || $locale === '') {
-                continue;
-            }
-            \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
-                [
-                    'news_id' => $news->id,
-                    'locale'  => $locale,
-                ],
-                [
-                    'title'   => $t['title'] ?? null,
-                    'slug'    => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
-                    'summary' => $t['summary'] ?? null,
-                    'content' => $t['content'] ?? null,
-                ]
-            );
-        }
-
-        return redirect()->to('/admin/news');
-    })->name('filament.admin.resources.news.store');
-
-    // Update
-    Route::put('/admin/news/{record}', function (\Illuminate\Http\Request $request, \App\Models\News $record) {
-        $data = $request->validate([
-            'is_visible'   => ['nullable', 'boolean'],
-            'published_at' => ['nullable', 'date'],
-            'author_name'  => ['nullable', 'string', 'max:255'],
-            'translations' => ['nullable', 'array'],
-        ]);
-
-        $record->update(array_filter([
-            'is_visible'   => $data['is_visible'] ?? $record->is_visible,
-            'published_at' => $data['published_at'] ?? $record->published_at,
-            'author_name'  => $data['author_name'] ?? $record->author_name,
-        ], fn ($v) => ! is_null($v)));
-
-        foreach ((array) ($data['translations'] ?? []) as $t) {
-            if (! is_array($t)) {
-                continue;
-            }
-            $locale = $t['locale'] ?? null;
-            if (! is_string($locale) || $locale === '') {
-                continue;
-            }
-            \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
-                [
-                    'news_id' => $record->id,
-                    'locale'  => $locale,
-                ],
-                [
-                    'title'   => $t['title'] ?? null,
-                    'slug'    => $t['slug'] ?? null,
-                    'summary' => $t['summary'] ?? null,
-                    'content' => $t['content'] ?? null,
-                ]
-            );
-        }
-
-        return redirect()->to('/admin/news');
-    })->name('filament.admin.resources.news.update');
-});
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {
@@ -966,95 +885,6 @@ Route::prefix('posts')->name('posts.')->group(function () {
     Route::get('/search', [App\Http\Controllers\PostController::class, 'search'])->name('search');
     Route::get('/author/{authorId}', [App\Http\Controllers\PostController::class, 'byAuthor'])->name('by-author');
     Route::get('/{post}', [App\Http\Controllers\PostController::class, 'show'])->name('show');
-});
-
-// --- Admin News helper endpoints (HTTP verbs for tests) ---
-Route::middleware('auth')->group(function (): void {
-    // Index placeholder
-    Route::get('/admin/news', function () {
-        return response('OK');
-    })->name('filament.admin.resources.news.index');
-
-    // Store
-    Route::post('/admin/news', function (\Illuminate\Http\Request $request) {
-        $data = $request->validate([
-            'is_visible'   => ['nullable', 'boolean'],
-            'published_at' => ['nullable', 'date'],
-            'author_name'  => ['nullable', 'string', 'max:255'],
-            'translations' => ['nullable', 'array'],
-        ]);
-
-        /** @var \App\Models\News $news */
-        $news = \App\Models\News::query()->create([
-            'is_visible'   => (bool) ($data['is_visible'] ?? true),
-            'published_at' => $data['published_at'] ?? null,
-            'author_name'  => $data['author_name'] ?? null,
-        ]);
-
-        foreach ((array) ($data['translations'] ?? []) as $t) {
-            if (! is_array($t)) {
-                continue;
-            }
-            $locale = $t['locale'] ?? null;
-            if (! is_string($locale) || $locale === '') {
-                continue;
-            }
-            \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
-                [
-                    'news_id' => $news->id,
-                    'locale'  => $locale,
-                ],
-                [
-                    'title'   => $t['title'] ?? null,
-                    'slug'    => $t['slug'] ?? str($t['title'] ?? '')->slug()->toString(),
-                    'summary' => $t['summary'] ?? null,
-                    'content' => $t['content'] ?? null,
-                ]
-            );
-        }
-
-        return redirect()->to('/admin/news');
-    })->name('filament.admin.resources.news.store');
-
-    // Update
-    Route::put('/admin/news/{record}', function (\Illuminate\Http\Request $request, \App\Models\News $record) {
-        $data = $request->validate([
-            'is_visible'   => ['nullable', 'boolean'],
-            'published_at' => ['nullable', 'date'],
-            'author_name'  => ['nullable', 'string', 'max:255'],
-            'translations' => ['nullable', 'array'],
-        ]);
-
-        $record->update(array_filter([
-            'is_visible'   => $data['is_visible'] ?? $record->is_visible,
-            'published_at' => $data['published_at'] ?? $record->published_at,
-            'author_name'  => $data['author_name'] ?? $record->author_name,
-        ], fn ($v) => ! is_null($v)));
-
-        foreach ((array) ($data['translations'] ?? []) as $t) {
-            if (! is_array($t)) {
-                continue;
-            }
-            $locale = $t['locale'] ?? null;
-            if (! is_string($locale) || $locale === '') {
-                continue;
-            }
-            \App\Models\Translations\NewsTranslation::query()->updateOrCreate(
-                [
-                    'news_id' => $record->id,
-                    'locale'  => $locale,
-                ],
-                [
-                    'title'   => $t['title'] ?? null,
-                    'slug'    => $t['slug'] ?? null,
-                    'summary' => $t['summary'] ?? null,
-                    'content' => $t['content'] ?? null,
-                ]
-            );
-        }
-
-        return redirect()->to('/admin/news');
-    })->name('filament.admin.resources.news.update');
 });
 
 // --- Admin translation save helpers expected by tests ---

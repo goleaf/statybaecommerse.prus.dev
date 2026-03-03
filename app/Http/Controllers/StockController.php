@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Jobs\GenerateStockExport;
 use App\Models\Location;
-use App\Models\Partner;
+use App\Models\Supplier;
 use App\Models\VariantInventory;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -116,7 +116,10 @@ final class StockController extends Controller
         $stockItems = $query->paginate(20)->withQueryString();
         // Get filter options
         $locations = Location::enabled()->get();
-        $suppliers = Partner::enabled()->get();
+        $suppliers = Supplier::query()
+            ->where('is_enabled', true)
+            ->orderBy('name')
+            ->get();
 
         /** @var view-string $indexView */
         $indexView = 'stock.index';

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\Schemas;
 
+use App\Models\Product;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -13,6 +14,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class ProductForm
 {
@@ -44,6 +47,29 @@ class ProductForm
                                 Select::make('brand_id')
                                     ->label(__('messages.brand'))
                                     ->relationship('brand', 'name')
+                                    ->searchable()
+                                    ->preload(),
+                                Select::make('suppliers')
+                                    ->label(__('admin.suppliers.plural_model_label'))
+                                    ->relationship(
+                                        name: 'suppliers',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: static function (Builder $query, ?Model $record): Builder {
+                                            return $query
+                                                ->where(static function (Builder $where) use ($record): void {
+                                                    $where->where('is_enabled', true);
+
+                                                    if ($record instanceof Product && $record->exists) {
+                                                        $where->orWhereIn(
+                                                            'suppliers.id',
+                                                            $record->suppliers()->select('suppliers.id')
+                                                        );
+                                                    }
+                                                })
+                                                ->orderBy('name');
+                                        },
+                                    )
+                                    ->multiple()
                                     ->searchable()
                                     ->preload(),
                                 Select::make('status')

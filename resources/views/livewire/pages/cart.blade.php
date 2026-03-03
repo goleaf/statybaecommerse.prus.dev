@@ -95,7 +95,7 @@
                                                 </div>
 
                                                 <div class="min-w-0">
-                                                    <h3 class="truncate text-base font-semibold leading-6 text-gray-900">{{ $item->name }}</h3>
+                                                    <h3 class="whitespace-normal break-words text-base font-semibold leading-6 text-gray-900">{{ $item->name }}</h3>
                                                     <p class="mt-2 text-sm text-gray-600">
                                                         {{ __('messages.unit_price') }}: {{ \Illuminate\Support\Number::currency((float) $item->price, current_currency(), app()->getLocale()) }}
                                                     </p>

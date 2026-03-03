@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * NewsImage
@@ -40,6 +41,15 @@ final class NewsImage extends Model
     protected function casts(): array
     {
         return ['news_id' => 'integer', 'is_featured' => 'boolean', 'sort_order' => 'integer', 'file_size' => 'integer', 'dimensions' => 'array'];
+    }
+
+    protected static function booted(): void
+    {
+        self::saving(static function (NewsImage $image): void {
+            $image->normalizeSortOrder();
+            $image->populateFileMetadata();
+            $image->ensureSingleFeaturedImage();
+        });
     }
 
     /**
@@ -133,6 +143,82 @@ final class NewsImage extends Model
         }
 
         return number_format($bytes, 2, '.', '') . ' ' . $units[$i];
+    }
+
+    private function normalizeSortOrder(): void
+    {
+        if (! is_numeric($this->news_id)) {
+            return;
+        }
+
+        if (is_numeric($this->sort_order)) {
+            return;
+        }
+
+        $maxSortOrder = self::withoutGlobalScopes()
+            ->where('news_id', (int) $this->news_id)
+            ->max('sort_order');
+
+        $this->sort_order = is_numeric($maxSortOrder) ? ((int) $maxSortOrder + 1) : 0;
+    }
+
+    private function ensureSingleFeaturedImage(): void
+    {
+        if (! $this->is_featured || ! is_numeric($this->news_id)) {
+            return;
+        }
+
+        $query = self::withoutGlobalScopes()
+            ->where('news_id', (int) $this->news_id);
+
+        if ($this->exists) {
+            $query->whereKeyNot($this->getKey());
+        }
+
+        $query->update(['is_featured' => false]);
+    }
+
+    private function populateFileMetadata(): void
+    {
+        $path = (string) ($this->file_path ?? '');
+
+        if ($path === '' || filter_var($path, FILTER_VALIDATE_URL) !== false || ! is_numeric($this->news_id)) {
+            return;
+        }
+
+        $metadataAlreadyLoaded = ! blank($this->mime_type)
+            && is_numeric($this->file_size)
+            && is_array($this->dimensions);
+
+        if (! $this->isDirty('file_path') && $metadataAlreadyLoaded) {
+            return;
+        }
+
+        $disk = Storage::disk('public');
+
+        if (! $disk->exists($path)) {
+            return;
+        }
+
+        $this->file_size = $disk->size($path) ?: $this->file_size;
+        $this->mime_type = $disk->mimeType($path) ?: $this->mime_type;
+
+        $absolutePath = $disk->path($path);
+
+        if (! is_file($absolutePath)) {
+            return;
+        }
+
+        $dimensions = @getimagesize($absolutePath);
+
+        if (! is_array($dimensions) || ! isset($dimensions[0], $dimensions[1])) {
+            return;
+        }
+
+        $this->dimensions = [
+            'width'  => $dimensions[0],
+            'height' => $dimensions[1],
+        ];
     }
 
     private function buildAbsoluteUrl(string $path): string

@@ -1067,6 +1067,63 @@ final class TestingDatabase
             });
         }
 
+        if (! $schema->hasTable('suppliers')) {
+            $schema->create('suppliers', function (Blueprint $table): void {
+                // Keep supplier resource tests operational when full migrations are unavailable.
+                $table->id();
+                $table->string('name');
+                $table->string('code')->unique();
+                $table->string('contact_email')->nullable();
+                $table->string('contact_phone')->nullable();
+                $table->text('notes')->nullable();
+                $table->boolean('is_enabled')->default(true);
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->index(['is_enabled']);
+            });
+        }
+
+        if (! $schema->hasTable('brochures')) {
+            $schema->create('brochures', function (Blueprint $table): void {
+                // Provide brochure CRUD coverage when fallback SQLite schema is used.
+                $table->id();
+                $table->string('title');
+                $table->text('description')->nullable();
+                $table->boolean('is_active')->default(true);
+                $table->unsignedInteger('sort_order')->default(0);
+                $table->timestamps();
+
+                $table->index(['is_active', 'sort_order']);
+            });
+        }
+
+        if (! $schema->hasTable('brochure_files')) {
+            $schema->create('brochure_files', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('brochure_id')->constrained('brochures')->cascadeOnDelete();
+                $table->string('name');
+                $table->string('file_path');
+                $table->boolean('is_active')->default(true);
+                $table->unsignedInteger('sort_order')->default(0);
+                $table->timestamps();
+
+                $table->index(['brochure_id', 'is_active', 'sort_order'], 'brochure_files_brochure_active_sort');
+            });
+        }
+
+        if (! $schema->hasTable('product_supplier')) {
+            $schema->create('product_supplier', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+                $table->foreignId('supplier_id')->constrained('suppliers')->cascadeOnDelete();
+                $table->timestamps();
+
+                $table->unique(['product_id', 'supplier_id']);
+                $table->index(['supplier_id', 'product_id']);
+            });
+        }
+
         if (! $schema->hasTable('product_images')) {
             $schema->create('product_images', function (Blueprint $table): void {
                 // Mirror the relationship and ordering fields used by ProductImageTest so

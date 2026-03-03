@@ -6,8 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Models\News;
 use App\Services\PaginationService;
-use App\Support\SearchQuerySanitizer;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -23,50 +23,16 @@ final class NewsController extends Controller
      */
     public function index(Request $request): View|JsonResponse
     {
-        $query = News::published()->with(['categories', 'images'])->withCount('comments');
+        $query = News::query()
+            ->published()
+            ->with(['images', 'translations']);
 
-        $searchTerm = SearchQuerySanitizer::sanitize($request->get('search'));
-        $categoryId = $request->filled('category') ? (int) $request->get('category') : null;
-        $featuredOnly = $request->boolean('featured');
+        $news = PaginationService::paginateWithContext($query->orderBy('published_at', 'desc'), 'news')
+            ->appends($request->except('page'));
 
-        // Search functionality
-        if ($searchTerm !== '') {
-            $query->search($searchTerm);
-        }
-        // Category filter
-        if ($categoryId !== null) {
-            $query->byCategory($categoryId);
-        }
-        // Featured filter
-        if ($featuredOnly) {
-            $query->featured();
-        }
-        $news = PaginationService::paginateWithContext($query->orderBy('published_at', 'desc'), 'news');
-
-        $appends = $request->except('page');
-
-        if ($searchTerm === '') {
-            unset($appends['search']);
-        } else {
-            $appends['search'] = $searchTerm;
-        }
-
-        if ($categoryId !== null) {
-            $appends['category'] = $categoryId;
-        }
-
-        if ($featuredOnly) {
-            $appends['featured'] = 1;
-        } else {
-            unset($appends['featured']);
-        }
-
-        $news = $news->appends($appends);
-        // Categories functionality has been removed
-        $categories = collect();
         $featuredNews = News::published()
             ->featured()
-            ->with(['categories', 'images'])
+            ->with(['images', 'translations'])
             ->orderBy('published_at', 'desc')
             ->limit(3)
             ->get()
@@ -93,12 +59,8 @@ final class NewsController extends Controller
         }
 
         return view('news.index', [
-            'news'             => $news,
-            'categories'       => $categories,
-            'featuredNews'     => $featuredNews,
-            'searchTerm'       => $searchTerm,
-            'selectedCategory' => $categoryId,
-            'featuredOnly'     => $featuredOnly,
+            'news'         => $news,
+            'featuredNews' => $featuredNews,
         ]);
     }
 
@@ -107,17 +69,20 @@ final class NewsController extends Controller
      */
     public function show(string $slug): View
     {
-        $news = News::published()->whereHas('translations', function ($query) use ($slug) {
-            $query->where('slug', $slug)->where('locale', app()->getLocale());
-        })->with(['categories', 'images', 'comments' => function ($query) {
-            $query->approved()->visible()->topLevel()->with('replies');
-        }])->firstOrFail();
-        // Increment view count
+        $news = News::query()
+            ->published()
+            ->whereHas('translations', function ($query) use ($slug): void {
+                $query->where('slug', $slug)->where('locale', app()->getLocale());
+            })
+            ->with(['images', 'translations'])
+            ->firstOrFail();
+
         $news->incrementViewCount();
-        // Get related news - category functionality removed
+
         $relatedNews = News::published()
             ->where('id', '!=', $news->id)
-            ->with(['categories', 'images'])
+            ->with(['images', 'translations'])
+            ->orderBy('published_at', 'desc')
             ->limit(4)
             ->get()
             ->filter(function (News $related): bool {
@@ -129,10 +94,29 @@ final class NewsController extends Controller
     }
 
     /**
-     * Handle category functionality - removed due to NewsCategory model removal.
+     * Handle legacy category URLs by redirecting to the canonical news index.
      */
-    public function category(string $slug): View
+    public function category(string $slug): RedirectResponse
     {
-        abort(404, __('messages.category_functionality_has_been_removed'));
+        return $this->redirectToIndex();
+    }
+
+    /**
+     * Handle legacy tag URLs by redirecting to the canonical news index.
+     */
+    public function tag(string $slug): RedirectResponse
+    {
+        return $this->redirectToIndex();
+    }
+
+    private function redirectToIndex(): RedirectResponse
+    {
+        if (request()->routeIs('localized.news.*')) {
+            return redirect()->route('localized.news.index', [
+                'locale' => app()->getLocale(),
+            ]);
+        }
+
+        return redirect()->route('frontend.news.index');
     }
 }

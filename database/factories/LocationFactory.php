@@ -20,7 +20,7 @@ final class LocationFactory extends Factory
         $type = $this->faker->randomElement($types);
 
         return [
-            'code'           => strtoupper($this->faker->unique()->lexify('???###')),
+            'code'           => strtoupper($this->faker->unique()->bothify('???###')),
             'name'           => $this->faker->company() . ' ' . ucfirst($type),
             'slug'           => $this->faker->slug(),
             'description'    => $this->faker->paragraph(),

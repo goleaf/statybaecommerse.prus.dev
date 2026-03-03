@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\CartItem;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Services\Cart\CartService;
@@ -103,4 +104,65 @@ it('normalizes session cart payloads within configured quantity limits and clamp
         ->and($summary['total'])->toBe(0.0)
         ->and($summary['shipping'])->toBe(0.0)
         ->and($summary['tax'])->toBe(0.0);
+});
+
+it('falls back to the product main image when persisted cart snapshots have no image', function (): void {
+    config()->set('shared.tax.default_rate', 0.0);
+
+    $user = User::factory()->create();
+    $product = Product::factory()->create();
+    ProductImage::factory()->for($product, 'product')->create([
+        'path'       => 'product-images/cart-db-fallback.jpg',
+        'is_default' => true,
+        'sort_order' => 1,
+    ]);
+
+    $sessionId = 'sess-db-image-fallback';
+
+    CartItem::factory()->create([
+        'session_id'       => $sessionId,
+        'user_id'          => $user->getKey(),
+        'product_id'       => $product->getKey(),
+        'quantity'         => 1,
+        'unit_price'       => 25.0,
+        'price'            => 25.0,
+        'total_price'      => 25.0,
+        'product_snapshot' => [
+            'name' => $product->name,
+            'sku'  => $product->sku,
+        ],
+    ]);
+
+    $summary = app(CartService::class)->getSummary($user->getKey(), $sessionId);
+
+    expect($summary['items'])->toHaveCount(1)
+        ->and($summary['items'][0]['image'])->toBe($product->fresh()->main_image);
+});
+
+it('hydrates missing session cart images from product default images', function (): void {
+    config()->set('shared.tax.default_rate', 0.0);
+
+    $product = Product::factory()->create();
+    ProductImage::factory()->for($product, 'product')->create([
+        'path'       => 'product-images/cart-session-fallback.jpg',
+        'is_default' => true,
+        'sort_order' => 1,
+    ]);
+
+    session()->flush();
+    session()->put('cart', [
+        [
+            'id'         => 1,
+            'product_id' => $product->getKey(),
+            'name'       => $product->name,
+            'price'      => 12.5,
+            'quantity'   => 2,
+            'image'      => null,
+        ],
+    ]);
+
+    $summary = app(CartService::class)->getSummary(null, session()->getId());
+
+    expect($summary['items'])->toHaveCount(1)
+        ->and($summary['items'][0]['image'])->toBe($product->fresh()->main_image);
 });

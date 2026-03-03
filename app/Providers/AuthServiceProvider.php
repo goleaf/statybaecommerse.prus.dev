@@ -7,33 +7,39 @@ namespace App\Providers;
 use App\Models\Address;
 use App\Models\AdminUser;
 use App\Models\Brand;
+use App\Models\Brochure;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\DiscountCondition;
 use App\Models\Export;
 use App\Models\Legal;
+use App\Models\News;
 use App\Models\Notification;
 use App\Models\Order;
 use App\Models\ProductRequest;
 use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\Role;
+use App\Models\Supplier;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Models\VariantCombination;
 use App\Policies\AddressPolicy;
 use App\Policies\BrandPolicy;
+use App\Policies\BrochurePolicy;
 use App\Policies\CategoryPolicy;
 use App\Policies\CountryPolicy;
 use App\Policies\DiscountConditionPolicy;
 use App\Policies\ExportPolicy;
 use App\Policies\LegalPolicy;
+use App\Policies\NewsPolicy;
 use App\Policies\NotificationPolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\ProductRequestPolicy;
 use App\Policies\ReferralCodePolicy;
 use App\Policies\ReferralPolicy;
 use App\Policies\RolePolicy;
+use App\Policies\SupplierPolicy;
 use App\Policies\SystemSettingPolicy;
 use App\Policies\UserPolicy;
 use App\Policies\VariantCombinationPolicy;
@@ -51,17 +57,20 @@ final class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Address::class            => AddressPolicy::class,
         Brand::class              => BrandPolicy::class,
+        Brochure::class           => BrochurePolicy::class,
         Category::class           => CategoryPolicy::class,
         Country::class            => CountryPolicy::class,
         DiscountCondition::class  => DiscountConditionPolicy::class,
         Export::class             => ExportPolicy::class,
         Legal::class              => LegalPolicy::class,
+        News::class               => NewsPolicy::class,
         Notification::class       => NotificationPolicy::class,
         Order::class              => OrderPolicy::class,
         ProductRequest::class     => ProductRequestPolicy::class,
         Referral::class           => ReferralPolicy::class,
         ReferralCode::class       => ReferralCodePolicy::class,
         Role::class               => RolePolicy::class,
+        Supplier::class           => SupplierPolicy::class,
         SystemSetting::class      => SystemSettingPolicy::class,
         User::class               => UserPolicy::class,
         VariantCombination::class => VariantCombinationPolicy::class,

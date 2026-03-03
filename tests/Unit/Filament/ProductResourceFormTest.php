@@ -29,6 +29,7 @@ it('product resource form returns a Schema instance and includes core product fi
     expect($componentKeys)->toContain('name');
     expect($componentKeys)->toContain('slug');
     expect($componentKeys)->toContain('sku');
+    expect($componentKeys)->toContain('suppliers');
 });
 
 it('bootstraps a testing schema host when none is provided', function (): void {

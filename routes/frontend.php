@@ -125,8 +125,8 @@ Route::middleware(['web'])->group(function () {
 
     // News & Content
     Route::prefix('news')->name('frontend.news.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\NewsController::class, 'index'])->name('index');
-        Route::get('/{news}', [App\Http\Controllers\Frontend\NewsController::class, 'show'])->name('show');
+        Route::get('/', [App\Http\Controllers\NewsController::class, 'index'])->name('index');
+        Route::get('/{slug}', [App\Http\Controllers\NewsController::class, 'show'])->name('show');
     });
 
     Route::prefix('posts')->name('frontend.posts.')->group(function () {

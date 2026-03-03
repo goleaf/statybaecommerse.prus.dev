@@ -10,6 +10,7 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\PdfFixture;
 
 uses(RefreshDatabase::class);
 
@@ -56,7 +57,7 @@ it('can generate invoice for one unpaid order when allow-unpaid is set', functio
     $marker = "order_number:{$order->number};order_id:{$order->getKey()}";
 
     Http::fake([
-        'https://saskaita.vercel.app/api/initiate' => Http::response('%PDF-1.4 command-binary', 200, [
+        'https://saskaita.vercel.app/api/initiate' => Http::response(PdfFixture::binary('Backfill command'), 200, [
             'Content-Type' => 'application/pdf',
         ]),
         'https://saskaita.vercel.app/api/actions/list-invoices' => Http::response([

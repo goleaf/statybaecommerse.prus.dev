@@ -331,7 +331,7 @@ final class CartController extends Controller
             'name'  => $product->name,
             'price' => $unitPrice,
             'sku'   => $product->sku,
-            'image' => $product->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb') ?: null,
+            'image' => $this->resolveProductCartImage($product),
         ], static fn ($value) => $value !== null && $value !== '');
     }
 
@@ -380,7 +380,7 @@ final class CartController extends Controller
             'sku'        => $product->sku,
             'price'      => (float) ($cartItem->unit_price ?? 0.0),
             'quantity'   => $cartItem->quantity,
-            'image'      => $product->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb') ?: null,
+            'image'      => $this->resolveProductCartImage($product),
         ];
 
         $this->saveCart($cart);
@@ -417,6 +417,27 @@ final class CartController extends Controller
     private function resolveAvailableQuantity(Product $product): int
     {
         return max(0, $product->availableQuantity());
+    }
+
+    private function resolveProductCartImage(Product $product): ?string
+    {
+        $candidates = [
+            $product->main_image,
+            $product->thumbnail,
+            $product->getImageUrl(),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate) && $candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        $collection = (string) config('media.storage.collection_name', 'images');
+        $mediaImage = $product->getFirstMediaUrl($collection, 'thumb')
+            ?: $product->getFirstMediaUrl($collection);
+
+        return is_string($mediaImage) && $mediaImage !== '' ? $mediaImage : null;
     }
 
     private function buildCartSummary(Request $request): array

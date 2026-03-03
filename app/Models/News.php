@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 /**
@@ -41,6 +42,7 @@ final class News extends Model implements TranslatableRecord
 {
     use HasFactory;
     use HasTranslations;
+    use SoftDeletes;
 
     protected $table = 'news';
 
@@ -52,6 +54,8 @@ final class News extends Model implements TranslatableRecord
         'submitted_for_review_at',
         'approved_at',
         'approved_by_id',
+        'created_by_id',
+        'updated_by_id',
         'published_at',
         'author_name',
         'author_email',
@@ -72,6 +76,8 @@ final class News extends Model implements TranslatableRecord
             'submitted_for_review_at' => 'datetime',
             'approved_at'             => 'datetime',
             'approved_by_id'          => 'integer',
+            'created_by_id'           => 'integer',
+            'updated_by_id'           => 'integer',
             'published_at'            => 'datetime',
             'view_count'              => 'integer',
             'meta_data'               => 'array',
@@ -81,6 +87,16 @@ final class News extends Model implements TranslatableRecord
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by_id');
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(AdminUser::class, 'created_by_id');
+    }
+
+    public function updatedBy(): BelongsTo
+    {
+        return $this->belongsTo(AdminUser::class, 'updated_by_id');
     }
 
     /**
@@ -278,6 +294,12 @@ final class News extends Model implements TranslatableRecord
      */
     public function getSeoTitleAttribute(): ?string
     {
+        $seoTitle = $this->getTranslation('seo_title', app()->getLocale());
+
+        if (filled($seoTitle)) {
+            return $seoTitle;
+        }
+
         return $this->getTitleAttribute();
     }
 
@@ -286,6 +308,12 @@ final class News extends Model implements TranslatableRecord
      */
     public function getSeoDescriptionAttribute(): ?string
     {
+        $seoDescription = $this->getTranslation('seo_description', app()->getLocale());
+
+        if (filled($seoDescription)) {
+            return $seoDescription;
+        }
+
         return $this->getSummaryAttribute() ?: strip_tags((string) $this->getContentAttribute());
     }
 

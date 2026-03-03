@@ -154,8 +154,7 @@ final class ProductVariantSelector extends Component
         $cartItem->product_snapshot = array_filter([
             'name'  => $this->selectedVariant->getLocalizedName(),
             'sku'   => $this->selectedVariant->variant_sku ?: $this->product->sku,
-            'image' => $this->selectedVariant->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb')
-                ?: $this->selectedVariant->getFirstMediaUrl(config('media.storage.collection_name')),
+            'image' => $this->resolveVariantCartImage(),
         ], static fn ($value) => $value !== null && $value !== '');
         $cartItem->save();
 
@@ -329,6 +328,37 @@ final class ProductVariantSelector extends Component
             ->firstWhere('value', $value);
 
         return $attributeValue?->getLocalizedDisplayValue() ?? $value;
+    }
+
+    private function resolveVariantCartImage(): ?string
+    {
+        if ($this->selectedVariant instanceof ProductVariant) {
+            $collection = (string) config('media.storage.collection_name', 'images');
+            $variantImage = $this->selectedVariant->getFirstMediaUrl($collection, 'thumb')
+                ?: $this->selectedVariant->getFirstMediaUrl($collection);
+
+            if (is_string($variantImage) && $variantImage !== '') {
+                return $variantImage;
+            }
+        }
+
+        $candidates = [
+            $this->product->main_image,
+            $this->product->thumbnail,
+            $this->product->getImageUrl(),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_string($candidate) && $candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        $collection = (string) config('media.storage.collection_name', 'images');
+        $mediaImage = $this->product->getFirstMediaUrl($collection, 'thumb')
+            ?: $this->product->getFirstMediaUrl($collection);
+
+        return is_string($mediaImage) && $mediaImage !== '' ? $mediaImage : null;
     }
 
     public function render()

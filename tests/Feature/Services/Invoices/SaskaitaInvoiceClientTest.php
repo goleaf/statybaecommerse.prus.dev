@@ -6,6 +6,7 @@ use App\Services\Invoices\SaskaitaInvoiceClient;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
+use Tests\Support\PdfFixture;
 
 beforeEach(function (): void {
     Config::set('invoices.base_url', 'https://saskaita.vercel.app');
@@ -21,7 +22,7 @@ it('strips null fields from initiate payload before sending request', function (
     Http::fake(function (Request $request) use (&$capturedPayload) {
         $capturedPayload = $request->data();
 
-        return Http::response('%PDF-1.4 fake-binary', 200, [
+        return Http::response(PdfFixture::binary('Saskaita initiate response'), 200, [
             'Content-Type' => 'application/pdf',
         ]);
     });
@@ -60,7 +61,8 @@ it('strips null fields from initiate payload before sending request', function (
 
     $binary = app(SaskaitaInvoiceClient::class)->initiateInvoice($payload);
 
-    expect($binary)->toBe('%PDF-1.4 fake-binary')
+    expect($binary)->toStartWith('%PDF-')
+        ->and($binary)->toContain('Lorem ipsum')
         ->and($capturedPayload)->toBeArray()
         ->and(array_key_exists('company_code', $capturedPayload['billing']))->toBeFalse()
         ->and(array_key_exists('vat_code', $capturedPayload['billing']))->toBeFalse()
@@ -84,7 +86,7 @@ it('retries with fallback seller website when provider returns seller website va
             ], 400);
         }
 
-        return Http::response('%PDF-1.4 retried-binary', 200, [
+        return Http::response(PdfFixture::binary('Saskaita retry response'), 200, [
             'Content-Type' => 'application/pdf',
         ]);
     });
@@ -121,7 +123,8 @@ it('retries with fallback seller website when provider returns seller website va
 
     $binary = app(SaskaitaInvoiceClient::class)->initiateInvoice($payload);
 
-    expect($binary)->toBe('%PDF-1.4 retried-binary')
+    expect($binary)->toStartWith('%PDF-')
+        ->and($binary)->toContain('Lorem ipsum')
         ->and($capturedPayloads)->toHaveCount(2)
         ->and($capturedPayloads[0]['seller']['website'] ?? null)->toBe('https://example.com')
         ->and($capturedPayloads[1]['seller']['website'] ?? null)->toBe('https://www.example.com');

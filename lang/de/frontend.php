@@ -41,7 +41,7 @@ return [
                 ],
             ],
             'values' => [
-                'items'    => [
+                'items' => [
                     [
                         'description' => 'Wir wählen für jedes Projekt zuverlässige Produkte und bewährte technische Lösungen.',
                         'title'       => 'Qualität zuerst',
@@ -195,6 +195,17 @@ return [
             'sort_by'       => 'Sortieren nach',
             'visit_website' => 'Website besuchen',
         ],
+    ],
+    'brochures' => [
+        'meta' => [
+            'title'       => 'Downloads',
+            'description' => 'Laden Sie Broschueren und produktbezogene PDF-Dateien herunter.',
+        ],
+        'heading'           => 'Downloads',
+        'subheading'        => 'Durchsuchen und laden Sie die neuesten Broschueren als PDF herunter.',
+        'empty_title'       => 'Keine Downloads verfuegbar',
+        'empty_description' => 'Derzeit sind keine Broschueren-Dateien veroeffentlicht.',
+        'download_cta'      => 'PDF herunterladen',
     ],
     'buttons' => [
         'back_to_collections' => 'Zurück zu den Kollektionen',
@@ -1026,27 +1037,27 @@ return [
             'terms' => [
                 'sections' => [
                     [
-                        'title' => '1. Annahme der Bedingungen',
+                        'title'      => '1. Annahme der Bedingungen',
                         'paragraphs' => [
                             'Durch die Nutzung dieser Website und das Aufgeben von Bestellungen akzeptieren Sie diese Bedingungen sowie alle geltenden Gesetze.',
                         ],
                     ],
                     [
-                        'title' => '2. Bestellungen und Preise',
+                        'title'      => '2. Bestellungen und Preise',
                         'paragraphs' => [
                             'Alle Produktinformationen und Preise werden nach bestem Wissen bereitgestellt und können ohne Vorankündigung aktualisiert werden.',
                             'Eine Bestellung gilt erst nach Bestätigung und erfolgreicher Zahlungsabwicklung als verbindlich.',
                         ],
                     ],
                     [
-                        'title' => '3. Lieferung und Rückgabe',
+                        'title'      => '3. Lieferung und Rückgabe',
                         'paragraphs' => [
                             'Lieferzeiten hängen von Lagerbestand, Versanddienstleister und Zielort ab.',
                             'Rückgaben werden gemäß unserer Rückgaberichtlinie und den geltenden Verbraucherrechten bearbeitet.',
                         ],
                     ],
                     [
-                        'title' => '4. Kontakt und Support',
+                        'title'      => '4. Kontakt und Support',
                         'paragraphs' => [
                             'Wenn Sie Fragen zu diesen Bedingungen haben, kontaktieren Sie bitte unseren Kundensupport.',
                         ],
@@ -1504,6 +1515,13 @@ return [
                 'product'  => 'Handyhuelle',
             ],
         ],
+    ],
+    'news_page' => [
+        'subtitle'          => 'Neueste veroeffentlichte Artikel.',
+        'loading'           => 'Wird geladen...',
+        'load_more'         => 'Mehr laden',
+        'no_more_results'   => 'Keine weiteren Ergebnisse',
+        'empty_description' => 'Keine News-Eintraege gefunden.',
     ],
     'view_cart' => 'Warenkorb anzeigen',
 ];

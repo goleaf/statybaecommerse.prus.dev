@@ -27,6 +27,10 @@ class AuthorizationMatrix
             'view_products',
             'manage_products',
             'delete_products',
+            'view_suppliers',
+            'create_suppliers',
+            'edit_suppliers',
+            'delete_suppliers',
             'manage_inventory',
 
             // Order Management
@@ -37,6 +41,11 @@ class AuthorizationMatrix
             // Content
             'manage_content',
             'manage_media',
+            'manage_news',
+            'view_brochures',
+            'create_brochures',
+            'edit_brochures',
+            'delete_brochures',
 
             // Settings
             'view_settings',
@@ -88,12 +97,20 @@ class AuthorizationMatrix
                     'view_users',
                     'view_products',
                     'manage_products',
+                    'view_suppliers',
+                    'create_suppliers',
+                    'edit_suppliers',
                     'manage_inventory',
                     'view_orders',
                     'manage_orders',
                     'process_refunds',
                     'manage_content',
                     'manage_media',
+                    'manage_news',
+                    'view_brochures',
+                    'create_brochures',
+                    'edit_brochures',
+                    'delete_brochures',
                     'view_reports',
                 ],
             ],
@@ -102,8 +119,16 @@ class AuthorizationMatrix
                 'permissions' => [
                     'view_products',
                     'manage_products',
+                    'view_suppliers',
+                    'create_suppliers',
+                    'edit_suppliers',
                     'manage_content',
                     'manage_media',
+                    'manage_news',
+                    'view_brochures',
+                    'create_brochures',
+                    'edit_brochures',
+                    'delete_brochures',
                 ],
             ],
             [
@@ -120,8 +145,10 @@ class AuthorizationMatrix
                 'permissions' => [
                     'view_users',
                     'view_products',
+                    'view_suppliers',
                     'view_orders',
                     'view_reports',
+                    'view_brochures',
                 ],
             ],
             [

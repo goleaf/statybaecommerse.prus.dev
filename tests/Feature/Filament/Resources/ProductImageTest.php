@@ -10,7 +10,10 @@ use App\Filament\Resources\ProductResource\RelationManagers\ImagesRelationManage
 use App\Models\Brand;
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
@@ -31,6 +34,76 @@ beforeEach(function () {
         'is_enabled' => true,
     ]);
 
+    if (! Schema::hasTable('suppliers')) {
+        Schema::create('suppliers', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name');
+            $table->string('code')->unique();
+            $table->string('contact_email')->nullable();
+            $table->string('contact_phone')->nullable();
+            $table->text('notes')->nullable();
+            $table->boolean('is_enabled')->default(true);
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    if (! Schema::hasTable('product_supplier')) {
+        Schema::create('product_supplier', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->foreignId('supplier_id')->constrained('suppliers')->cascadeOnDelete();
+            $table->timestamps();
+            $table->unique(['product_id', 'supplier_id']);
+        });
+    }
+
+    if (Schema::hasTable('products')) {
+        Schema::table('products', function (Blueprint $table): void {
+            if (! Schema::hasColumn('products', 'barcode')) {
+                $table->string('barcode')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'detailed_description')) {
+                $table->text('detailed_description')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'cost_price')) {
+                $table->decimal('cost_price', 10, 2)->nullable();
+            }
+            if (! Schema::hasColumn('products', 'allow_backorder')) {
+                $table->boolean('allow_backorder')->default(false);
+            }
+            if (! Schema::hasColumn('products', 'size')) {
+                $table->string('size')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'size_type')) {
+                $table->string('size_type')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'color')) {
+                $table->string('color')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'pack_size')) {
+                $table->string('pack_size')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'pack_size_type')) {
+                $table->string('pack_size_type')->nullable();
+            }
+            if (! Schema::hasColumn('products', 'is_venipak_locker_excluded')) {
+                $table->boolean('is_venipak_locker_excluded')->default(false);
+            }
+            if (! Schema::hasColumn('products', 'is_venipak_courier_excluded')) {
+                $table->boolean('is_venipak_courier_excluded')->default(false);
+            }
+        });
+    }
+
+    if (Schema::hasTable('product_supplier')) {
+        DB::table('product_supplier')->delete();
+    }
+
+    if (Schema::hasTable('suppliers')) {
+        DB::table('suppliers')->delete();
+    }
+
     Storage::fake('public');
 });
 
@@ -41,7 +114,7 @@ it('creates product successfully without inline image repeater', function () {
             'slug'     => 'product-save-test',
             'sku'      => 'SAVE-001',
             'price'    => 100,
-            'status'   => 'published',
+            'status'   => 'draft',
             'brand_id' => $this->brand->id,
         ])
         ->call('create')

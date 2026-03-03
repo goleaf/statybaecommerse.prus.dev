@@ -23,7 +23,7 @@ final class DashboardMetricsRepository
             $endOfDay = CarbonImmutable::now()->endOfDay();
 
             return Order::query()
-                ->withoutGlobalScopes([ActiveScope::class])
+                ->withoutGlobalScopes()
                 // Wrap the daily window in the created_at scope to leverage the standalone index.
                 ->createdBetween($startOfDay, $endOfDay)
                 ->whereNull('deleted_at')
@@ -39,7 +39,7 @@ final class DashboardMetricsRepository
             $statuses = Config::get('dashboard.revenue_statuses', []);
 
             $total = Order::query()
-                ->withoutGlobalScopes([ActiveScope::class])
+                ->withoutGlobalScopes()
                 ->when($statuses !== [], fn ($query) => $query->whereIn('status', $statuses))
                 // Pivot to the createdSince scope so the revenue rollup stays aligned with the index.
                 ->createdSince($startDate)
@@ -77,17 +77,22 @@ final class DashboardMetricsRepository
             $threshold = (int) Config::get('inventory.low_stock_threshold', 5);
 
             return Product::query()
-                ->withoutGlobalScopes([ActiveScope::class])
+                ->withoutGlobalScopes()
                 ->where('manage_stock', true)
                 ->whereNull('deleted_at')
                 ->where(function ($query) use ($threshold): void {
                     $query->where(function ($innerQuery): void {
                         $innerQuery
                             ->whereNotNull('low_stock_threshold')
+                            ->where('low_stock_threshold', '>', 0)
                             ->whereColumn('stock_quantity', '<=', 'low_stock_threshold');
                     })->orWhere(function ($innerQuery) use ($threshold): void {
                         $innerQuery
-                            ->whereNull('low_stock_threshold')
+                            ->where(function ($fallbackQuery): void {
+                                $fallbackQuery
+                                    ->whereNull('low_stock_threshold')
+                                    ->orWhere('low_stock_threshold', '<=', 0);
+                            })
                             ->where('stock_quantity', '<=', $threshold);
                     });
                 })

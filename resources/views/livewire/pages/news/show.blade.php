@@ -1,4 +1,10 @@
 <article class="container mx-auto px-4 py-8 prose max-w-none">
+    @php
+        $newsIndexUrl = \Illuminate\Support\Facades\Route::has('localized.news.index')
+            ? route('localized.news.index', ['locale' => app()->getLocale()])
+            : route('frontend.news.index');
+    @endphp
+
     <nav class="mb-6 text-sm text-gray-600">
         <a href="{{ app()->getLocale() === 'lt' ? url('/lt/naujienos') : url('/en/news') }}"
            class="underline">{{ __('messages.frontend') }}</a>
@@ -43,7 +49,7 @@
 
     <!-- Back Button -->
     <div class="mt-8 text-center">
-        <a href="{{ route('news.index', ['locale' => app()->getLocale()]) }}" 
+        <a href="{{ $newsIndexUrl }}"
            class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition duration-200">
             <x-heroicon-o-arrow-left class="w-4 h-4 mr-2" />
             {{ __('frontend.buttons.back_to_news') }}
