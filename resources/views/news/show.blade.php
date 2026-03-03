@@ -74,7 +74,7 @@
         <aside class="lg:col-span-1 space-y-6">
             @if($relatedNews->isNotEmpty())
                 <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.related_products') }}</h2>
+                    <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('messages.related_news') }}</h2>
                     <div class="space-y-4">
                         @foreach($relatedNews as $related)
                             @php($relatedImage = $related->primaryImage())

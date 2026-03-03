@@ -15,56 +15,81 @@ class LegalSeeder extends BaseSeeder
 
         $legalDocuments = [
             [
-                'key'   => 'privacy',
-                'title' => [
+                'key'      => 'privacy-policy',
+                'type'     => 'privacy_policy',
+                'required' => true,
+                'title'    => [
                     'lt' => 'Privatumo politika',
                     'en' => 'Privacy Policy',
                 ],
                 'content' => [
-                    'lt' => 'Privatumo politikos turinys lietuvių kalba...',
-                    'en' => 'Privacy policy content in English...',
+                    'lt' => '<p>Ši privatumo politika paaiškina, kaip renkame, naudojame ir saugome jūsų asmens duomenis naudojantis mūsų svetaine bei paslaugomis.</p>',
+                    'en' => '<p>This privacy policy explains how we collect, use, and protect your personal data when using our website and services.</p>',
                 ],
             ],
             [
-                'key'   => 'terms',
-                'title' => [
+                'key'      => 'terms-of-use',
+                'type'     => 'terms_of_use',
+                'required' => true,
+                'title'    => [
                     'lt' => 'Naudojimosi sąlygos',
                     'en' => 'Terms of Use',
                 ],
                 'content' => [
-                    'lt' => 'Naudojimosi sąlygų turinys lietuvių kalba...',
-                    'en' => 'Terms of use content in English...',
+                    'lt' => '<p>Naudodamiesi svetaine sutinkate su šiomis sąlygomis. Prieš pateikdami užsakymą, susipažinkite su visa sąlygų redakcija.</p>',
+                    'en' => '<p>By using this website, you agree to these terms. Please review the full terms before placing an order.</p>',
                 ],
             ],
             [
-                'key'   => 'refund',
-                'title' => [
+                'key'      => 'return-policy',
+                'type'     => 'refund_policy',
+                'required' => false,
+                'title'    => [
                     'lt' => 'Grąžinimo politika',
-                    'en' => 'Refund Policy',
+                    'en' => 'Return Policy',
                 ],
                 'content' => [
-                    'lt' => 'Grąžinimo politikos turinys lietuvių kalba...',
-                    'en' => 'Refund policy content in English...',
+                    'lt' => '<p>Prekių grąžinimas vykdomas pagal galiojančius teisės aktus. Grąžinimo terminai ir sąlygos nurodomi šiame dokumente.</p>',
+                    'en' => '<p>Returns are handled according to applicable law. Return timelines and conditions are detailed in this policy.</p>',
                 ],
             ],
             [
-                'key'   => 'shipping',
-                'title' => [
+                'key'      => 'shipping-policy',
+                'type'     => 'shipping_policy',
+                'required' => false,
+                'title'    => [
                     'lt' => 'Pristatymo politika',
                     'en' => 'Shipping Policy',
                 ],
                 'content' => [
-                    'lt' => 'Pristatymo politikos turinys lietuvių kalba...',
-                    'en' => 'Shipping policy content in English...',
+                    'lt' => '<p>Pristatymo terminai priklauso nuo sandėlio likučio ir pasirinkto pristatymo būdo. Tiksli informacija pateikiama užsakymo metu.</p>',
+                    'en' => '<p>Delivery timelines depend on stock availability and selected shipping method. Exact details are provided during checkout.</p>',
+                ],
+            ],
+            [
+                'key'      => 'cookie-policy',
+                'type'     => 'cookie_policy',
+                'required' => false,
+                'title'    => [
+                    'lt' => 'Slapukų politika',
+                    'en' => 'Cookie Policy',
+                ],
+                'content' => [
+                    'lt' => '<p>Slapukus naudojame svetainės funkcionalumui, analitikai ir turinio personalizavimui. Daugiau informacijos rasite šiame dokumente.</p>',
+                    'en' => '<p>We use cookies for core website functionality, analytics, and content personalization. Learn more in this document.</p>',
                 ],
             ],
         ];
 
-        foreach ($legalDocuments as $document) {
+        foreach ($legalDocuments as $index => $document) {
             $legal = Legal::query()->updateOrCreate(
                 ['key' => $document['key']],
                 [
-                    'is_enabled' => true,
+                    'type'         => $document['type'],
+                    'is_enabled'   => true,
+                    'is_required'  => (bool) $document['required'],
+                    'sort_order'   => $index + 1,
+                    'published_at' => now(),
                 ]
             );
 

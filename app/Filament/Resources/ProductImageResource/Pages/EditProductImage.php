@@ -5,27 +5,33 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductImageResource\Pages;
 
 use App\Filament\Resources\ProductImageResource;
-use App\Support\Filament\ProductImageDataNormalizer;
+use App\Models\ProductImage;
+use App\Services\ProductImages\ProductImageWriteService;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\Eloquent\Model;
 
 class EditProductImage extends EditRecord
 {
     protected static string $resource = ProductImageResource::class;
 
     /**
-     * @param  array<string, mixed> $data
-     * @return array<string, mixed>
+     * @param  array<string, mixed>  $data
      */
-    protected function mutateFormDataBeforeSave(array $data): array
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
-        return ProductImageDataNormalizer::normalize($data, forUpdate: true);
+        if (! $record instanceof ProductImage) {
+            return $record;
+        }
+
+        return app(ProductImageWriteService::class)->update($record, $data);
     }
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->action(fn (ProductImage $record) => app(ProductImageWriteService::class)->delete($record)),
         ];
     }
 }

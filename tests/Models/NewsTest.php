@@ -36,7 +36,6 @@ final class NewsTest extends TestCase
             'author_name',
             'author_email',
             'view_count',
-            'meta_data',
         ], $news->getFillable());
 
         // Confirm the casts cover every persisted attribute that needs type juggling.
@@ -51,7 +50,6 @@ final class NewsTest extends TestCase
             'approved_by_id'          => 'integer',
             'published_at'            => 'datetime',
             'view_count'              => 'integer',
-            'meta_data'               => 'array',
             'deleted_at'              => 'datetime',
         ], $news->getCasts());
     }

@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Tests\Models;
 
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\StockReservation;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 final class ProductTest extends TestCase
@@ -112,5 +115,33 @@ final class ProductTest extends TestCase
             // Always clear the mocked clock to avoid leaking state between tests.
             Carbon::setTestNow();
         }
+    }
+
+    public function test_main_image_uses_signed_url_when_file_exists_on_secure_media_disk(): void
+    {
+        Storage::fake('public');
+        Storage::fake(SecureStorage::disk());
+
+        $product = Product::factory()->create([
+            'name'         => 'Secure Product Image',
+            'slug'         => 'secure-product-image',
+            'status'       => 'published',
+            'published_at' => now(),
+            'is_enabled'   => true,
+        ]);
+
+        $path = 'product-images/secure-main-image.jpg';
+        Storage::disk(SecureStorage::disk())->put($path, 'secure-image-contents');
+
+        ProductImage::factory()->for($product, 'product')->create([
+            'path'       => $path,
+            'sort_order' => 0,
+            'is_default' => true,
+        ]);
+
+        $mainImage = (string) $product->fresh()->main_image;
+
+        self::assertStringContainsString('/secure-media/', $mainImage);
+        self::assertStringContainsString('signature=', $mainImage);
     }
 }

@@ -7,12 +7,22 @@ namespace Tests\Feature\Frontend;
 use App\Models\Legal;
 use App\Models\Translations\LegalTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\TestCase;
 
 final class LegalPagesTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('app.locale', 'en');
+        config()->set('app.fallback_locale', 'en');
+        app()->setLocale('en');
+    }
 
     #[DataProvider('legalRouteProvider')] // Using attributes silences PHPUnit's metadata deprecation warnings.
     public function test_legal_pages_render_successfully(string $routeName, array $state, string $expectedTitle): void
@@ -45,10 +55,15 @@ final class LegalPagesTest extends TestCase
 
     public function test_legal_page_gracefully_handles_missing_document(): void
     {
+        $documentName = Str::lower((string) __('frontend.legal.privacy_policy'));
+        $expectedMessage = __('frontend.legal.document_unavailable', [
+            'document' => $documentName,
+        ]);
+
         $this
             ->get(route('frontend.legal.privacy'))
             ->assertOk()
-            ->assertSee('Our privacy policy is currently unavailable.');
+            ->assertSee($expectedMessage);
     }
 
     /**

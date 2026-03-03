@@ -210,23 +210,6 @@
                 </div>
             @endif
 
-            @if(!empty($links))
-                <div class="mt-12">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-6">{{ __('frontend.errors.popular_pages.title') }}
-                    </h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        @foreach($links as $link)
-                            <a href="{{ $link['url'] ?? $homeRoute }}"
-                                class="text-center p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
-                                {!! $iconLibrary[$link['icon'] ?? 'categories'] ?? '' !!}
-                                <span
-                                    class="block text-sm font-medium text-gray-700">{{ $link['label'] ?? __('frontend.errors.popular_pages.explore') }}</span>
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
-
             @if($contactCta)
             <div class="mt-12">
                 <div
@@ -256,42 +239,6 @@
             </div>
             @endif
 
-            <div class="mt-12 border-t border-gray-100 pt-8">
-                <h2 class="text-lg font-semibold text-gray-800 text-center mb-3">{{ $supportTitle }}</h2>
-                <p class="text-sm text-gray-500 max-w-xl mx-auto text-center">{{ $supportDescription }}</p>
-
-                @if($traceId !== null)
-                    <div class="mt-6 flex items-center justify-center">
-                        <div
-                            class="inline-flex flex-col sm:flex-row sm:items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-5 py-3">
-                            <span
-                                class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('frontend.errors.trace_id') }}</span>
-                            <span class="font-mono text-sm text-gray-800">{{ $traceId }}</span>
-                        </div>
-                    </div>
-                @endif
-
-                <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4">
-                    @if(is_string($supportEmail) && $supportEmail !== '')
-                        <a href="mailto:{{ $supportEmail }}"
-                            class="border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                            {{ __('frontend.errors.support.email_support') }}
-                        </a>
-                    @endif
-
-                    <a href="{{ $supportPageUrl }}"
-                        class="border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                        {{ __('frontend.errors.support.visit_help_center') }}
-                    </a>
-
-                    <a href="{{ $statusPageUrl }}"
-                        class="border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                        {{ __('frontend.errors.support.view_system_status') }}
-                    </a>
-                </div>
-
-                <p class="mt-6 text-xs text-gray-400 text-center">{{ __('frontend.errors.support.share_trace_id') }}</p>
-            </div>
         </div>
     </div>
 </div>

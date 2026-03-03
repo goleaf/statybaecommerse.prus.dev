@@ -67,10 +67,6 @@ final class NewsSeeder extends BaseSeeder
                 'author_name'             => 'Lorem Ipsum Editorial Team',
                 'author_email'            => $seedEmail,
                 'view_count'              => max(0, (self::TOTAL_ITEMS - $index + 1) * 37),
-                'meta_data'               => [
-                    'seed_source' => 'news_seeder',
-                    'seed_index'  => $index,
-                ],
             ];
             $news->fill(array_intersect_key($newsData, $newsColumns));
             $news->save();

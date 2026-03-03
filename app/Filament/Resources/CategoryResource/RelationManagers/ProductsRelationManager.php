@@ -48,7 +48,7 @@ class ProductsRelationManager extends RelationManager
                 ImageColumn::make('main_image')
                     ->label(__('messages.image'))
                     ->disk('public')
-                    ->getStateUsing(static fn (Product $record): ?string => $record->primaryImage?->path)
+                    ->getStateUsing(static fn (Product $record): ?string => $record->main_image)
                     ->circular(),
                 TextColumn::make('name')
                     ->sortable()

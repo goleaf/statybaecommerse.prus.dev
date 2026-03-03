@@ -17,36 +17,6 @@
 
     <div class="mt-6">{!! $record->content ?? $record->trans('content') !!}</div>
 
-    @php
-        $podcastPlayerUrl = $record->getPodcastPlayerUrl();
-        $podcastShareUrl = $record->getPodcastShareUrl();
-    @endphp
-
-    @if ($podcastPlayerUrl)
-        <section class="mt-10 bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
-            <h2 class="text-2xl font-semibold text-gray-900">{{ __('news.podcast.section_title') }}</h2>
-            <p class="mt-2 text-gray-600">{{ __('news.podcast.section_description') }}</p>
-            <div class="mt-4">
-                <iframe
-                    src="{{ $podcastPlayerUrl }}"
-                    title="{{ __('news.podcast.embed_title') }}"
-                    loading="lazy"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowfullscreen
-                    class="w-full h-48 rounded-lg border border-gray-200"
-                ></iframe>
-            </div>
-            @if ($podcastShareUrl)
-                <div class="mt-4">
-                    <a href="{{ $podcastShareUrl }}" target="_blank" rel="noopener" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition duration-200">
-                        <x-heroicon-o-play class="w-4 h-4 mr-2" />
-                        {{ __('news.podcast.listen_cta') }}
-                    </a>
-                </div>
-            @endif
-        </section>
-    @endif
-
     <!-- Back Button -->
     <div class="mt-8 text-center">
         <a href="{{ $newsIndexUrl }}"

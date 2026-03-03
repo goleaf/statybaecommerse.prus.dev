@@ -19,6 +19,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
 use BackedEnum;
+use Closure;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -93,6 +94,60 @@ final class NewsResource extends BaseResource
             $tenant,
             $shouldGuessMissingParameters,
         );
+    }
+
+    public static function resolveRecordRouteBinding(int|string $key, ?Closure $modifyQuery = null): ?Model
+    {
+        $query = self::getRecordRouteBindingEloquentQuery();
+
+        if ($modifyQuery) {
+            $query = $modifyQuery($query) ?? $query;
+        }
+
+        $record = (clone $query)->whereKey($key)->first();
+
+        if ($record instanceof Model) {
+            return $record;
+        }
+
+        if (! is_string($key) || $key === '') {
+            return null;
+        }
+
+        $locale = app()->getLocale();
+        $fallbackLocale = config('app.fallback_locale');
+
+        $record = (clone $query)
+            ->whereHas('translations', static function (Builder $translationQuery) use ($key, $locale): void {
+                $translationQuery
+                    ->where('locale', $locale)
+                    ->where('slug', $key);
+            })
+            ->first();
+
+        if ($record instanceof Model) {
+            return $record;
+        }
+
+        if (is_string($fallbackLocale) && $fallbackLocale !== '' && $fallbackLocale !== $locale) {
+            $record = (clone $query)
+                ->whereHas('translations', static function (Builder $translationQuery) use ($key, $fallbackLocale): void {
+                    $translationQuery
+                        ->where('locale', $fallbackLocale)
+                        ->where('slug', $key);
+                })
+                ->first();
+
+            if ($record instanceof Model) {
+                return $record;
+            }
+        }
+
+        return (clone $query)
+            ->whereHas('translations', static function (Builder $translationQuery) use ($key): void {
+                $translationQuery->where('slug', $key);
+            })
+            ->first();
     }
 
     public static function getEloquentQuery(): Builder

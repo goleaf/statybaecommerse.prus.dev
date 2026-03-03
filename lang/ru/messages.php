@@ -986,6 +986,7 @@ return [
     'title'                                                                  => 'Title',
     'summary'                                                                => 'Краткое описание',
     'content'                                                                => 'Содержимое',
+    'related_news'                                                           => 'Связанные новости',
     'related_products'                                                       => 'Связанные товары',
     'todays_revenue'                                                         => 'Todays revenue',
     'too_many_requests'                                                      => 'Too many requests.',

@@ -11,7 +11,6 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -89,14 +88,14 @@ final class ProductImagesRelationManagerTest extends TestCase
 
     public function test_can_create_image_with_uploaded_file_from_product_relation_manager(): void
     {
-        $upload = UploadedFile::fake()->image('fresh-upload.jpg', 1200, 800);
+        Storage::disk('public')->put('product-images/fresh-upload.jpg', 'fresh-content');
 
         Livewire::test(ImagesRelationManager::class, [
             'ownerRecord' => $this->product,
             'pageClass'   => EditProduct::class,
         ])
             ->mountTableAction('create')
-            ->set('mountedActions.0.data.path', $upload)
+            ->set('mountedActions.0.data.path', ['product-images/fresh-upload.jpg'])
             ->set('mountedActions.0.data.alt_text', 'Fresh upload image')
             ->set('mountedActions.0.data.sort_order', 0)
             ->set('mountedActions.0.data.is_default', true)
@@ -116,15 +115,15 @@ final class ProductImagesRelationManagerTest extends TestCase
 
     public function test_uploading_images_assigns_incremental_sort_order_automatically(): void
     {
-        $firstUpload = UploadedFile::fake()->image('first-upload.jpg', 1200, 800);
-        $secondUpload = UploadedFile::fake()->image('second-upload.jpg', 1200, 800);
+        Storage::disk('public')->put('product-images/first-upload.jpg', 'first-content');
+        Storage::disk('public')->put('product-images/second-upload.jpg', 'second-content');
 
         Livewire::test(ImagesRelationManager::class, [
             'ownerRecord' => $this->product,
             'pageClass'   => EditProduct::class,
         ])
             ->mountTableAction('create')
-            ->set('mountedActions.0.data.path', $firstUpload)
+            ->set('mountedActions.0.data.path', ['product-images/first-upload.jpg'])
             ->set('mountedActions.0.data.alt_text', 'First upload')
             ->set('mountedActions.0.data.is_default', true)
             ->set('mountedActions.0.data.is_active', true)
@@ -136,7 +135,7 @@ final class ProductImagesRelationManagerTest extends TestCase
             'pageClass'   => EditProduct::class,
         ])
             ->mountTableAction('create')
-            ->set('mountedActions.0.data.path', $secondUpload)
+            ->set('mountedActions.0.data.path', ['product-images/second-upload.jpg'])
             ->set('mountedActions.0.data.alt_text', 'Second upload')
             ->set('mountedActions.0.data.is_default', false)
             ->set('mountedActions.0.data.is_active', true)
@@ -153,7 +152,7 @@ final class ProductImagesRelationManagerTest extends TestCase
         $this->assertSame([0, 1], $sortOrders);
     }
 
-    public function test_can_edit_image_with_uploaded_file_from_product_relation_manager(): void
+    public function test_can_edit_image_with_replacement_path_from_product_relation_manager(): void
     {
         Storage::disk('public')->put('product-images/original-image.jpg', 'original-binary');
 
@@ -166,14 +165,14 @@ final class ProductImagesRelationManagerTest extends TestCase
             'is_active'  => true,
         ]);
 
-        $replacementUpload = UploadedFile::fake()->image('replacement-image.jpg', 1000, 700);
+        Storage::disk('public')->put('product-images/replacement-image.jpg', 'replacement-binary');
 
         Livewire::test(ImagesRelationManager::class, [
             'ownerRecord' => $this->product,
             'pageClass'   => EditProduct::class,
         ])
             ->mountTableAction('edit', $image->getKey())
-            ->set('mountedActions.0.data.path', [$replacementUpload])
+            ->set('mountedActions.0.data.path', ['product-images/replacement-image.jpg'])
             ->set('mountedActions.0.data.alt_text', 'Updated image')
             ->set('mountedActions.0.data.sort_order', 1)
             ->set('mountedActions.0.data.is_default', true)
@@ -238,9 +237,21 @@ final class ProductImagesRelationManagerTest extends TestCase
             ->callMountedTableAction()
             ->assertHasNoTableActionErrors();
 
+        $existingImage->refresh();
+
+        $this->assertSame($otherProduct->getKey(), $existingImage->product_id);
+
+        $clonedImage = ProductImage::withoutGlobalScopes()
+            ->where('product_id', $this->product->getKey())
+            ->where('path', $existingImage->path)
+            ->where('id', '!=', $existingImage->getKey())
+            ->first();
+
+        $this->assertNotNull($clonedImage);
+
         $this->assertDatabaseHas('product_images', [
             'id'         => $existingImage->getKey(),
-            'product_id' => $this->product->getKey(),
+            'product_id' => $otherProduct->getKey(),
         ]);
     }
 
@@ -277,9 +288,22 @@ final class ProductImagesRelationManagerTest extends TestCase
             ->callMountedTableAction()
             ->assertHasNoTableActionErrors();
 
+        $inactiveImage->refresh();
+
+        $this->assertSame($otherProduct->getKey(), $inactiveImage->product_id);
+
+        $clonedImage = ProductImage::withoutGlobalScopes()
+            ->where('product_id', $this->product->getKey())
+            ->where('path', $inactiveImage->path)
+            ->where('id', '!=', $inactiveImage->getKey())
+            ->first();
+
+        $this->assertNotNull($clonedImage);
+        $this->assertFalse((bool) $clonedImage->is_active);
+
         $this->assertDatabaseHas('product_images', [
             'id'         => $inactiveImage->getKey(),
-            'product_id' => $this->product->getKey(),
+            'product_id' => $otherProduct->getKey(),
             'is_active'  => 0,
         ]);
     }

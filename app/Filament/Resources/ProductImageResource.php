@@ -6,8 +6,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductImageResource\Pages as ImagePages;
 use App\Models\ProductImage;
+use App\Services\ProductImages\ProductImageWriteService;
 use App\Support\Filament\Forms\Components\SortOrderInput;
-use App\Support\Storage\SecureStorage;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -23,6 +23,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
 
@@ -65,9 +66,9 @@ final class ProductImageResource extends BaseResource
                             ->label(__('messages.image'))
                             ->required()
                             ->image()
-                            ->disk(SecureStorage::disk())
+                            ->disk('public')
                             ->directory('product-images')
-                            ->visibility('private')
+                            ->visibility('public')
                             ->maxSize(5120)
                             ->columnSpanFull(),
                     ])
@@ -125,10 +126,12 @@ final class ProductImageResource extends BaseResource
             ])
             ->actions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->action(fn (ProductImage $record) => app(ProductImageWriteService::class)->delete($record)),
             ])
             ->bulkActions([
-                DeleteBulkAction::make(),
+                DeleteBulkAction::make()
+                    ->action(fn (EloquentCollection $records) => app(ProductImageWriteService::class)->deleteMany($records)),
             ]);
     }
 

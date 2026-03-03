@@ -122,7 +122,6 @@ trait InteractsWithFilamentPivotTables
                 $table->string('author_name')->nullable();
                 $table->string('author_email')->nullable();
                 $table->unsignedInteger('view_count')->default(0);
-                $table->json('meta_data')->nullable();
                 $table->softDeletes();
                 $table->timestamps();
             });

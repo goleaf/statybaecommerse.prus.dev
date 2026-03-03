@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Widgets;
 
 use App\Models\Slider;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
@@ -32,7 +30,8 @@ final class RecentSlidersWidget extends BaseWidget
                     ->limit(5)
             )
             ->columns([
-                ImageColumn::make('image')
+                SpatieMediaLibraryImageColumn::make('image')
+                    ->collection('slider_images')
                     ->circular()
                     ->size(40),
                 TextColumn::make('title')

@@ -10,6 +10,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
 use App\Support\Html\HtmlSanitizer;
+use App\Support\Storage\SecureStorage;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use DateTimeInterface;
@@ -219,7 +220,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     /**
      * Resolve a scalar fallback from locale-keyed translation arrays.
      *
-     * @param  array<array-key, mixed>  $value
+     * @param array<array-key, mixed> $value
      */
     private static function resolveTranslatedScalar(array $value): ?string
     {
@@ -1459,13 +1460,22 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             return asset(ltrim($path, '/'));
         }
 
-        $defaultDisk = config('filesystems.default', 'public');
-        $disksToCheck = array_unique([$defaultDisk, 'public']);
+        $secureDisk = SecureStorage::disk();
 
-        foreach ($disksToCheck as $disk) {
-            if (Storage::disk($disk)->exists($path)) {
-                return Storage::disk($disk)->url($path);
+        foreach (self::candidateImageDisks() as $disk) {
+            try {
+                if (! Storage::disk($disk)->exists($path)) {
+                    continue;
+                }
+            } catch (Throwable) {
+                continue;
             }
+
+            if ($disk === $secureDisk) {
+                return SecureStorage::temporarySignedUrl($path);
+            }
+
+            return Storage::disk($disk)->url($path);
         }
 
         // Fall back to the public disk URL even if the file is missing so the UI has a consistent path format
@@ -1483,10 +1493,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             return [0, 0];
         }
 
-        $defaultDisk = config('filesystems.default', 'public');
-        $disksToCheck = array_unique([$defaultDisk, 'public']);
-
-        foreach ($disksToCheck as $disk) {
+        foreach (self::candidateImageDisks() as $disk) {
             $filesystem = Storage::disk($disk);
 
             if (! $filesystem->exists($path) || ! method_exists($filesystem, 'path')) {
@@ -1511,6 +1518,20 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         }
 
         return [0, 0];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function candidateImageDisks(): array
+    {
+        $defaultDisk = config('filesystems.default', 'public');
+
+        return array_values(array_unique(array_filter([
+            'public',
+            SecureStorage::disk(),
+            $defaultDisk,
+        ], static fn (mixed $disk): bool => is_string($disk) && $disk !== '')));
     }
 
     // Translation methods

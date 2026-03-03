@@ -22,6 +22,8 @@ final class SupplierForm
                         SpatieMediaLibraryFileUpload::make('logo')
                             ->label(__('messages.logo'))
                             ->collection('logo')
+                            ->disk('public')
+                            ->visibility('public')
                             ->avatar()
                             ->alignCenter()
                             ->columnSpanFull(),

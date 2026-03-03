@@ -108,6 +108,26 @@ final class ProductImageResourceTest extends TestCase
         ]);
     }
 
+    public function test_can_create_product_image_from_existing_storage_path(): void
+    {
+        Storage::disk('public')->put('product-images/uploaded-resource-image.jpg', 'resource-content');
+
+        Livewire::test(CreateProductImage::class)
+            ->fillForm([
+                'product_id' => $this->product->id,
+                'path'       => ['product-images/uploaded-resource-image.jpg'],
+                'alt_text'   => 'Uploaded product image',
+                'sort_order' => 0,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $image = ProductImage::latest()->first();
+        $this->assertNotNull($image);
+        $this->assertSame('Uploaded product image', $image->alt_text);
+        Storage::disk('public')->assertExists($image->path);
+    }
+
     public function test_can_edit_product_image(): void
     {
         $image = ProductImage::factory()->create([

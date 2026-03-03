@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Support\Filament;
 
-use App\Support\Storage\SecureStorage;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -26,7 +25,7 @@ final class ProductImageDataNormalizer
         }
 
         if ($path instanceof TemporaryUploadedFile || $path instanceof UploadedFile) {
-            $storedPath = $path->store(self::PRODUCT_IMAGES_DIRECTORY, SecureStorage::disk());
+            $storedPath = $path->store(self::PRODUCT_IMAGES_DIRECTORY, 'public');
 
             $path = is_string($storedPath) ? $storedPath : null;
         }

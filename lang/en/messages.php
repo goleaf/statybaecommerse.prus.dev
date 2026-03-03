@@ -986,6 +986,7 @@ return [
     'title'                                                                  => 'Title',
     'summary'                                                                => 'Summary',
     'content'                                                                => 'Content',
+    'related_news'                                                           => 'Related news',
     'related_products'                                                       => 'Related products',
     'todays_revenue'                                                         => 'Todays revenue',
     'too_many_requests'                                                      => 'Too many requests.',

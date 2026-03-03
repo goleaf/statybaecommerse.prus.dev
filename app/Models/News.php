@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 /**
  * News
@@ -60,7 +59,6 @@ final class News extends Model implements TranslatableRecord
         'author_name',
         'author_email',
         'view_count',
-        'meta_data',
     ];
 
     /**
@@ -80,7 +78,6 @@ final class News extends Model implements TranslatableRecord
             'updated_by_id'           => 'integer',
             'published_at'            => 'datetime',
             'view_count'              => 'integer',
-            'meta_data'               => 'array',
         ];
     }
 
@@ -180,7 +177,7 @@ final class News extends Model implements TranslatableRecord
     }
 
     /**
-     * Confirm the record has all of the content, metadata, and publishing state required for display.
+     * Confirm the record has all of the content and publishing state required for display.
      */
     public function isReadyForFrontend(): bool
     {
@@ -315,91 +312,6 @@ final class News extends Model implements TranslatableRecord
         }
 
         return $this->getSummaryAttribute() ?: strip_tags((string) $this->getContentAttribute());
-    }
-
-    /**
-     * Retrieve a sanitized embed URL for the associated podcast episode.
-     */
-    public function getPodcastPlayerUrl(): ?string
-    {
-        $embedUrl = data_get($this->meta_data, 'podcast_embed_url');
-        if (is_string($embedUrl) && $embedUrl !== '') {
-            $normalized = $this->normalizePodcastUrl($embedUrl, true);
-            if ($normalized !== null) {
-                return $normalized;
-            }
-        }
-
-        $shareUrl = data_get($this->meta_data, 'podcast_url');
-        if (is_string($shareUrl) && $shareUrl !== '') {
-            return $this->normalizePodcastUrl($shareUrl, true);
-        }
-
-        return null;
-    }
-
-    /**
-     * Retrieve a sanitized share URL for the associated podcast episode.
-     */
-    public function getPodcastShareUrl(): ?string
-    {
-        $shareUrl = data_get($this->meta_data, 'podcast_url');
-        if (is_string($shareUrl) && $shareUrl !== '') {
-            $normalized = $this->normalizePodcastUrl($shareUrl, false);
-            if ($normalized !== null) {
-                return $normalized;
-            }
-        }
-
-        $embedUrl = data_get($this->meta_data, 'podcast_embed_url');
-        if (is_string($embedUrl) && $embedUrl !== '') {
-            return $this->normalizePodcastUrl($embedUrl, false);
-        }
-
-        return null;
-    }
-
-    /**
-     * Normalize supported podcast URLs while avoiding untrusted hosts.
-     */
-    private function normalizePodcastUrl(string $url, bool $preferEmbed): ?string
-    {
-        $trimmed = trim($url);
-        if ($trimmed === '' || filter_var($trimmed, FILTER_VALIDATE_URL) === false) {
-            return null;
-        }
-
-        $parsed = parse_url($trimmed);
-        if ($parsed === false || ! isset($parsed['host'])) {
-            return null;
-        }
-
-        $host = strtolower($parsed['host']);
-        if (! Str::contains($host, 'transistor.fm')) {
-            return null;
-        }
-
-        $path = $parsed['path'] ?? '';
-        $path = '/' . ltrim($path, '/');
-        if ($path === '/') {
-            return null;
-        }
-
-        if ($preferEmbed) {
-            if (Str::startsWith($path, '/s/')) {
-                $path = Str::replaceFirst('/s/', '/e/', $path);
-            } elseif (! Str::startsWith($path, '/e/')) {
-                return null;
-            }
-        } else {
-            if (Str::startsWith($path, '/e/')) {
-                $path = Str::replaceFirst('/e/', '/s/', $path);
-            } elseif (! Str::startsWith($path, '/s/')) {
-                return null;
-            }
-        }
-
-        return 'https://share.transistor.fm' . $path;
     }
 
     /**

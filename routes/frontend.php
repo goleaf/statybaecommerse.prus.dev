@@ -134,15 +134,6 @@ Route::middleware(['web'])->group(function () {
         Route::get('/{post}', [App\Http\Controllers\PostController::class, 'show'])->name('show');
     });
 
-    // Legal Pages
-    Route::prefix('legal')->name('frontend.legal.')->group(function () {
-        Route::get('/privacy', [App\Http\Controllers\Frontend\LegalController::class, 'privacy'])->name('privacy');
-        Route::get('/terms', [App\Http\Controllers\Frontend\LegalController::class, 'terms'])->name('terms');
-        Route::get('/cookies', [App\Http\Controllers\Frontend\LegalController::class, 'cookies'])->name('cookies');
-        Route::get('/shipping', [App\Http\Controllers\Frontend\LegalController::class, 'shipping'])->name('shipping');
-        Route::get('/returns', [App\Http\Controllers\Frontend\LegalController::class, 'returns'])->name('returns');
-    });
-
     // Search
     Route::prefix('search')->name('frontend.search.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\SearchController::class, 'index'])->name('index');

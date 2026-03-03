@@ -109,7 +109,7 @@ class SliderForm
                             ->label(__('translations.slider_image'))
                             ->collection('slider_images')
                             ->image()
-                            ->visibility('private')
+                            ->visibility('public')
                             ->imageEditor()
                             ->imageEditorAspectRatios([
                                 '16:9',
@@ -121,7 +121,7 @@ class SliderForm
                             ->label(__('translations.mobile_image'))
                             ->collection('mobile_images')
                             ->image()
-                            ->visibility('private')
+                            ->visibility('public')
                             ->imageEditor()
                             ->maxSize(2048),  // 2MB
                     ])
@@ -257,7 +257,9 @@ class SliderForm
                                 FileUpload::make('image')
                                     ->label(__('translations.slide_image'))
                                     ->image()
-                                    ->directory('sliders/slides'),
+                                    ->disk('public')
+                                    ->directory('sliders/slides')
+                                    ->visibility('public'),
                                 SearchableInput::make('link')
                                     ->label(__('translations.button_url'))
                                     ->placeholder(__('translations.button_url'))

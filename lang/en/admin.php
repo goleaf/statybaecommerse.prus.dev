@@ -911,8 +911,6 @@ return [
         'view_count'              => 'Views',
         'images_count'            => 'Images',
         'is_breaking'             => 'Breaking',
-        'meta_data'               => 'Meta data',
-        'add_meta_data'           => 'Add metadata entry',
         'seo_title'               => 'SEO title',
         'seo_description'         => 'SEO description',
         'audit'                   => 'Audit',

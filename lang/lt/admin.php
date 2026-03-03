@@ -911,8 +911,6 @@ return [
         'view_count'              => 'Peržiūros',
         'images_count'            => 'Paveikslėliai',
         'is_breaking'             => 'Skubi naujiena',
-        'meta_data'               => 'Meta duomenys',
-        'add_meta_data'           => 'Pridėti meta duomenų įrašą',
         'seo_title'               => 'SEO pavadinimas',
         'seo_description'         => 'SEO aprašymas',
         'audit'                   => 'Auditas',

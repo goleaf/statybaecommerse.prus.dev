@@ -907,8 +907,6 @@ return [
         'view_count'              => 'Просмотры',
         'images_count'            => 'Изображения',
         'is_breaking'             => 'Срочная новость',
-        'meta_data'               => 'Мета-данные',
-        'add_meta_data'           => 'Добавить мета-запись',
         'seo_title'               => 'SEO заголовок',
         'seo_description'         => 'SEO описание',
         'audit'                   => 'Аудит',

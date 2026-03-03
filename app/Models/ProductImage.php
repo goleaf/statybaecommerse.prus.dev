@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 /**
  * ProductImage
@@ -154,10 +156,17 @@ final class ProductImage extends Model
      */
     public function getExistsOnDiskAttribute(): bool
     {
-        /** @var string $disk */
-        $disk = config('filesystems.default', 'public');
+        foreach (self::candidateImageDisks() as $disk) {
+            try {
+                if (Storage::disk($disk)->exists($this->path)) {
+                    return true;
+                }
+            } catch (Throwable) {
+                continue;
+            }
+        }
 
-        return Storage::disk($disk)->exists($this->path);
+        return false;
     }
 
     /**
@@ -283,18 +292,40 @@ final class ProductImage extends Model
             return asset(ltrim($path, '/'));
         }
 
-        // Try to find the file in storage
-        /** @var string $defaultDisk */
-        $defaultDisk = config('filesystems.default', 'public');
-        $disksToCheck = array_unique([$defaultDisk, 'public']);
+        $secureDisk = SecureStorage::disk();
+        $disksToCheck = self::candidateImageDisks();
 
         foreach ($disksToCheck as $disk) {
-            if (Storage::disk($disk)->exists($path)) {
-                return Storage::disk($disk)->url($path);
+            try {
+                if (! Storage::disk($disk)->exists($path)) {
+                    continue;
+                }
+            } catch (Throwable) {
+                continue;
             }
+
+            if ($disk === $secureDisk) {
+                return SecureStorage::temporarySignedUrl($path);
+            }
+
+            return Storage::disk($disk)->url($path);
         }
 
         // Fall back to the public disk URL
         return Storage::disk('public')->url($path);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function candidateImageDisks(): array
+    {
+        $defaultDisk = config('filesystems.default', 'public');
+
+        return array_values(array_unique(array_filter([
+            'public',
+            SecureStorage::disk(),
+            $defaultDisk,
+        ], static fn (mixed $disk): bool => is_string($disk) && $disk !== '')));
     }
 }

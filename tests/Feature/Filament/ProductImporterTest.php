@@ -320,3 +320,114 @@ it('skips image import when image_url download fails and still imports the produ
 
     expect($images)->toHaveCount(0);
 });
+
+it('appends image paths from image column without replacing existing images', function (): void {
+    Storage::fake('public');
+    $user = User::factory()->admin()->create();
+
+    $existing = Product::factory()->create([
+        'sku'  => 'IMG-APPEND-001',
+        'name' => 'Append Existing Product',
+    ]);
+
+    ProductImage::factory()->create([
+        'product_id' => $existing->getKey(),
+        'path'       => 'product-images/existing-append.jpg',
+        'sort_order' => 0,
+        'is_default' => true,
+    ]);
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 1;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+    $row['name'] = 'Append Existing Product';
+    $row['sku'] = 'IMG-APPEND-001';
+    $row['image'] = 'https://example.com/images/appended-image.jpg';
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+    $options = [
+        'should_sync' => true,
+        'sync_keys'   => [
+            ['field' => 'sku'],
+        ],
+    ];
+
+    (new ImportCsv($import, [$row], $columnMap, $options))->handle();
+
+    $existing->refresh();
+    $images = $existing->images()->withoutGlobalScopes()->orderBy('sort_order')->get();
+
+    expect($import->fresh()->successful_rows)->toBe(1)
+        ->and($images)->toHaveCount(2)
+        ->and($images->pluck('path')->all())->toContain(
+            'product-images/existing-append.jpg',
+            'https://example.com/images/appended-image.jpg',
+        );
+});
+
+it('replaces image_url and appends image column paths in the same import row', function (): void {
+    Storage::fake('public');
+    Http::fake([
+        'https://example.com/images/combined.png' => Http::response('combined-image-bytes', 200, [
+            'Content-Type' => 'image/png',
+        ]),
+    ]);
+
+    $user = User::factory()->admin()->create();
+    $existing = Product::factory()->create([
+        'sku'  => 'IMG-COMBINED-001',
+        'name' => 'Combined Product',
+    ]);
+
+    ProductImage::factory()->create([
+        'product_id' => $existing->getKey(),
+        'path'       => 'product-images/legacy-combined.jpg',
+        'sort_order' => 0,
+        'is_default' => true,
+    ]);
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 1;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+    $row['name'] = 'Combined Product';
+    $row['sku'] = 'IMG-COMBINED-001';
+    $row['image_url'] = 'https://example.com/images/combined.png';
+    $row['image'] = 'https://example.com/images/combined-extra.jpg';
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+    $options = [
+        'should_sync' => true,
+        'sync_keys'   => [
+            ['field' => 'sku'],
+        ],
+    ];
+
+    (new ImportCsv($import, [$row], $columnMap, $options))->handle();
+
+    $existing->refresh();
+    $images = $existing->images()->withoutGlobalScopes()->orderBy('sort_order')->get();
+
+    expect($import->fresh()->successful_rows)->toBe(1)
+        ->and($images)->toHaveCount(2)
+        ->and($images->pluck('path')->contains('https://example.com/images/combined-extra.jpg'))->toBeTrue();
+
+    $downloadedImage = $images->firstWhere('path', '!=', 'https://example.com/images/combined-extra.jpg');
+
+    expect($downloadedImage)->not->toBeNull()
+        ->and((string) $downloadedImage?->path)->toStartWith('product-images/' . $existing->getKey() . '/')
+        ->and((string) $downloadedImage?->path)->toEndWith('.png');
+});

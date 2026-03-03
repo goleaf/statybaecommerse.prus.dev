@@ -6,6 +6,7 @@ namespace Tests\Models;
 
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -82,6 +83,21 @@ final class ProductImageTest extends TestCase
         self::assertSame($absoluteUrl, $image->fresh()->url);
     }
 
+    public function test_url_attribute_returns_signed_url_for_secure_media_files(): void
+    {
+        // Fake the secure disk and persist a file there to exercise secure URL generation.
+        Storage::fake(SecureStorage::disk());
+        $path = 'product-images/private-example.jpg';
+        Storage::disk(SecureStorage::disk())->put($path, 'secure-image-contents');
+
+        $image = ProductImage::factory()->create(['path' => $path]);
+        $url = (string) $image->fresh()->url;
+
+        // Secure assets should resolve to the signed download route, not a public storage URL.
+        self::assertStringContainsString('/secure-media/', $url);
+        self::assertStringContainsString('signature=', $url);
+    }
+
     public function test_full_path_attribute_returns_storage_location(): void
     {
         // Build an image instance without persisting it to inspect the computed attribute.
@@ -109,6 +125,19 @@ final class ProductImageTest extends TestCase
         $missing = $image->fresh();
         $missing->path = 'product-images/missing.jpg';
         self::assertFalse($missing->exists_on_disk);
+    }
+
+    public function test_exists_on_disk_attribute_checks_secure_media_disk_as_fallback(): void
+    {
+        Storage::fake('public');
+        Storage::fake(SecureStorage::disk());
+
+        $path = 'product-images/private-on-disk.jpg';
+        Storage::disk(SecureStorage::disk())->put($path, 'secure-image-contents');
+
+        $image = ProductImage::factory()->create(['path' => $path]);
+
+        self::assertTrue($image->fresh()->exists_on_disk);
     }
 
     public function test_scopes_chain_for_active_product_and_ordering_filters(): void

@@ -93,6 +93,7 @@ final class Supplier extends Model implements HasMedia
     {
         $this->addMediaCollection('logo')
             ->singleFile()
+            ->useDisk('public')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml']);
     }
 

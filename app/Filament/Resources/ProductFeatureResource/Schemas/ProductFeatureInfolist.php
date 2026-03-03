@@ -43,7 +43,7 @@ class ProductFeatureInfolist
                                 return $record->product ? [$record->product] : [];
                             })
                             ->schema([
-                                ImageEntry::make('primaryImage.path')
+                                ImageEntry::make('main_image')
                                     ->label(__('messages.image'))
                                     ->disk('public')
                                     ->defaultImageUrl(product_placeholder_url('thumb'))

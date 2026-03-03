@@ -24,6 +24,7 @@ final class SuppliersTable
                     ->label(__('messages.logo'))
                     ->collection('logo')
                     ->conversion('logo-sm')
+                    ->visibility('private')
                     ->circular(),
                 TextColumn::make('name')
                     ->label(__('messages.name'))

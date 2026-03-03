@@ -6,7 +6,6 @@ namespace App\Filament\Resources\News\Schemas;
 
 use App\Enums\ModerationState;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -84,15 +83,6 @@ final class NewsForm
                             ->default(0)
                             ->disabled()
                             ->dehydrated(false),
-                    ]),
-                Section::make(__('admin.news.meta_data'))
-                    ->schema([
-                        KeyValue::make('meta_data')
-                            ->label(__('admin.news.meta_data'))
-                            ->keyLabel(__('messages.key'))
-                            ->valueLabel(__('messages.value'))
-                            ->addActionLabel(__('admin.news.add_meta_data'))
-                            ->columnSpanFull(),
                     ]),
             ]);
     }

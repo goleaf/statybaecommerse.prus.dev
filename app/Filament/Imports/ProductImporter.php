@@ -7,7 +7,7 @@ namespace App\Filament\Imports;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductImage;
+use App\Services\ProductImages\ProductImageWriteService;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
@@ -29,6 +29,8 @@ class ProductImporter extends BaseImporter
     protected static ?string $model = Product::class;
 
     private ?string $pendingImageUrl = null;
+
+    private mixed $pendingImageState = null;
 
     private const IMPORT_IMAGE_MAX_WIDTH = 1600;
 
@@ -125,8 +127,10 @@ class ProductImporter extends BaseImporter
 
     protected function beforeFill(): void
     {
-        $rawImageUrl = $this->data['image_url'] ?? $this->data['image'] ?? null;
+        $rawImageUrl = $this->data['image_url'] ?? null;
         $this->pendingImageUrl = is_string($rawImageUrl) ? trim($rawImageUrl) : null;
+
+        $this->pendingImageState = $this->data['image'] ?? null;
 
         if ($this->pendingImageUrl === '') {
             $this->pendingImageUrl = null;
@@ -421,7 +425,7 @@ class ProductImporter extends BaseImporter
             $this->replaceProductImageFromUrl(trim($imageUrl));
         }
 
-        $imageState = $this->data['image'] ?? null;
+        $imageState = $this->pendingImageState;
 
         if (blank($imageState)) {
             return;
@@ -496,42 +500,7 @@ class ProductImporter extends BaseImporter
      */
     private function attachImages(Product $product, array $paths): void
     {
-        $existingPaths = $product->images()
-            ->withoutGlobalScopes()
-            ->pluck('path')
-            ->all();
-
-        $maxSortOrder = $product->images()
-            ->withoutGlobalScopes()
-            ->max('sort_order');
-
-        $nextSortOrder = is_numeric($maxSortOrder) ? ((int) $maxSortOrder + 1) : 0;
-        $shouldMarkDefault = empty($existingPaths);
-
-        foreach ($paths as $path) {
-            $storedPath = $this->resolveImagePath($product, $path, $nextSortOrder);
-
-            if ($storedPath === '') {
-                continue;
-            }
-
-            if (in_array($storedPath, $existingPaths, true)) {
-                continue;
-            }
-
-            ProductImage::query()->create([
-                'product_id' => $product->getKey(),
-                'path'       => $storedPath,
-                'alt_text'   => $this->resolveImageAltText($product),
-                'sort_order' => $nextSortOrder,
-                'is_default' => $shouldMarkDefault,
-                'is_active'  => true,
-            ]);
-
-            $existingPaths[] = $storedPath;
-            $nextSortOrder++;
-            $shouldMarkDefault = false;
-        }
+        $this->imageWriteService()->appendPaths($product, $paths, $this->resolveImageAltText($product));
     }
 
     private function resolveImageAltText(Product $product): ?string
@@ -545,54 +514,6 @@ class ProductImporter extends BaseImporter
         $name = trim($name);
 
         return $name !== '' ? $name : null;
-    }
-
-    private function resolveImagePath(Product $product, string $path, int $index): string
-    {
-        $path = trim($path);
-
-        if ($path === '') {
-            return '';
-        }
-
-        if (str_starts_with($path, 'data:')) {
-            return $this->storeDataUriImage($product, $path, $index);
-        }
-
-        return $path;
-    }
-
-    private function storeDataUriImage(Product $product, string $dataUri, int $index): string
-    {
-        if (! preg_match('/^data:(.*?);base64,(.*)$/', $dataUri, $matches)) {
-            return '';
-        }
-
-        $mime = strtolower($matches[1] ?? 'image/jpeg');
-        $extension = match ($mime) {
-            'image/png'  => 'png',
-            'image/webp' => 'webp',
-            'image/gif'  => 'gif',
-            default      => 'jpg',
-        };
-
-        $contents = base64_decode($matches[2] ?? '', true);
-
-        if (! is_string($contents) || $contents === '') {
-            return '';
-        }
-
-        $dir = 'product-images/' . $product->getKey();
-        $filename = 'image-' . $index . '-' . Str::random(8) . '.' . $extension;
-        $path = $dir . '/' . $filename;
-
-        try {
-            Storage::disk('public')->put($path, $contents);
-        } catch (Throwable) {
-            return '';
-        }
-
-        return $path;
     }
 
     private function shouldSync(): bool
@@ -884,25 +805,7 @@ class ProductImporter extends BaseImporter
 
             Storage::disk('public')->put($path, $resizedImageContents);
 
-            $existingImages = $this->record
-                ->images()
-                ->withoutGlobalScopes()
-                ->get();
-
-            foreach ($existingImages as $existingImage) {
-                Storage::disk('public')->delete((string) $existingImage->path);
-            }
-
-            $this->record->images()->withoutGlobalScopes()->delete();
-
-            ProductImage::query()->create([
-                'product_id' => $this->record->getKey(),
-                'path'       => $path,
-                'alt_text'   => $this->record->name,
-                'sort_order' => 0,
-                'is_default' => true,
-                'is_active'  => true,
-            ]);
+            $this->imageWriteService()->replaceWithPath($this->record, $path, $this->record->name);
         } catch (Throwable) {
             // Best-effort image import. Ignore errors so the product row still imports successfully.
             return;
@@ -1048,5 +951,10 @@ class ProductImporter extends BaseImporter
         }
 
         return $encodedContents;
+    }
+
+    private function imageWriteService(): ProductImageWriteService
+    {
+        return app(ProductImageWriteService::class);
     }
 }

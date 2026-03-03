@@ -459,6 +459,19 @@ Route::get('/cart', Pages\Cart::class)->name('cart.index');
 Route::get('/search', function () {
     return redirect('/' . app()->getLocale() . '/search');
 })->name('search');
+
+Route::prefix('legal')->name('frontend.legal.')->group(function (): void {
+    Route::get('/privacy', [App\Http\Controllers\Frontend\LegalController::class, 'privacy'])->name('privacy');
+    Route::get('/terms', [App\Http\Controllers\Frontend\LegalController::class, 'terms'])->name('terms');
+    Route::get('/cookies', [App\Http\Controllers\Frontend\LegalController::class, 'cookies'])->name('cookies');
+    Route::get('/shipping', [App\Http\Controllers\Frontend\LegalController::class, 'shipping'])->name('shipping');
+    Route::get('/returns', [App\Http\Controllers\Frontend\LegalController::class, 'returns'])->name('returns');
+});
+
+Route::get('/privatumo-politika', function () {
+    return redirect('/legal/privacy', 301);
+})->name('frontend.legal.privacy.legacy-lt');
+
 // Legal pages
 Route::prefix('legal')->name('legal.')->group(function () {
     Route::get('/', [App\Http\Controllers\LegalController::class, 'index'])->name('index');
@@ -467,8 +480,12 @@ Route::prefix('legal')->name('legal.')->group(function () {
     // Specific endpoints must be defined before the catch-all {key}
     Route::get('/sitemap.xml', [App\Http\Controllers\LegalController::class, 'sitemap'])->name('sitemap');
     Route::get('/rss.xml', [App\Http\Controllers\LegalController::class, 'rss'])->name('rss');
-    Route::get('/{key}/download/{format?}', [App\Http\Controllers\LegalController::class, 'download'])->name('download');
-    Route::get('/{key}', [App\Http\Controllers\LegalController::class, 'show'])->name('show');
+    Route::get('/{key}/download/{format?}', [App\Http\Controllers\LegalController::class, 'download'])
+        ->where('key', '^(?!privacy$|terms$|cookies$|shipping$|returns$).+')
+        ->name('download');
+    Route::get('/{key}', [App\Http\Controllers\LegalController::class, 'show'])
+        ->where('key', '^(?!privacy$|terms$|cookies$|shipping$|returns$).+')
+        ->name('show');
 });
 
 // Legacy legal route

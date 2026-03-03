@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\RelationManagers;
 
+use App\Models\Product;
 use App\Models\ProductImage;
+use App\Services\ProductImages\ProductImageWriteService;
 use App\Support\Filament\Forms\Components\SortOrderInput;
-use App\Support\Filament\ProductImageDataNormalizer;
-use App\Support\Storage\SecureStorage;
 use Filament\Actions\AssociateAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
@@ -24,10 +24,6 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\Relation;
 
 class ImagesRelationManager extends RelationManager
 {
@@ -47,9 +43,9 @@ class ImagesRelationManager extends RelationManager
                 FileUpload::make('path')
                     ->label(__('messages.image'))
                     ->image()
-                    ->disk(SecureStorage::disk())
+                    ->disk('public')
                     ->directory('product-images')
-                    ->visibility('private')
+                    ->visibility('public')
                     ->required(fn (string $operation): bool => $operation === 'create')
                     ->imagePreviewHeight('250'),
                 TextInput::make('alt_text')
@@ -109,32 +105,19 @@ class ImagesRelationManager extends RelationManager
                         array $arguments,
                         array $data,
                         Schema $schema,
-                        Table $table,
                     ): void {
-                        /** @var HasMany|MorphMany $relationship */
-                        $relationship = Relation::noConstraints(fn () => $table->getRelationship());
-
-                        /** @var ProductImage|null $record */
-                        $record = ProductImage::query()
+                        $sourceImage = ProductImage::query()
                             ->withoutGlobalScopes()
                             ->find($data['recordId'] ?? null);
 
-                        if (! $record instanceof ProductImage) {
+                        $owner = $this->getOwnerRecord();
+
+                        if (! $sourceImage instanceof ProductImage || ! $owner instanceof Product) {
                             return;
                         }
 
-                        $action->record($record);
-
-                        /** @var BelongsTo $inverseRelationship */
-                        $inverseRelationship = $table->getInverseRelationshipFor($record);
-
-                        $action->process(function () use ($inverseRelationship, $record, $relationship): void {
-                            $inverseRelationship->associate($relationship->getParent());
-                            $record->save();
-                        }, [
-                            'inverseRelationship' => $inverseRelationship,
-                            'relationship'        => $relationship,
-                        ]);
+                        $action->record($sourceImage);
+                        $this->imageWriteService()->cloneAttach($owner, $sourceImage);
 
                         if ($arguments['another'] ?? false) {
                             $action->callAfter();
@@ -149,39 +132,30 @@ class ImagesRelationManager extends RelationManager
                         $action->success();
                     }),
                 CreateAction::make()
-                    ->mutateDataUsing(function (array $data): array {
-                        $ownerRecord = $this->getOwnerRecord();
+                    ->using(function (array $data): ProductImage {
+                        $owner = $this->getOwnerRecord();
 
-                        $rawSortOrder = $data['sort_order'] ?? null;
-                        $sortOrderWasProvided = is_string($rawSortOrder)
-                            ? trim($rawSortOrder) !== ''
-                            : $rawSortOrder !== null;
-
-                        $data = ProductImageDataNormalizer::normalize($data);
-
-                        $data['product_id'] = $ownerRecord->getKey();
-
-                        if (! $sortOrderWasProvided) {
-                            $nextSortOrder = (int) (
-                                $ownerRecord->images()
-                                    ->withoutGlobalScopes()
-                                    ->max('sort_order')
-                                ?? -1
-                            ) + 1;
-
-                            $data['sort_order'] = max(0, $nextSortOrder);
+                        if (! $owner instanceof Product) {
+                            throw new \RuntimeException('Owner record must be a product.');
                         }
 
-                        return $data;
-                    })
-                    ->using(fn (array $data): ProductImage => $this->getOwnerRecord()->images()->create($data)),
+                        return $this->imageWriteService()->create($owner, $data);
+                    }),
             ])
             ->actions([
                 EditAction::make()
-                    ->mutateDataUsing(static fn (array $data): array => ProductImageDataNormalizer::normalize($data, forUpdate: true)),
-                DeleteAction::make(),
+                    ->using(function (array $data, ProductImage $record): void {
+                        $this->imageWriteService()->update($record, $data);
+                    }),
+                DeleteAction::make()
+                    ->action(fn (ProductImage $record) => $this->imageWriteService()->delete($record)),
             ])
             ->reorderable('sort_order')
             ->defaultSort('sort_order');
+    }
+
+    private function imageWriteService(): ProductImageWriteService
+    {
+        return app(ProductImageWriteService::class);
     }
 }

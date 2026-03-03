@@ -911,8 +911,6 @@ return [
         'view_count'              => 'Aufrufe',
         'images_count'            => 'Bilder',
         'is_breaking'             => 'Eilmeldung',
-        'meta_data'               => 'Meta-Daten',
-        'add_meta_data'           => 'Meta-Daten-Eintrag hinzufügen',
         'seo_title'               => 'SEO-Titel',
         'seo_description'         => 'SEO-Beschreibung',
         'audit'                   => 'Audit',

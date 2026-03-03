@@ -60,9 +60,6 @@ use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
-
-use function in_array;
-
 use InvalidArgumentException;
 
 use function is_array;
@@ -524,7 +521,53 @@ class AppServiceProvider extends ServiceProvider
                                 return $state;
                             }
 
-                            return SecureStorage::temporarySignedUrl($state);
+                            if (str_starts_with($state, '/')) {
+                                return asset(ltrim($state, '/'));
+                            }
+
+                            $secureDisk = SecureStorage::disk();
+                            $configuredDisk = $column->getDiskName();
+
+                            if ($configuredDisk === $secureDisk) {
+                                return SecureStorage::temporarySignedUrl($state);
+                            }
+
+                            $disksToCheck = array_values(array_unique(array_filter([
+                                $configuredDisk,
+                                'public',
+                                $secureDisk,
+                                config('filesystems.default', 'public'),
+                            ], static fn (mixed $disk): bool => is_string($disk) && $disk !== '')));
+
+                            foreach ($disksToCheck as $disk) {
+                                try {
+                                    if (! Storage::disk($disk)->exists($state)) {
+                                        continue;
+                                    }
+                                } catch (Throwable) {
+                                    continue;
+                                }
+
+                                if ($disk === $secureDisk) {
+                                    return SecureStorage::temporarySignedUrl($state);
+                                }
+
+                                if ($disk === 'public') {
+                                    return Storage::disk('public')->url($state);
+                                }
+
+                                return $state;
+                            }
+
+                            try {
+                                if (Storage::disk($secureDisk)->exists($state)) {
+                                    return SecureStorage::temporarySignedUrl($state);
+                                }
+                            } catch (Throwable) {
+                                // Fall back to Filament's native resolution when disk checks fail.
+                            }
+
+                            return $state;
                         }
                     );
                 }

@@ -14,6 +14,7 @@ use Database\Seeders\CurrencySeeder;
 use Database\Seeders\CustomerGroupSeeder;
 use Database\Seeders\FeatureFlagSeeder;
 use Database\Seeders\InventorySeeder;
+use Database\Seeders\LegalSeeder;
 use Database\Seeders\NewsSeeder;
 use Database\Seeders\OptimizedFullSeeder;
 use Database\Seeders\ServiceSeeder;
@@ -90,6 +91,7 @@ return [
         CitiesMergedSeeder::class,
         AdminAuthorizationSeeder::class,
         AdminUserSeeder::class,
+        LegalSeeder::class,
         NewsSeeder::class,
         CustomerGroupSeeder::class,
         UsersCompanyTabSeeder::class,

@@ -986,6 +986,7 @@ return [
     'title'                                                                  => 'Pavadinimas',
     'summary'                                                                => 'Santrauka',
     'content'                                                                => 'Turinys',
+    'related_news'                                                           => 'Susijusios naujienos',
     'related_products'                                                       => 'Susijusios prekės',
     'todays_revenue'                                                         => 'Šios dienos pajamos',
     'too_many_requests'                                                      => 'Per daug prašymų.',

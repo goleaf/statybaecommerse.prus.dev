@@ -32,6 +32,7 @@ final class ImagesRelationManager extends RelationManager
                     ->label(__('admin.news_images.image'))
                     ->disk('public')
                     ->directory('news-images')
+                    ->visibility('public')
                     ->image()
                     ->required(),
                 TextInput::make('alt_text')
@@ -58,6 +59,7 @@ final class ImagesRelationManager extends RelationManager
                 ImageColumn::make('file_path')
                     ->label(__('admin.news_images.image'))
                     ->disk('public')
+                    ->visibility('public')
                     ->square(),
                 TextColumn::make('caption')
                     ->label(__('admin.news_images_table.columns.caption'))

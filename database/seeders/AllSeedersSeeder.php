@@ -27,6 +27,7 @@ final class AllSeedersSeeder extends BaseSeeder
         \Database\Seeders\Cities\CitiesMergedSeeder::class,
         AdminAuthorizationSeeder::class,
         AdminUserSeeder::class,
+        LegalSeeder::class,
         NewsSeeder::class,
         CustomerGroupSeeder::class,
         ServiceSeeder::class,

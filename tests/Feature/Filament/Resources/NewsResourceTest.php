@@ -171,6 +171,20 @@ it('does not return server errors for invalid edit identifiers', function (): vo
     expect($response->status())->toBeIn([302, 404]);
 });
 
+it('resolves translated slugs on admin news view and edit routes', function (): void {
+    app()->setLocale('lt');
+
+    $news = createNewsRecord();
+    addNewsTranslation($news, 'lt', 'Naujiena LT', 'naujiena-lt');
+    addNewsTranslation($news, 'en', 'News EN', 'lorem-ipsum-news-1-1-en');
+
+    $this->get('/admin/news/lorem-ipsum-news-1-1-en')
+        ->assertSuccessful();
+
+    $this->get('/admin/news/lorem-ipsum-news-1-1-en/edit')
+        ->assertSuccessful();
+});
+
 it('can create news with localized content', function (): void {
     Livewire::test(CreateNews::class)
         ->fillForm([
