@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Brochure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 
 final class BrochureController extends Controller
 {
@@ -14,9 +15,9 @@ final class BrochureController extends Controller
     {
         $brochures = Brochure::query()
             ->active()
-            ->whereHas('files', static fn ($query) => $query->active())
+            ->whereHas('files', static fn (Builder $query): Builder => $query->active())
             ->with([
-                'files' => static fn ($query) => $query
+                'files' => static fn ($filesQuery) => $filesQuery
                     ->active()
                     ->orderBy('sort_order')
                     ->orderBy('name'),
@@ -25,17 +26,14 @@ final class BrochureController extends Controller
             ->orderBy('title')
             ->get();
 
-        $downloads = $brochures
-            ->flatMap(static fn (Brochure $brochure) => $brochure->files->map(static function ($file) use ($brochure): array {
-                return [
-                    'brochure_title' => $brochure->title,
-                    'file'           => $file,
-                ];
-            }))
-            ->values();
+        $stats = [
+            'total_brochures' => $brochures->count(),
+            'total_files'     => $brochures->sum(static fn (Brochure $brochure): int => $brochure->files->count()),
+        ];
 
         return view('frontend.brochures.index', [
-            'downloads' => $downloads,
+            'brochures' => $brochures,
+            'stats'     => $stats,
         ]);
     }
 }

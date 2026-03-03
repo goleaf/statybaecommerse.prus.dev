@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\News\Schemas;
 
+use App\Enums\ModerationState;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
@@ -27,11 +28,15 @@ final class NewsInfolist
                                 TextEntry::make('moderation_state')
                                     ->label(__('messages.moderation'))
                                     ->badge()
-                                    ->formatStateUsing(static fn (?string $state): string => match ($state) {
-                                        'draft'     => __('admin.news.state_draft'),
-                                        'review'    => __('admin.news.state_review'),
-                                        'published' => __('admin.news.state_published'),
-                                        default     => (string) $state,
+                                    ->formatStateUsing(static function (mixed $state): string {
+                                        $value = $state instanceof ModerationState ? $state->value : (string) $state;
+
+                                        return match ($value) {
+                                            'draft'     => __('admin.news.state_draft'),
+                                            'review'    => __('admin.news.state_review'),
+                                            'published' => __('admin.news.state_published'),
+                                            default     => $value,
+                                        };
                                     }),
                                 TextEntry::make('published_at')
                                     ->label(__('admin.news.published_at'))

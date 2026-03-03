@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Filament;
 
-use App\Filament\Pages\SliderManagement;
-use App\Filament\Resources\SliderResource;
+use App\Filament\Resources\Sliders\SliderResource;
 use App\Filament\Widgets\SliderQuickActionsWidget;
 use App\Support\Filament\Components\SearchableInput;
 use App\Support\Filament\SearchableInputHelper;
 use ErrorException;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
+use Filament\Forms\Form;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
@@ -25,7 +25,6 @@ uses(TestCase::class);
 // Provide each place where the slider link lookup exists so the shared assertion can exercise all entry points.
 dataset('slider_searchable_input_resolvers', [
     'quick actions widget' => static fn (): array => resolveQuickActionComponent(),
-    'management page'      => static fn (): array => resolveManagementComponent(),
     'resource form'        => static fn (): array => resolveResourceComponent(),
 ]);
 
@@ -56,23 +55,8 @@ it('clears the slider link lookup state and payload when the search input is emp
  */
 function resolveQuickActionComponent(): array
 {
-    if (! class_exists(\Filament\Tables\Actions\Action::class)) {
-        throw new ErrorException('Filament tables actions are not available in this build.');
-    }
-
     $widget = app(SliderQuickActionsWidget::class);
     $action = $widget->createSliderAction();
-
-    return resolveComponentFromAction($action);
-}
-
-/**
- * @return array{SearchableInput, DummyLivewireComponent}
- */
-function resolveManagementComponent(): array
-{
-    $page = app(SliderManagement::class);
-    $action = $page->createSliderAction();
 
     return resolveComponentFromAction($action);
 }

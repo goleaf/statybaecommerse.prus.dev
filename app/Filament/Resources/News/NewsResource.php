@@ -22,6 +22,7 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
 final class NewsResource extends BaseResource
@@ -67,6 +68,31 @@ final class NewsResource extends BaseResource
     public static function table(Table $table): Table
     {
         return NewsTable::configure($table);
+    }
+
+    /**
+     * @param array<mixed> $parameters
+     */
+    public static function getUrl(
+        ?string $name = null,
+        array $parameters = [],
+        bool $isAbsolute = true,
+        ?string $panel = null,
+        ?Model $tenant = null,
+        bool $shouldGuessMissingParameters = false
+    ): string {
+        if (($parameters['record'] ?? null) instanceof News) {
+            $parameters['record'] = (string) $parameters['record']->getKey();
+        }
+
+        return parent::getUrl(
+            $name,
+            $parameters,
+            $isAbsolute,
+            $panel,
+            $tenant,
+            $shouldGuessMissingParameters,
+        );
     }
 
     public static function getEloquentQuery(): Builder

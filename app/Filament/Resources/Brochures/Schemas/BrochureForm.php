@@ -20,37 +20,40 @@ final class BrochureForm
         return $schema
             ->components([
                 Section::make(__('admin.brochures.section_brochure'))
+                    ->description(__('admin.brochures.section_brochure_description'))
                     ->schema([
                         TextInput::make('title')
                             ->label(__('messages.title'))
+                            ->placeholder(__('admin.brochures.title_placeholder'))
                             ->required()
                             ->maxLength(255),
                         Textarea::make('description')
                             ->label(__('messages.description'))
+                            ->placeholder(__('admin.brochures.description_placeholder'))
                             ->rows(3)
                             ->columnSpanFull(),
-                        TextInput::make('sort_order')
-                            ->label(__('messages.sort_order'))
-                            ->numeric()
-                            ->integer()
-                            ->default(0)
-                            ->required(),
                         Toggle::make('is_active')
                             ->label(__('messages.active'))
+                            ->helperText(__('admin.brochures.active_helper'))
                             ->default(true)
                             ->required(),
                     ])
                     ->columns(2)
                     ->columnSpanFull(),
                 Section::make(__('admin.brochures.section_files'))
+                    ->description(__('admin.brochures.section_files_description'))
                     ->schema([
                         Repeater::make('files')
                             ->label(__('admin.brochures.files_label'))
                             ->relationship()
+                            ->orderColumn('sort_order')
                             ->defaultItems(0)
+                            ->collapsible()
+                            ->collapsed()
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('messages.name'))
+                                    ->placeholder(__('admin.brochures.file_name_placeholder'))
                                     ->required()
                                     ->maxLength(255),
                                 FileUpload::make('file_path')
@@ -61,14 +64,9 @@ final class BrochureForm
                                     ->visibility('private')
                                     ->acceptedFileTypes(['application/pdf', '.pdf'])
                                     ->maxSize(50 * 1024)
+                                    ->helperText(__('admin.brochures.file_upload_helper'))
                                     ->openable()
                                     ->downloadable(),
-                                TextInput::make('sort_order')
-                                    ->label(__('messages.sort_order'))
-                                    ->numeric()
-                                    ->integer()
-                                    ->default(0)
-                                    ->required(),
                                 Toggle::make('is_active')
                                     ->label(__('messages.active'))
                                     ->default(true)
@@ -78,7 +76,16 @@ final class BrochureForm
                             ->itemLabel(static function (array $state): ?string {
                                 $name = trim((string) ($state['name'] ?? ''));
 
-                                return $name !== '' ? $name : __('admin.brochures.file_row');
+                                if ($name === '') {
+                                    $name = __('admin.brochures.file_row');
+                                }
+
+                                $isActive = (bool) ($state['is_active'] ?? true);
+                                if (! $isActive) {
+                                    return $name . ' (' . __('admin.brochures.file_inactive') . ')';
+                                }
+
+                                return $name;
                             })
                             ->addActionLabel(__('admin.brochures.add_file')),
                     ])

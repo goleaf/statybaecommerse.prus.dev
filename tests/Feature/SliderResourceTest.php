@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Enums\NavigationGroup;
+use App\Filament\Resources\Sliders\Pages\CreateSlider;
+use App\Filament\Resources\Sliders\Pages\EditSlider;
+use App\Filament\Resources\Sliders\Pages\ListSliders;
 use App\Filament\Resources\Sliders\SliderResource;
 use App\Models\AdminUser;
 use App\Models\Slider;
@@ -27,17 +30,14 @@ final class SliderResourceTest extends TestCase
         Storage::fake('public');
         Storage::fake('media');
 
-        // Create test user
         $this->user = AdminUser::factory()->create();
         $this->actingAs($this->user, 'admin');
 
-        // Create test sliders
         $this->createTestSliders();
     }
 
     private function createTestSliders(): void
     {
-        // Create active sliders with various features
         $slider1 = Slider::factory()->create([
             'title'            => 'Active Slider with Image',
             'is_active'        => true,
@@ -62,7 +62,7 @@ final class SliderResourceTest extends TestCase
             'title'       => 'Inactive Slider',
             'is_active'   => false,
             'button_text' => 'Click Here',
-            'button_url'  => 'https://internal-link.com',
+            'button_url'  => '/products',
         ]);
         $this->attachImage($slider3);
 
@@ -80,34 +80,47 @@ final class SliderResourceTest extends TestCase
         try {
             $slider->addMedia(UploadedFile::fake()->image('slider.jpg'))
                 ->toMediaCollection('slider_images');
-        } catch (Exception $e) {
-            // Ignore if media library not set up or fails in test env
+        } catch (Exception) {
+            // Ignore media edge cases in SQLite test runs.
         }
     }
 
     public function test_can_access_slider_resource_list(): void
     {
-        $this
-            ->get('/admin/sliders')
-            ->assertStatus(200);
+        $this->get('/admin/sliders')->assertSuccessful();
     }
 
     public function test_slider_resource_has_correct_navigation_group(): void
     {
-        $this->assertEquals(
-            NavigationGroup::Content->label(),
-            SliderResource::getNavigationGroup()
-        );
+        $this->assertSame(NavigationGroup::Content->label(), SliderResource::getNavigationGroup());
     }
 
     public function test_slider_resource_has_correct_model(): void
     {
-        $this->assertEquals(Slider::class, SliderResource::getModel());
+        $this->assertSame(Slider::class, SliderResource::getModel());
+    }
+
+    public function test_slider_resource_has_expected_header_actions(): void
+    {
+        Livewire::test(ListSliders::class)
+            ->assertActionExists('create')
+            ->assertActionExists('settings')
+            ->assertActionExists('toggleAllSliders');
+    }
+
+    public function test_slider_resource_has_expected_table_and_bulk_actions(): void
+    {
+        Livewire::test(ListSliders::class)
+            ->assertTableActionExists('toggleSlider')
+            ->assertTableActionExists('edit')
+            ->assertTableActionExists('delete')
+            ->assertTableActionExists('replicate')
+            ->assertTableBulkActionExists('delete');
     }
 
     public function test_slider_resource_can_list_sliders(): void
     {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
+        Livewire::test(ListSliders::class)
             ->assertCanSeeTableRecords(Slider::all());
     }
 
@@ -115,7 +128,7 @@ final class SliderResourceTest extends TestCase
     {
         $slug = 'new-test-slider-' . uniqid();
 
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
+        Livewire::test(CreateSlider::class)
             ->fillForm([
                 'title'            => 'New Test Slider',
                 'slug'             => $slug,
@@ -137,51 +150,27 @@ final class SliderResourceTest extends TestCase
         ]);
     }
 
-    /*
-    // Commented out: SearchableInput component causes Filament validation errors
-    // when testing form submission. See: button_url field uses searchUsing() not options()
-    public function test_slider_resource_can_create_slider(): void
-    {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
-            ->fillForm([
-                'title'            => 'New Test Slider',
-                'slug'             => 'new-test-slider',
-                'description'      => 'Test description',
-                'button_text'      => 'Click Me',
-                'background_color' => '#ff0000',
-                'text_color'       => '#ffffff',
-                'is_active'        => true,
-                'sort_order'       => 1,
-            ])
-            ->call('create')
-            ->assertHasNoFormErrors();
-
-        $this->assertDatabaseHas('sliders', [
-            'title'            => 'New Test Slider',
-            'slug'             => 'new-test-slider',
-            'description'      => 'Test description',
-            'button_text'      => 'Click Me',
-            'background_color' => '#ff0000',
-            'text_color'       => '#ffffff',
-            'is_active'        => true,
-            'sort_order'       => 1,
-        ]);
-    }
-    */
-
-    /*
-    // Commented out: SearchableInput component causes Filament validation errors
     public function test_slider_resource_can_edit_slider(): void
     {
-        $slider = Slider::first();
+        $slider = Slider::query()->firstOrFail();
+        $slider->update(['slug' => 'editable-slider-' . $slider->id]);
 
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\EditSlider::class, [
+        $updatedSlug = 'updated-slider-' . $slider->id;
+
+        Livewire::test(EditSlider::class, [
             'record' => $slider->getRouteKey(),
         ])
             ->fillForm([
-                'title'       => 'Updated Slider Title',
-                'description' => 'Updated description',
-                'is_active'   => false,
+                'title'            => 'Updated Slider Title',
+                'slug'             => $updatedSlug,
+                'description'      => 'Updated description',
+                'button_text'      => 'Updated CTA',
+                'button_url'       => '/updated-products',
+                'background_color' => '#112233',
+                'text_color'       => '#ffffff',
+                'is_active'        => false,
+                'sort_order'       => 25,
+                'slides'           => [],
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -189,19 +178,21 @@ final class SliderResourceTest extends TestCase
         $this->assertDatabaseHas('sliders', [
             'id'          => $slider->id,
             'title'       => 'Updated Slider Title',
-            'description' => 'Updated description',
+            'slug'        => $updatedSlug,
+            'description' => '<p>Updated description</p>',
+            'button_url'  => '/updated-products',
             'is_active'   => false,
+            'sort_order'  => 25,
         ]);
     }
-    */
 
     public function test_slider_resource_can_delete_slider(): void
     {
-        $slider = Slider::first();
+        $slider = Slider::query()->firstOrFail();
 
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
+        Livewire::test(ListSliders::class)
             ->callTableAction('delete', $slider)
-            ->assertHasNoActionErrors();
+            ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseMissing('sliders', [
             'id' => $slider->id,
@@ -210,7 +201,7 @@ final class SliderResourceTest extends TestCase
 
     public function test_slider_resource_can_filter_by_status(): void
     {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
+        Livewire::test(ListSliders::class)
             ->filterTable('is_active', true)
             ->assertCanSeeTableRecords(Slider::where('is_active', true)->get())
             ->assertCanNotSeeTableRecords(Slider::where('is_active', false)->get());
@@ -218,24 +209,52 @@ final class SliderResourceTest extends TestCase
 
     public function test_slider_resource_can_search_sliders(): void
     {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
+        Livewire::test(ListSliders::class)
             ->searchTable('Active Slider with Image')
             ->assertCanSeeTableRecords(Slider::where('title', 'like', '%Active Slider with Image%')->get());
     }
 
     public function test_slider_resource_can_sort_sliders(): void
     {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
+        Livewire::test(ListSliders::class)
             ->sortTable('title')
             ->assertCanSeeTableRecords(Slider::orderBy('title')->get());
     }
 
+    public function test_slider_resource_can_toggle_active_status(): void
+    {
+        $slider = Slider::query()->where('is_active', true)->firstOrFail();
+        $isActiveBeforeToggle = $slider->is_active;
+
+        Livewire::test(ListSliders::class)
+            ->callTableAction('toggleSlider', $slider)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertNotSame($isActiveBeforeToggle, $slider->fresh()->is_active);
+    }
+
+    public function test_slider_resource_can_duplicate_slider(): void
+    {
+        $slider = Slider::query()->whereNull('slug')->firstOrFail();
+        $initialCount = Slider::count();
+
+        Livewire::test(ListSliders::class)
+            ->callTableAction('replicate', $slider)
+            ->assertHasNoTableActionErrors();
+
+        $this->assertSame($initialCount + 1, Slider::count());
+        $this->assertDatabaseHas('sliders', [
+            'title' => $slider->title . ' (Copy)',
+        ]);
+    }
+
     public function test_slider_resource_can_bulk_delete_sliders(): void
     {
-        $sliders = Slider::take(2)->get();
+        $sliders = Slider::query()->take(2)->get();
 
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
-            ->callTableBulkAction('delete', $sliders);
+        Livewire::test(ListSliders::class)
+            ->callTableBulkAction('delete', $sliders)
+            ->assertHasNoTableBulkActionErrors();
 
         foreach ($sliders as $slider) {
             $this->assertDatabaseMissing('sliders', [
@@ -244,129 +263,45 @@ final class SliderResourceTest extends TestCase
         }
     }
 
-    /*
-    public function test_slider_resource_can_toggle_active_status(): void
+    public function test_slider_resource_can_toggle_all_sliders_to_inactive_when_active_majority(): void
     {
-        $slider = Slider::first();
+        $this->assertGreaterThan(
+            Slider::query()->where('is_active', false)->count(),
+            Slider::query()->where('is_active', true)->count()
+        );
 
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
-            ->callTableAction('toggle_active', $slider)
-            ->assertHasNoTableActionErrors();
+        Livewire::test(ListSliders::class)
+            ->callAction('toggleAllSliders')
+            ->assertHasNoActionErrors();
 
-        $slider->refresh();
-        $this->assertNotEquals($slider->is_active, Slider::first()->is_active);
+        $this->assertSame(0, Slider::query()->where('is_active', true)->count());
     }
-    */
 
-    /*
-    // Commented out: SearchableInput component issues
-    public function test_slider_resource_can_duplicate_slider(): void
+    public function test_slider_resource_can_toggle_all_sliders_to_active_when_inactive_majority(): void
     {
-        $slider = Slider::first();
+        Slider::query()->update(['is_active' => false]);
 
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
-            ->callTableAction('replicate', $slider)
-            ->assertHasNoTableActionErrors();
+        Livewire::test(ListSliders::class)
+            ->callAction('toggleAllSliders')
+            ->assertHasNoActionErrors();
 
-        $this->assertDatabaseHas('sliders', [
-            'title' => $slider->title . ' (Copy)',
-        ]);
+        $this->assertSame(Slider::count(), Slider::query()->where('is_active', true)->count());
     }
-    */
 
-    /*
-    // Commented out: SearchableInput component issues
-    public function test_slider_resource_validates_required_fields(): void
+    public function test_slider_resource_can_submit_settings_action(): void
     {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
-            ->fillForm([
-                'title' => '',  // Required field
+        Livewire::test(ListSliders::class)
+            ->callAction('settings', [
+                'auto_optimize_images' => false,
+                'default_animation'    => 'zoom',
+                'default_duration'     => 4000,
             ])
-            ->call('create')
-            ->assertHasFormErrors(['title']);
+            ->assertHasNoActionErrors();
     }
-    */
-
-    /*
-    // Commented out: SearchableInput component causes Filament validation errors
-    public function test_slider_resource_validates_url_format(): void
-    {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
-            ->fillForm([
-                'title' => '',  // Required field - testing validation
-            ])
-            ->call('create')
-            ->assertHasFormErrors(['title']);
-    }
-    */
-
-    /*
-    // Commented out: SearchableInput component causes Filament validation errors
-    public function test_slider_resource_can_upload_image(): void
-    {
-        $slider = Slider::first();
-
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\EditSlider::class, [
-            'record' => $slider->getRouteKey(),
-        ])
-            ->fillForm([
-                'slider_image' => UploadedFile::fake()->image('test.jpg'),
-            ])
-            ->call('save')
-            ->assertHasNoFormErrors();
-
-        $this->assertTrue($slider->fresh()->hasMedia('slider_images'));
-    }
-    */
-
-    /*
-    // Commented out: SearchableInput component causes Filament validation errors
-    public function test_slider_resource_can_upload_mobile_image(): void
-    {
-        $slider = Slider::first();
-
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\EditSlider::class, [
-            'record' => $slider->getRouteKey(),
-        ])
-            ->fillForm([
-                'mobile_image' => UploadedFile::fake()->image('mobile.jpg'),
-            ])
-            ->call('save')
-            ->assertHasNoFormErrors();
-
-        $this->assertTrue($slider->fresh()->hasMedia('mobile_images'));
-    }
-    */
-
-    /*
-    public function test_slider_resource_can_manage_settings(): void
-    {
-        $slider = Slider::first();
-
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\EditSlider::class, [
-            'record' => $slider->getRouteKey(),
-        ])
-            ->fillForm([
-                'settings' => [
-                    'autoplay'        => true,
-                    'interval'        => 5000,
-                    'show_indicators' => true,
-                ],
-            ])
-            ->call('save')
-            ->assertHasNoFormErrors();
-
-        $slider->refresh();
-        $this->assertIsArray($slider->settings);
-        $this->assertTrue($slider->settings['autoplay']);
-        $this->assertEquals(5000, $slider->settings['interval']);
-        $this->assertTrue($slider->settings['show_indicators']);
-    }
-    */
 
     public function test_slider_resource_has_correct_table_columns(): void
     {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
+        Livewire::test(ListSliders::class)
             ->assertCanSeeTableColumns([
                 'title',
                 'sort_order',
@@ -376,12 +311,11 @@ final class SliderResourceTest extends TestCase
 
     public function test_slider_resource_has_correct_form_fields(): void
     {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
+        Livewire::test(CreateSlider::class)
             ->assertFormFieldExists('title')
             ->assertFormFieldExists('slug')
             ->assertFormFieldExists('description')
             ->assertFormFieldExists('button_text')
-            // Note: button_url is a SearchableInput which cannot be tested with assertFormFieldExists
             ->assertFormFieldExists('background_color')
             ->assertFormFieldExists('text_color')
             ->assertFormFieldExists('is_active')
@@ -392,24 +326,6 @@ final class SliderResourceTest extends TestCase
     {
         auth('admin')->logout();
 
-        $this
-            ->get('/admin/sliders')
-            ->assertRedirect('/admin/login');
+        $this->get('/admin/sliders')->assertRedirect('/admin/login');
     }
-
-    /*
-    public function test_slider_resource_can_export_sliders(): void
-    {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
-            ->callTableAction('export')
-            ->assertHasNoTableActionErrors();
-    }
-
-    public function test_slider_resource_can_import_sliders(): void
-    {
-        Livewire::test(\App\Filament\Resources\Sliders\Pages\ListSliders::class)
-            ->callTableAction('import')
-            ->assertHasNoTableActionErrors();
-    }
-    */
 }

@@ -31,6 +31,20 @@ final class SupplierResource extends Resource
         return NavigationGroup::Products->label();
     }
 
+    public static function shouldRegisterNavigation(): bool
+    {
+        return self::canViewAny();
+    }
+
+    public static function getNavigationItems(): array
+    {
+        if (! self::canViewAny()) {
+            return [];
+        }
+
+        return parent::getNavigationItems();
+    }
+
     public static function getModelLabel(): string
     {
         return __('admin.suppliers.model_label');

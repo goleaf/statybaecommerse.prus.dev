@@ -22,6 +22,8 @@ it('provides critical admin translation keys and does not expose deprecated mess
         'admin.brochures.model_label',
         'admin.brochures.navigation_label',
         'admin.brochures.requires_active_file',
+        'admin.brochures.active_files_label',
+        'admin.brochures.open_frontend',
     ];
 
     foreach ($requiredKeys as $key) {

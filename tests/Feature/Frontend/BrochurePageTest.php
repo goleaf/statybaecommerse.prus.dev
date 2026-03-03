@@ -82,8 +82,10 @@ it('shows only active brochure files on localized brochures page', function (): 
     $response = $this->get(route('localized.brochures.index', ['locale' => 'lt']));
 
     $response->assertOk();
+    $response->assertSee('Active brochure');
     $response->assertSee('Visible file');
     $response->assertSee($visibleFile->downloadUrl());
+    $response->assertDontSee('Hidden brochure');
     $response->assertDontSee('Hidden inactive file');
     $response->assertDontSee('Hidden brochure file');
 });

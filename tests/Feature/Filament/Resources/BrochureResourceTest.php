@@ -15,8 +15,8 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
-use Tests\Support\PdfFixture;
 use Livewire\Livewire;
+use Tests\Support\PdfFixture;
 
 uses(RefreshDatabase::class);
 
@@ -74,13 +74,63 @@ it('can list seeded brochures in admin table', function (): void {
         ->assertCanSeeTableRecords($seededBrochures);
 });
 
+it('filters brochures table by active status', function (): void {
+    $active = Brochure::factory()->create([
+        'title'     => 'Active brochure',
+        'is_active' => true,
+    ]);
+
+    $inactive = Brochure::factory()->create([
+        'title'     => 'Inactive brochure',
+        'is_active' => false,
+    ]);
+
+    Livewire::test(ListBrochures::class)
+        ->filterTable('is_active', true)
+        ->assertCanSeeTableRecords([$active])
+        ->assertCanNotSeeTableRecords([$inactive]);
+});
+
+it('filters brochures table by active files availability', function (): void {
+    $withActiveFiles = Brochure::factory()->create([
+        'title'     => 'Brochure with active files',
+        'is_active' => true,
+    ]);
+
+    $withoutActiveFiles = Brochure::factory()->create([
+        'title'     => 'Brochure without active files',
+        'is_active' => true,
+    ]);
+
+    BrochureFile::factory()->create([
+        'brochure_id' => $withActiveFiles->id,
+        'name'        => 'Active file',
+        'is_active'   => true,
+    ]);
+
+    BrochureFile::factory()->create([
+        'brochure_id' => $withoutActiveFiles->id,
+        'name'        => 'Inactive file',
+        'is_active'   => false,
+    ]);
+
+    Livewire::test(ListBrochures::class)
+        ->filterTable('has_active_files', 'yes')
+        ->assertCanSeeTableRecords([$withActiveFiles])
+        ->assertCanNotSeeTableRecords([$withoutActiveFiles]);
+
+    Livewire::test(ListBrochures::class)
+        ->filterTable('has_active_files', 'no')
+        ->assertCanSeeTableRecords([$withoutActiveFiles])
+        ->assertCanNotSeeTableRecords([$withActiveFiles]);
+});
+
 it('blocks creating active brochure without active files', function (): void {
     Livewire::test(CreateBrochure::class)
         ->fillForm([
-            'title'      => 'Missing Files',
-            'sort_order' => 1,
-            'is_active'  => true,
-            'files'      => [],
+            'title'     => 'Missing Files',
+            'is_active' => true,
+            'files'     => [],
         ])
         ->call('create')
         ->assertHasFormErrors(['files']);
@@ -91,10 +141,9 @@ it('blocks creating active brochure without active files', function (): void {
 it('can create inactive brochure without files', function (): void {
     Livewire::test(CreateBrochure::class)
         ->fillForm([
-            'title'      => 'Draft brochure',
-            'sort_order' => 1,
-            'is_active'  => false,
-            'files'      => [],
+            'title'     => 'Draft brochure',
+            'is_active' => false,
+            'files'     => [],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -124,18 +173,16 @@ it('can edit brochure fields', function (): void {
 
     Livewire::test(EditBrochure::class, ['record' => $brochure->getRouteKey()])
         ->fillForm([
-            'title'      => 'Updated brochure',
-            'sort_order' => 9,
-            'is_active'  => true,
+            'title'     => 'Updated brochure',
+            'is_active' => true,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('brochures', [
-        'id'         => $brochure->id,
-        'title'      => 'Updated brochure',
-        'sort_order' => 9,
-        'is_active'  => true,
+        'id'        => $brochure->id,
+        'title'     => 'Updated brochure',
+        'is_active' => true,
     ]);
 });
 

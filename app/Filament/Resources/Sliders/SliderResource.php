@@ -11,6 +11,7 @@ use App\Filament\Resources\Sliders\Pages\ListSliders;
 use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
 use App\Models\Slider;
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -18,6 +19,8 @@ use Filament\Tables\Table;
 class SliderResource extends Resource
 {
     protected static ?string $model = Slider::class;
+
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-photo';
 
     public static function getNavigationGroup(): ?string
     {

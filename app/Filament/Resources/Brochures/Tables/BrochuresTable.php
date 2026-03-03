@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Brochures\Tables;
 
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -22,14 +25,19 @@ final class BrochuresTable
                 TextColumn::make('title')
                     ->label(__('messages.title'))
                     ->searchable()
+                    ->description(static fn (mixed $state, mixed $record): ?string => filled($record?->description) ? (string) $record->description : null)
+                    ->limit(80)
+                    ->wrap()
                     ->sortable(),
                 TextColumn::make('files_count')
                     ->label(__('admin.brochures.files_label'))
-                    ->counts('files')
+                    ->badge()
+                    ->color('gray')
                     ->sortable(),
-                TextColumn::make('sort_order')
-                    ->label(__('messages.sort_order'))
-                    ->numeric()
+                TextColumn::make('active_files_count')
+                    ->label(__('admin.brochures.active_files_label'))
+                    ->badge()
+                    ->color('success')
                     ->sortable(),
                 IconColumn::make('is_active')
                     ->label(__('messages.active'))
@@ -41,7 +49,37 @@ final class BrochuresTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->filters([
+                TernaryFilter::make('is_active')
+                    ->label(__('messages.active')),
+                SelectFilter::make('has_active_files')
+                    ->label(__('admin.brochures.active_files_filter'))
+                    ->options([
+                        'yes' => __('admin.yes'),
+                        'no'  => __('admin.no'),
+                    ])
+                    ->query(static function (Builder $query, array $data): Builder {
+                        $value = $data['value'] ?? null;
+
+                        if ($value === 'yes') {
+                            return $query->whereHas('files', static fn (Builder $filesQuery): Builder => $filesQuery->where('is_active', true));
+                        }
+
+                        if ($value === 'no') {
+                            return $query->whereDoesntHave('files', static fn (Builder $filesQuery): Builder => $filesQuery->where('is_active', true));
+                        }
+
+                        return $query;
+                    }),
+            ])
             ->recordActions([
+                Action::make('open_frontend')
+                    ->label(__('admin.brochures.open_frontend'))
+                    ->icon('heroicon-m-arrow-top-right-on-square')
+                    ->url(static fn (mixed $record): string => route('localized.brochures.index', [
+                        'locale' => app()->getLocale(),
+                    ]))
+                    ->openUrlInNewTab(),
                 EditAction::make(),
                 DeleteAction::make()
                     ->requiresConfirmation()
@@ -56,7 +94,14 @@ final class BrochuresTable
                         ->modalDescription(__('admin.brochures.delete_warning')),
                 ]),
             ])
-            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->orderBy('sort_order')->orderBy('title'))
-            ->defaultSort('sort_order');
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query
+                ->withCount('files')
+                ->withCount([
+                    'files as active_files_count' => static fn (Builder $filesQuery): Builder => $filesQuery->where('is_active', true),
+                ])
+                ->orderBy('sort_order')
+                ->orderBy('title'))
+            ->defaultSort('sort_order')
+            ->reorderable('sort_order');
     }
 }

@@ -8,11 +8,10 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
-use Symfony\Component\HttpFoundation\Response;
 
 final class SetFilamentLocale
 {
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next): mixed
     {
         $isAdminContext = $this->isAdminContext($request);
         $locale = $this->resolveLocale($request, $isAdminContext);
@@ -29,10 +28,7 @@ final class SetFilamentLocale
 
         Session::put('app.locale', $locale);
 
-        /** @var Response $response */
-        $response = $next($request);
-
-        return $response;
+        return $next($request);
     }
 
     private function isAdminContext(Request $request): bool
