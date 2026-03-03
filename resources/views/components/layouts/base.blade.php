@@ -9,14 +9,46 @@
 
     @php
         $seoData = $seo ?? [];
-        $sectionTitle = trim($__env->yieldContent('title'));
-        $resolvedTitle = $seoData['title']
-            ?? $title
-            ?? ($sectionTitle !== '' ? $sectionTitle : config('app.name', 'E-Commerce'));
-        $sectionDescription = trim($__env->yieldContent('description'));
-        $resolvedDescription = $seoData['description']
-            ?? $description
-            ?? ($sectionDescription !== '' ? $sectionDescription : null);
+        $normalizeMetaValue = static function (mixed $value): ?string {
+            if (! is_scalar($value)) {
+                return null;
+            }
+
+            $normalized = trim((string) $value);
+
+            if ($normalized === '') {
+                return null;
+            }
+
+            $looksLikeTranslationKey = preg_match('/^[a-z0-9_]+(?:\.[a-z0-9_]+)+$/i', $normalized) === 1;
+            if ($looksLikeTranslationKey && __($normalized) === $normalized) {
+                return null;
+            }
+
+            return $normalized;
+        };
+
+        $defaultTitle = $normalizeMetaValue(config('app.name')) ?? 'E-Commerce';
+        $defaultDescription = $normalizeMetaValue(__('messages.meta_description_home')) ?? $defaultTitle;
+
+        $hasCustomMetaSection = trim($__env->yieldContent('meta')) !== '';
+        $sectionTitle = $normalizeMetaValue($__env->yieldContent('title'));
+        $sectionDescription = $normalizeMetaValue($__env->yieldContent('description'));
+        $legacySectionDescription = $normalizeMetaValue($__env->yieldContent('meta_description'));
+
+        $resolvedTitle = $normalizeMetaValue($seoData['title'] ?? null)
+            ?? $normalizeMetaValue($title ?? null)
+            ?? $sectionTitle
+            ?? $defaultTitle;
+
+        $resolvedDescription = $normalizeMetaValue($seoData['description'] ?? null)
+            ?? $normalizeMetaValue($description ?? null)
+            ?? $sectionDescription
+            ?? $legacySectionDescription;
+
+        if ($resolvedDescription === null && ! $hasCustomMetaSection) {
+            $resolvedDescription = $defaultDescription;
+        }
         $canonicalLink = $seoData['canonical_url'] ?? ($canonicalUrl ?? null);
         $alternateLinks = $seoData['alternate_locales'] ?? ($alternateLocales ?? null);
         $metaKeywords = $seoData['keywords'] ?? ($metaKeywords ?? null);

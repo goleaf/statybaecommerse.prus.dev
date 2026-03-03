@@ -33,6 +33,7 @@ final class ProductListItemData implements Arrayable
         'products.short_description', // Used for short description, NOT description
         'products.price',
         'products.stock_quantity',
+        'products.manage_stock',
         'products.brand_id',
         'products.created_at', // May be needed for sorting
         'products.updated_at', // May be needed for sorting
@@ -72,6 +73,7 @@ final class ProductListItemData implements Arrayable
         public readonly ?float $averageRating,
         public readonly int $reviewsCount,
         public readonly int $stockQuantity,
+        public readonly bool $manageStock,
         public readonly ?string $imageUrl,
         public readonly string $initials,
         public readonly ?string $shortDescription,
@@ -139,6 +141,7 @@ final class ProductListItemData implements Arrayable
             $product->average_rating !== null ? (float) $product->average_rating : null,
             (int) $product->reviews_count,
             (int) $product->stock_quantity,
+            (bool) $product->manage_stock,
             $imageUrl !== '' ? $imageUrl : null,
             Str::upper(Str::of($name)->substr(0, 2)->toString()),
             $shortDescription,
@@ -150,7 +153,7 @@ final class ProductListItemData implements Arrayable
      */
     public function inStock(): bool
     {
-        return $this->stockQuantity > 0;
+        return ! $this->manageStock || $this->stockQuantity > 0;
     }
 
     /**
@@ -175,6 +178,7 @@ final class ProductListItemData implements Arrayable
      *     average_rating:?float,
      *     reviews_count:int,
      *     stock_quantity:int,
+     *     manage_stock:bool,
      *     image_url:?string,
      *     initials:string,
      *     short_description:?string
@@ -193,6 +197,7 @@ final class ProductListItemData implements Arrayable
             'average_rating'    => $this->averageRating,
             'reviews_count'     => $this->reviewsCount,
             'stock_quantity'    => $this->stockQuantity,
+            'manage_stock'      => $this->manageStock,
             'image_url'         => $this->imageUrl,
             'initials'          => $this->initials,
             'short_description' => $this->shortDescription,

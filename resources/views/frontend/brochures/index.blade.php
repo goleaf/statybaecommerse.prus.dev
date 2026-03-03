@@ -1,4 +1,4 @@
-<x-layouts.base title="{{ __('frontend.brochures.meta.title') }}">
+<x-layouts.base title="{{ __('frontend.brochures.meta.title') }}" description="{{ __('frontend.brochures.meta.description') }}">
     <div class="min-h-screen bg-slate-50">
         <section class="border-b border-slate-200 bg-white">
             <x-container class="px-4 py-10">

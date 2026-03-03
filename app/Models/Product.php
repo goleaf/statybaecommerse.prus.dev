@@ -1088,6 +1088,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             'products.short_description', // Used for short description, NOT description
             'products.price',
             'products.stock_quantity',
+            'products.manage_stock',
             'products.brand_id',
             'products.created_at', // May be needed for sorting
             'products.updated_at', // May be needed for sorting

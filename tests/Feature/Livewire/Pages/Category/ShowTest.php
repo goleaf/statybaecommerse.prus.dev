@@ -115,4 +115,38 @@ final class ShowTest extends TestCase
         $this->assertSame($product->getKey(), $cart[$cartKey]['product_id']);
         $this->assertSame(1, $cart[$cartKey]['quantity']);
     }
+
+    public function test_it_keeps_add_to_cart_enabled_for_non_stock_managed_products(): void
+    {
+        $category = Category::factory()->create([
+            'is_visible' => true,
+        ]);
+
+        $product = Product::factory()->published()->create([
+            'is_enabled'       => true,
+            'status'           => 'published',
+            'published_at'     => now()->subDay(),
+            'manage_stock'     => false,
+            'stock_quantity'   => 0,
+            'hide_add_to_cart' => false,
+            'is_requestable'   => false,
+        ]);
+
+        $category->products()->attach($product->getKey());
+
+        $component = Livewire::test(Show::class, ['category' => $category])->assertStatus(200);
+        $html = $component->html();
+        $productIdPattern = preg_quote((string) $product->getKey(), '/');
+
+        $this->assertMatchesRegularExpression('/wire:click="addToCart\(' . $productIdPattern . '\)"[^>]*>/', $html);
+        $this->assertDoesNotMatchRegularExpression('/wire:click="addToCart\(' . $productIdPattern . '\)"[^>]*\sdisabled(\s|>)/', $html);
+
+        $component->call('addToCart', (int) $product->getKey(), 1, null, null);
+
+        $cart = session()->get('cart', []);
+        $cartKey = (string) $product->getKey();
+
+        $this->assertArrayHasKey($cartKey, $cart);
+        $this->assertSame(1, $cart[$cartKey]['quantity']);
+    }
 }

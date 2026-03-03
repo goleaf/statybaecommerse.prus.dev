@@ -310,12 +310,6 @@ return [
     ],
     'discounts_import'   => 'Import Discounts',
     'document_templates' => [
-        'actions' => [
-            'activate'   => 'Активировать',
-            'deactivate' => 'Деактивировать',
-            'duplicate'  => 'Дублировать',
-            'preview'    => 'Просмотр',
-        ],
         'categories' => [
             'business'  => 'Бизнес',
             'financial' => 'Финансовые',
@@ -329,36 +323,6 @@ return [
             'sections' => [
                 'organization' => 'Информация об организации',
             ],
-        ],
-        'fields' => [
-            'category'        => 'Категория',
-            'content'         => 'Содержимое',
-            'documents_count' => 'Документы',
-            'is_active'       => 'Активен',
-            'settings'        => 'Настройки документа',
-            'type'            => 'Тип',
-            'variables'       => 'Переменные',
-        ],
-        'filters' => [
-            'category'  => 'Категория',
-            'is_active' => 'Активен',
-            'type'      => 'Тип',
-        ],
-        'model_label'      => 'Шаблон документа',
-        'navigation_label' => 'Шаблоны документов',
-        'notifications'    => [
-            'duplicated' => 'Шаблон документа продублирован.',
-        ],
-        'plural_model_label' => 'Шаблоны документов',
-        'sections'           => [
-            'basic_information'             => 'Основная информация',
-            'basic_information_description' => 'Название, тип и статус шаблона.',
-            'content'                       => 'Содержимое шаблона',
-            'content_description'           => 'HTML-контент с переменными.',
-            'settings'                      => 'Настройки шаблона',
-            'settings_description'          => 'Параметры печати и форматирования.',
-            'variables'                     => 'Переменные шаблона',
-            'variables_description'         => 'Определите доступные переменные для шаблона.',
         ],
         'types' => [
             'contract' => 'Договор',

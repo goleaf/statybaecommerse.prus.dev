@@ -311,12 +311,6 @@ return [
     ],
     'discounts_import'   => 'Rabatte importieren',
     'document_templates' => [
-        'actions' => [
-            'activate'   => 'Aktivieren',
-            'deactivate' => 'Deaktivieren',
-            'duplicate'  => 'Duplizieren',
-            'preview'    => 'Vorschau',
-        ],
         'categories' => [
             'business'  => 'Geschäftlich',
             'financial' => 'Finanziell',
@@ -330,36 +324,6 @@ return [
             'sections' => [
                 'organization' => 'Organisationsinformationen',
             ],
-        ],
-        'fields' => [
-            'category'        => 'Kategorie',
-            'content'         => 'Inhalt',
-            'documents_count' => 'Dokumente',
-            'is_active'       => 'Aktiv',
-            'settings'        => 'Dokumenteneinstellungen',
-            'type'            => 'Typ',
-            'variables'       => 'Variablen',
-        ],
-        'filters' => [
-            'category'  => 'Kategorie',
-            'is_active' => 'Aktiv',
-            'type'      => 'Typ',
-        ],
-        'model_label'      => 'Dokumentvorlage',
-        'navigation_label' => 'Dokumentvorlagen',
-        'notifications'    => [
-            'duplicated' => 'Dokumentvorlage dupliziert.',
-        ],
-        'plural_model_label' => 'Dokumentvorlagen',
-        'sections'           => [
-            'basic_information'             => 'Grundinformationen',
-            'basic_information_description' => 'Name, Typ und Status der Vorlage.',
-            'content'                       => 'Vorlageninhalt',
-            'content_description'           => 'HTML-Inhalt mit Platzhaltern für Variablen.',
-            'settings'                      => 'Vorlageneinstellungen',
-            'settings_description'          => 'Druck- und Formatierungseinstellungen.',
-            'variables'                     => 'Vorlagenvariablen',
-            'variables_description'         => 'Definieren Sie verfügbare Platzhalter für diese Vorlage.',
         ],
         'types' => [
             'contract' => 'Vertrag',

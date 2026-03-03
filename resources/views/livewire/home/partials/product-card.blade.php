@@ -91,7 +91,8 @@
     $price = (float) ($productData['price'] ?? 0.0);
 
     $stockQuantity = (int) ($productData['stock_quantity'] ?? 0);
-    $inStock = $stockQuantity > 0;
+    $manageStock = isset($productData['manage_stock']) ? (bool) $productData['manage_stock'] : true;
+    $inStock = ! $manageStock || $stockQuantity > 0;
     // Get first category label for secondary name display
     $secondaryName = !empty($categoryLabels) ? $categoryLabels[0] : null;
     

@@ -171,13 +171,13 @@ final class Show extends Component implements HasForms
     #[Computed]
     public function pageTitle(): string
     {
-        return $this->isIndex ? __('messages.categories_index_meta_title') : $this->category->name;
+        return $this->isIndex ? __('categories.index.meta_title') : $this->category->name;
     }
 
     #[Computed]
     public function pageDescription(): string
     {
-        return $this->isIndex ? __('messages.categories_index_meta_description') : ($this->category->description ?? '');
+        return $this->isIndex ? __('categories.index.meta_description') : ($this->category->description ?? '');
     }
 
     #[Computed]
@@ -519,10 +519,18 @@ final class Show extends Component implements HasForms
 
     public function render(): View
     {
+        $appName = config('app.name');
+        $title = $this->pageTitle();
+
+        if (is_string($appName) && $appName !== '') {
+            $title .= ' - ' . $appName;
+        }
+
         return view('livewire.pages.category.show', [
             'products' => $this->products,
         ])->layout('components.layouts.base', [
-            'title' => $this->category->name,
+            'title'       => $title,
+            'description' => $this->pageDescription(),
         ]);
     }
 }

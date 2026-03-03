@@ -311,12 +311,6 @@ return [
     ],
     'discounts_import'   => 'Importuoti nuolaidas',
     'document_templates' => [
-        'actions' => [
-            'activate'   => 'Aktyvuoti',
-            'deactivate' => 'Deaktyvuoti',
-            'duplicate'  => 'Dubliuoti',
-            'preview'    => 'Peržiūra',
-        ],
         'categories' => [
             'business'  => 'Verslas',
             'financial' => 'Finansiniai',
@@ -330,36 +324,6 @@ return [
             'sections' => [
                 'organization' => 'Organizacijos informacija',
             ],
-        ],
-        'fields' => [
-            'category'        => 'Kategorija',
-            'content'         => 'Turinys',
-            'documents_count' => 'Dokumentai',
-            'is_active'       => 'Aktyvus',
-            'settings'        => 'Dokumentų nustatymai',
-            'type'            => 'Tipas',
-            'variables'       => 'Kintamieji',
-        ],
-        'filters' => [
-            'category'  => 'Kategorija',
-            'is_active' => 'Aktyvus',
-            'type'      => 'Tipas',
-        ],
-        'model_label'      => 'Dokumento šablonas',
-        'navigation_label' => 'Dokumentų šablonai',
-        'notifications'    => [
-            'duplicated' => 'Dokumento šablonas dubliuotas.',
-        ],
-        'plural_model_label' => 'Dokumentų šablonai',
-        'sections'           => [
-            'basic_information'             => 'Pagrindinė informacija',
-            'basic_information_description' => 'Šablono pavadinimas, tipas ir būsena.',
-            'content'                       => 'Šablono turinys',
-            'content_description'           => 'HTML turinys su kintamaisiais.',
-            'settings'                      => 'Šablono nustatymai',
-            'settings_description'          => 'Spausdinimo ir formatavimo nustatymai.',
-            'variables'                     => 'Šablono kintamieji',
-            'variables_description'         => 'Apibrėžkite galimus šablono kintamuosius.',
         ],
         'types' => [
             'contract' => 'Sutartis',

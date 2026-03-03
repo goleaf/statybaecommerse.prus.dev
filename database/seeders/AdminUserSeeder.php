@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 use App\Models\AdminUser;
+use Spatie\Permission\Models\Role;
 
 final class AdminUserSeeder extends BaseSeeder
 {
+    private const ADMIN_ROLE_NAME = 'super_admin';
+
+    private const ADMIN_GUARD = 'admin';
+
     /**
      * @var array<int, array{email: string, name: string, password: string}>
      */
@@ -30,6 +35,7 @@ final class AdminUserSeeder extends BaseSeeder
     public function run(): void
     {
         $allowedEmails = array_column(self::ADMIN_ACCOUNTS, 'email');
+        $adminRole = $this->resolveAdminRole();
 
         // Remove any legacy administrator accounts so only curated credentials remain available.
         AdminUser::query()
@@ -55,8 +61,34 @@ final class AdminUserSeeder extends BaseSeeder
             if ($admin->isDirty()) {
                 $admin->save();
             }
+
+            if ($adminRole !== null) {
+                $admin->syncRoles([$adminRole]);
+            }
         }
 
         $this->command?->info('Admin guard accounts ready: ' . implode(', ', $allowedEmails));
+    }
+
+    private function resolveAdminRole(): ?Role
+    {
+        $role = Role::query()
+            ->where('name', self::ADMIN_ROLE_NAME)
+            ->where('guard_name', self::ADMIN_GUARD)
+            ->first();
+
+        if ($role instanceof Role) {
+            return $role;
+        }
+
+        $this->command?->warn(
+            sprintf(
+                'AdminUserSeeder: role "%s" for guard "%s" is missing. Run AdminAuthorizationSeeder before AdminUserSeeder.',
+                self::ADMIN_ROLE_NAME,
+                self::ADMIN_GUARD
+            )
+        );
+
+        return null;
     }
 }

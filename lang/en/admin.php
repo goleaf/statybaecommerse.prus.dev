@@ -311,12 +311,6 @@ return [
     ],
     'discounts_import'   => 'Import Discounts',
     'document_templates' => [
-        'actions' => [
-            'activate'   => 'Activate',
-            'deactivate' => 'Deactivate',
-            'duplicate'  => 'Duplicate',
-            'preview'    => 'Preview',
-        ],
         'categories' => [
             'business'  => 'Business',
             'financial' => 'Financial',
@@ -330,36 +324,6 @@ return [
             'sections' => [
                 'organization' => 'Company Information',
             ],
-        ],
-        'fields' => [
-            'category'        => 'Category',
-            'content'         => 'Content',
-            'documents_count' => 'Documents',
-            'is_active'       => 'Active',
-            'settings'        => 'Document Settings',
-            'type'            => 'Type',
-            'variables'       => 'Variables',
-        ],
-        'filters' => [
-            'category'  => 'Category',
-            'is_active' => 'Active',
-            'type'      => 'Type',
-        ],
-        'model_label'      => 'Document Template',
-        'navigation_label' => 'Document Templates',
-        'notifications'    => [
-            'duplicated' => 'Document template duplicated.',
-        ],
-        'plural_model_label' => 'Document Templates',
-        'sections'           => [
-            'basic_information'             => 'Basic Information',
-            'basic_information_description' => 'Name, type, and status of the template.',
-            'content'                       => 'Template Content',
-            'content_description'           => 'HTML content with placeholders for variables.',
-            'settings'                      => 'Template Settings',
-            'settings_description'          => 'Print and formatting settings.',
-            'variables'                     => 'Template Variables',
-            'variables_description'         => 'Define available placeholders for this template.',
         ],
         'types' => [
             'contract' => 'Contract',

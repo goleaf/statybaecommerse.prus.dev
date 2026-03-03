@@ -85,13 +85,13 @@ final class Index extends Component implements HasSchemas
     #[Computed]
     public function pageTitle(): string
     {
-        return __('messages.categories_index_meta_title');
+        return __('categories.index.meta_title');
     }
 
     #[Computed]
     public function pageDescription(): string
     {
-        return __('messages.categories_index_meta_description');
+        return __('categories.index.meta_description');
     }
 
     public function mount(): void
@@ -393,9 +393,17 @@ final class Index extends Component implements HasSchemas
 
     public function render(): View
     {
+        $appName = config('app.name');
+        $title = $this->pageTitle();
+
+        if (is_string($appName) && $appName !== '') {
+            $title .= ' - ' . $appName;
+        }
+
         return view('livewire.pages.category.show')
             ->layout('components.layouts.base', [
-                'title' => $this->pageTitle(),
+                'title'       => $title,
+                'description' => $this->pageDescription(),
             ]);
     }
 
