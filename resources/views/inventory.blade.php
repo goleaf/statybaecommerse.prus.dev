@@ -54,7 +54,7 @@
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
                                         <img class="h-10 w-10 rounded-full object-cover" 
-                                             src="{{ $product->getFirstMediaUrl('images', 'thumb') ?: product_placeholder_url('thumb') }}"
+                                             src="{{ $product->getImageUrl('thumb') ?: $product->thumbnail ?: product_placeholder_url('thumb') }}"
                                              alt="{{ $product->name }}">
                                     </div>
                                     <div class="ml-4">

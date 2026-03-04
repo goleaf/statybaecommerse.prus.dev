@@ -31,6 +31,12 @@
                     'icon' => 'heroicon-o-tag',
                 ],
                 [
+                    'route' => 'filament.admin.resources.suppliers.index',
+                    'active' => 'filament.admin.resources.suppliers.*',
+                    'label' => __('admin.suppliers.navigation_label'),
+                    'icon' => 'heroicon-o-truck',
+                ],
+                [
                     'route' => 'filament.admin.resources.product-features.index',
                     'active' => 'filament.admin.resources.product-features.*',
                     'label' => __('admin.navigation.product_features'),

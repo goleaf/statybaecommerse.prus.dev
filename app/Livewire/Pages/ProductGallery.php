@@ -55,11 +55,11 @@ final class ProductGallery extends Component
             $query->where('name', 'like', '%' . $this->search . '%');
         })->when($this->filter === 'with_images', function ($query) {
             $query->whereHas('media', function ($q) {
-                $q->where('collection_name', 'images');
+                $q->whereIn('collection_name', ['thumbnail', 'product_images']);
             });
         })->when($this->filter === 'generated_only', function ($query) {
             $query->whereHas('media', function ($q) {
-                $q->where('collection_name', 'images')->whereJsonContains('custom_properties->generated', true);
+                $q->whereIn('collection_name', ['thumbnail', 'product_images'])->whereJsonContains('custom_properties->generated', true);
             });
         })->orderBy('created_at', 'desc')->paginate(12);
     }
@@ -71,9 +71,9 @@ final class ProductGallery extends Component
     public function totalImages(): int
     {
         return Product::query()->whereHas('media', function ($q) {
-            $q->where('collection_name', 'images');
+            $q->whereIn('collection_name', ['thumbnail', 'product_images']);
         })->withCount(['media' => function ($q) {
-            $q->where('collection_name', 'images');
+            $q->whereIn('collection_name', ['thumbnail', 'product_images']);
         }])->cursor()->takeUntilTimeout(now()->addSeconds(15))->collect()->skipWhile(function ($product) {
             // Skip products that are not properly configured for media counting
             return empty($product->name) || $product->media_count < 0;
@@ -86,7 +86,10 @@ final class ProductGallery extends Component
     #[Computed]
     public function generatedImages(): int
     {
-        return \Spatie\MediaLibrary\MediaCollections\Models\Media::query()->where('collection_name', 'images')->whereJsonContains('custom_properties->generated', true)->count();
+        return \Spatie\MediaLibrary\MediaCollections\Models\Media::query()
+            ->whereIn('collection_name', ['thumbnail', 'product_images'])
+            ->whereJsonContains('custom_properties->generated', true)
+            ->count();
     }
 
     /**

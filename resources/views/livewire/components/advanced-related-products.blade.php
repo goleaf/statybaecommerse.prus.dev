@@ -17,9 +17,9 @@
                     @foreach($this->relatedProducts as $relatedProduct)
                         <div class="group relative">
                             <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
-                                @if($relatedProduct->getFirstMediaUrl('images'))
+                                @if($relatedProduct->getImageUrl('preview'))
                                     <img 
-                                        src="{{ $relatedProduct->getFirstMediaUrl('images', 'medium') }}" 
+                                        src="{{ $relatedProduct->getImageUrl('preview') }}" 
                                         alt="{{ $relatedProduct->trans('name') ?? $relatedProduct->name }}"
                                         class="h-full w-full object-cover object-center lg:h-full lg:w-full"
                                         loading="lazy"

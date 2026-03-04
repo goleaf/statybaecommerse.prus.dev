@@ -25,7 +25,7 @@ final class ProductGalleryService
         $productColumns = $validProducts->splitIn($columnCount);
 
         return $productColumns->map(function ($columnProducts, $columnIndex) {
-            return ['column_id' => $columnIndex + 1, 'item_count' => $columnProducts->count(), 'products' => $columnProducts->map(fn ($product) => ['id' => $product->id ?? null, 'name' => $product->name ?? 'Unknown', 'slug' => $product->slug ?? 'unknown', 'price' => $product->formatted_price ?? $product->price ?? 0, 'image_url' => method_exists($product, 'getFirstMediaUrl') ? $product->getFirstMediaUrl('images') : null, 'category' => $product->category?->name ?? null, 'is_featured' => $product->is_featured ?? false])];
+            return ['column_id' => $columnIndex + 1, 'item_count' => $columnProducts->count(), 'products' => $columnProducts->map(fn ($product) => ['id' => $product->id ?? null, 'name' => $product->name ?? 'Unknown', 'slug' => $product->slug ?? 'unknown', 'price' => $product->formatted_price ?? $product->price ?? 0, 'image_url' => method_exists($product, 'getImageUrl') ? $product->getImageUrl('preview') : null, 'category' => $product->category?->name ?? null, 'is_featured' => $product->is_featured ?? false])];
         });
     }
 
@@ -184,7 +184,7 @@ final class ProductGalleryService
                 return true;
             }
             // Skip products without images if required
-            if ($hasImages && ! $product->getFirstMediaUrl('images')) {
+            if ($hasImages && method_exists($product, 'hasImages') && ! $product->hasImages()) {
                 return true;
             }
             // Skip products based on featured status
@@ -233,10 +233,10 @@ final class ProductGalleryService
             $score += 0.1;
         }
         // Media quality (30% of score)
-        if (method_exists($product, 'getFirstMediaUrl') && $product->getFirstMediaUrl('images')) {
+        if (method_exists($product, 'hasImages') && $product->hasImages()) {
             $score += 0.2;
         }
-        if (method_exists($product, 'getFirstMediaUrl') && $product->getFirstMediaUrl('images', 'large')) {
+        if (method_exists($product, 'getImageUrl') && $product->getImageUrl('large')) {
             $score += 0.1;
         }
         // Content quality (20% of score)
@@ -280,7 +280,7 @@ final class ProductGalleryService
                 return true;
             }
             // Skip products without images if required
-            if ($hasImages && method_exists($product, 'getFirstMediaUrl') && ! $product->getFirstMediaUrl('images')) {
+            if ($hasImages && method_exists($product, 'hasImages') && ! $product->hasImages()) {
                 return true;
             }
             // Skip products based on featured status

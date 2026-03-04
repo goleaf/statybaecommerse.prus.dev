@@ -72,7 +72,9 @@ final class ProductCard extends Component
      */
     public function getImageUrlProperty(): string
     {
-        return $this->product->getFirstMediaUrl('images', 'thumb') ?: product_placeholder_url('thumb');
+        return $this->product->getImageUrl('thumb')
+            ?: $this->product->thumbnail
+            ?: product_placeholder_url('thumb');
     }
 
     /**

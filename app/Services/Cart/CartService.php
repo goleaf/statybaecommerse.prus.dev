@@ -325,8 +325,8 @@ final class CartService
                     $image = $this->resolveProductMainImage($associatedModel);
                 }
 
-                if (is_object($associatedModel) && method_exists($associatedModel, 'getFirstMediaUrl')) {
-                    $image = $image ?: ($associatedModel->getFirstMediaUrl('images') ?: null);
+                if (is_object($associatedModel) && method_exists($associatedModel, 'getImageUrl')) {
+                    $image = $image ?: ($associatedModel->getImageUrl('preview') ?: null);
                 }
 
                 $items[] = [
@@ -609,6 +609,8 @@ final class CartService
         }
 
         $candidates = [
+            $product->getImageUrl('thumb'),
+            $product->getImageUrl('preview'),
             $product->main_image,
             $product->thumbnail,
             $product->getImageUrl(),
@@ -620,11 +622,7 @@ final class CartService
             }
         }
 
-        $collection = (string) config('media.storage.collection_name', 'images');
-        $fromMedia = $product->getFirstMediaUrl($collection, 'thumb')
-            ?: $product->getFirstMediaUrl($collection);
-
-        return is_string($fromMedia) && $fromMedia !== '' ? $fromMedia : null;
+        return null;
     }
 
     /**

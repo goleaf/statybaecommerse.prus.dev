@@ -422,6 +422,8 @@ final class CartController extends Controller
     private function resolveProductCartImage(Product $product): ?string
     {
         $candidates = [
+            $product->getImageUrl('thumb'),
+            $product->getImageUrl('preview'),
             $product->main_image,
             $product->thumbnail,
             $product->getImageUrl(),
@@ -433,11 +435,7 @@ final class CartController extends Controller
             }
         }
 
-        $collection = (string) config('media.storage.collection_name', 'images');
-        $mediaImage = $product->getFirstMediaUrl($collection, 'thumb')
-            ?: $product->getFirstMediaUrl($collection);
-
-        return is_string($mediaImage) && $mediaImage !== '' ? $mediaImage : null;
+        return null;
     }
 
     private function buildCartSummary(Request $request): array

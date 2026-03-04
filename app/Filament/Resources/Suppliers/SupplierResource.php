@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Suppliers;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\Suppliers\Pages\CreateSupplier;
 use App\Filament\Resources\Suppliers\Pages\EditSupplier;
 use App\Filament\Resources\Suppliers\Pages\ListSuppliers;
@@ -16,7 +15,6 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
-use UnitEnum;
 
 final class SupplierResource extends Resource
 {
@@ -24,25 +22,11 @@ final class SupplierResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-truck';
 
-    protected static ?int $navigationSort = 2;
-
-    public static function getNavigationGroup(): string|UnitEnum|null
-    {
-        return NavigationGroup::Products->label();
-    }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return self::canViewAny();
-    }
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function getNavigationItems(): array
     {
-        if (! self::canViewAny()) {
-            return [];
-        }
-
-        return parent::getNavigationItems();
+        return [];
     }
 
     public static function getModelLabel(): string

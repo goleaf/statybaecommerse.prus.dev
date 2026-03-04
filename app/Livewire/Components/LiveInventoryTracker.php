@@ -192,7 +192,7 @@ final class LiveInventoryTracker extends Component
                     'stock_quantity'   => $product->stock_quantity,
                     'price'            => $product->price,
                     'total_value'      => $product->stock_quantity * $product->price,
-                    'image'            => $product->getFirstMediaUrl('images', 'thumb'),
+                    'image'            => $product->getImageUrl('thumb') ?: $product->thumbnail,
                     'last_updated'     => $product->updated_at,
                     'stock_status'     => $this->getStockStatus($product->stock_quantity),
                     'stock_percentage' => $this->getStockPercentage($product->stock_quantity),

@@ -85,7 +85,7 @@ final class AutocompleteService
         $searchTerm = $this->prepareSearchTerm($normalizedQuery);
 
         return Product::query()
-            ->with(['brand', 'images'])
+            ->with(['brand', 'media'])
             ->whereNotNull('slug')
             ->where(function (Builder $builder) use ($searchTerm): void {
                 $builder

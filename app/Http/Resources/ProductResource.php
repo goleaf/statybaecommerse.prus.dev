@@ -22,13 +22,15 @@ class ProductResource extends JsonResource
         $product = $this->resource;
 
         // Build a normalised media payload for gallery rendering.
-        $media = $product->relationLoaded('media')
-            ? $product->getMedia('images')->map(static fn ($item): array => [
-                'url'       => $item->getUrl(),
-                'thumbnail' => $item->hasGeneratedConversion('thumb') ? $item->getUrl('thumb') : $item->getUrl(),
-                'alt'       => (string) $item->getCustomProperty('alt', ''),
-            ])->all()
-            : [];
+        $media = collect($product->getGalleryImages())
+            ->map(static fn (array $image): array => [
+                'url'       => $image['preview'] ?? $image['lg'] ?? $image['md'] ?? $image['original'] ?? null,
+                'thumbnail' => $image['thumb'] ?? $image['sm'] ?? $image['xs'] ?? ($image['preview'] ?? $image['original'] ?? null),
+                'alt'       => (string) ($image['alt'] ?? ''),
+            ])
+            ->filter(static fn (array $image): bool => is_string($image['url']) && $image['url'] !== '')
+            ->values()
+            ->all();
 
         // Collect categories so callers can build breadcrumbs without extra queries.
         $categories = $product->relationLoaded('categories')

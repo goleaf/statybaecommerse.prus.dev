@@ -25,9 +25,9 @@
                     @foreach($products->take($limit) as $product)
                         <div class="group relative">
                             <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
-                                @if($product->getFirstMediaUrl('images'))
+                                @if($product->getImageUrl('preview'))
                                     <img 
-                                        src="{{ $product->getFirstMediaUrl('images', 'medium') }}" 
+                                        src="{{ $product->getImageUrl('preview') }}" 
                                         alt="{{ $product->trans('name') ?? $product->name }}"
                                         class="h-full w-full object-cover object-center lg:h-full lg:w-full"
                                         loading="lazy"

@@ -8,9 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Services\Cart\CartService;
-use App\Support\Media\ProductImageUrlResolver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,40 +37,10 @@ final class ApiController extends Controller
                         ->orWhere('description', 'like', $likeQuery);
                 });
             })
-            ->with(['images' => static fn ($relation) => $relation->orderBy('sort_order')])
+            ->with('media')
             ->limit($limit)
             ->get(['id', 'name', 'slug', 'price'])
-            ->map(static function (Product $product): array {
-                $images = $product->images
-                    ->map(static function (ProductImage $image) use ($product): array {
-                        $url = ProductImageUrlResolver::resolve($image->path);
-
-                        return [
-                            'url'       => $url,
-                            'thumbnail' => $url,
-                            'alt'       => $image->alt_text ?? $product->name,
-                        ];
-                    })
-                    ->values()
-                    ->all();
-
-                $primaryImage = $images[0] ?? null;
-
-                // Normalize the payload so every consumer receives consistent media keys.
-                return [
-                    'id'    => $product->getKey(),
-                    'name'  => $product->name,
-                    'slug'  => $product->slug,
-                    'price' => $product->price,
-                    // Preserve the historical `image` field while introducing explicit media aliases.
-                    'image'      => $primaryImage['url'] ?? $product->main_image,
-                    'main_image' => $primaryImage['url'] ?? $product->main_image,
-                    'thumbnail'  => $primaryImage['thumbnail'] ?? $product->thumbnail,
-                    'media'      => [
-                        'images' => $images,
-                    ],
-                ];
-            })
+            ->map(static fn (Product $product): array => self::mapProductPayload($product))
             ->values();
 
         return response()->json($products);
@@ -128,7 +96,7 @@ final class ApiController extends Controller
         // Recently viewed should honour session ordering even for unpublished catalog entries during tests.
         $products = Product::withoutGlobalScopes()
             ->whereIn('id', $orderedIds)
-            ->with(['images' => static fn ($relation) => $relation->orderBy('sort_order')])
+            ->with('media')
             ->get(['id', 'name', 'slug', 'price', 'status', 'published_at', 'is_enabled'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
                 $position = array_search((int) $product->getKey(), $orderedIds, true);
@@ -150,35 +118,7 @@ final class ApiController extends Controller
                     ];
                 }
 
-                $images = $product->images
-                    ->map(static function (ProductImage $image) use ($product): array {
-                        $url = ProductImageUrlResolver::resolve($image->path);
-
-                        return [
-                            'url'       => $url,
-                            'thumbnail' => $url,
-                            'alt'       => $image->alt_text ?? $product->name,
-                        ];
-                    })
-                    ->values()
-                    ->all();
-
-                $primaryImage = $images[0] ?? null;
-
-                // Mirror the normalized media payload returned from the search endpoint when the product is live.
-                return [
-                    'id'    => $product->getKey(),
-                    'name'  => $product->name,
-                    'slug'  => $product->slug,
-                    'price' => $product->price,
-                    // Maintain the legacy `image` attribute for downstream caches still expecting it.
-                    'image'      => $primaryImage['url'] ?? $product->main_image,
-                    'main_image' => $primaryImage['url'] ?? $product->main_image,
-                    'thumbnail'  => $primaryImage['thumbnail'] ?? $product->thumbnail,
-                    'media'      => [
-                        'images' => $images,
-                    ],
-                ];
+                return self::mapProductPayload($product);
             });
 
         return response()->json($products);
@@ -204,5 +144,51 @@ final class ApiController extends Controller
         $request->session()->put('recently_viewed', $recentlyViewed);
 
         return response()->json(['success' => true]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function mapProductPayload(Product $product): array
+    {
+        $images = collect($product->getGalleryImages())
+            ->map(static function (array $image) use ($product): array {
+                $url = $image['preview']
+                    ?? $image['lg']
+                    ?? $image['md']
+                    ?? $image['original']
+                    ?? null;
+
+                $thumbnail = $image['thumb']
+                    ?? $image['sm']
+                    ?? $image['xs']
+                    ?? $url;
+
+                return [
+                    'url'       => $url,
+                    'thumbnail' => $thumbnail,
+                    'alt'       => $image['alt'] ?? $product->name,
+                ];
+            })
+            ->filter(static fn (array $image): bool => is_string($image['url']) && $image['url'] !== '')
+            ->values()
+            ->all();
+
+        $primaryImage = $images[0] ?? null;
+        $primaryUrl = $primaryImage['url'] ?? $product->getImageUrl('preview') ?? $product->main_image;
+        $thumbUrl = $primaryImage['thumbnail'] ?? $product->getImageUrl('thumb') ?? $product->thumbnail;
+
+        return [
+            'id'         => $product->getKey(),
+            'name'       => $product->name,
+            'slug'       => $product->slug,
+            'price'      => $product->price,
+            'image'      => $primaryUrl,
+            'main_image' => $primaryUrl,
+            'thumbnail'  => $thumbUrl,
+            'media'      => [
+                'images' => $images,
+            ],
+        ];
     }
 }

@@ -324,8 +324,9 @@ final class ProductVariantSelector extends Component
                     'variant_id'         => $variantId,
                     'variant_attributes' => $this->getVariantAttributes($this->selectedVariant),
                     'image'              => $this->selectedVariant->getFirstMediaUrl('images', 'thumb')
-                        ?: $this->product->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb')
-                        ?: $this->product->getFirstMediaUrl(config('media.storage.collection_name')),
+                        ?: $this->product->getImageUrl('thumb')
+                        ?: $this->product->getImageUrl('preview')
+                        ?: $this->product->getImageUrl(),
                 ],
             ]
         );

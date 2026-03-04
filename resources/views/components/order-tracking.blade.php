@@ -162,7 +162,7 @@
                         <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-xl">
                             {{-- Product Image --}}
                             <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                <img src="{{ $item->product->getFirstMediaUrl('images') ?? product_placeholder_url('medium') }}"
+                                <img src="{{ $item->product->getImageUrl('preview') ?? $item->product->thumbnail ?? product_placeholder_url('medium') }}"
                                      alt="{{ $item->product->name }}"
                                      class="w-full h-full object-cover">
                             </div>

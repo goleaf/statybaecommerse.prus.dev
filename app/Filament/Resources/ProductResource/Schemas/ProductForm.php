@@ -8,6 +8,7 @@ use App\Models\Product;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -125,6 +126,47 @@ class ProductForm
                             ]),
                     ])
                     ->columnSpanFull(),
+                Section::make('Product Images')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                SpatieMediaLibraryFileUpload::make('thumbnail')
+                                    ->label('Thumbnail / Featured Image')
+                                    ->collection('thumbnail')
+                                    ->image()
+                                    ->imageEditor()
+                                    ->imageEditorAspectRatios([
+                                        null,
+                                        '1:1',
+                                        '4:3',
+                                        '16:9',
+                                    ])
+                                    ->conversion('thumb')
+                                    ->maxSize(2048)
+                                    ->helperText('Main image shown in product listings (max 2MB)'),
+                                SpatieMediaLibraryFileUpload::make('product_images')
+                                    ->label('Product Gallery')
+                                    ->collection('product_images')
+                                    ->multiple()
+                                    ->image()
+                                    ->reorderable()
+                                    ->appendFiles()
+                                    ->downloadable()
+                                    ->openable()
+                                    ->maxFiles(10)
+                                    ->maxSize(5120)
+                                    ->acceptedFileTypes([
+                                        'image/jpeg',
+                                        'image/png',
+                                        'image/webp',
+                                        'image/gif',
+                                    ])
+                                    ->helperText('Upload up to 10 images. Drag to reorder.')
+                                    ->columnSpanFull(),
+                            ]),
+                    ])
+                    ->columnSpanFull()
+                    ->collapsible(),
                 Section::make(__('admin.products.inventory'))
                     ->schema([
                         Grid::make(4)

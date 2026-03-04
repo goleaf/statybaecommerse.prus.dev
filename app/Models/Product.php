@@ -10,14 +10,12 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
 use App\Support\Html\HtmlSanitizer;
-use App\Support\Storage\SecureStorage;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,12 +27,10 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\Storage;
 use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use Throwable;
 
 /**
  * Product
@@ -73,7 +69,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     use HasFactory;
     use HasProductPricing;
     use HasTranslations;
-    use InteractsWithMedia;
+    use InteractsWithMedia {
+        getFirstMediaUrl as protected getInteractsWithMediaFirstMediaUrl;
+    }
     use OrdersByName;
     use Searchable {
         Searchable::bootSearchable as scoutBootSearchable;
@@ -829,6 +827,47 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         });
     }
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('thumbnail')->singleFile();
+        $this->addMediaCollection('product_images');
+        $this->addMediaCollection('images');
+    }
+
+    public function getFirstMediaUrl(string $collectionName = 'default', string $conversionName = ''): string
+    {
+        if ($collectionName !== 'images') {
+            return $this->getInteractsWithMediaFirstMediaUrl($collectionName, $conversionName);
+        }
+
+        $normalizedConversion = $this->mapSpatieProductConversion($conversionName !== '' ? $conversionName : null);
+
+        foreach (['thumbnail', 'product_images'] as $preferredCollection) {
+            $url = $normalizedConversion !== null
+                ? $this->getInteractsWithMediaFirstMediaUrl($preferredCollection, $normalizedConversion)
+                : $this->getInteractsWithMediaFirstMediaUrl($preferredCollection, $conversionName);
+
+            if ($url !== '') {
+                return $url;
+            }
+        }
+
+        return '';
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+            ->width(300)
+            ->height(300)
+            ->nonQueued();
+
+        $this->addMediaConversion('preview')
+            ->width(800)
+            ->height(600)
+            ->nonQueued();
+    }
+
     /**
      * Handle orderItems functionality with proper error handling.
      */
@@ -1044,17 +1083,11 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return $query->with([
             'brand:id,name,slug',
             'categories:id,name,slug',
-            'primaryImage' => static function ($imageQuery): void {
-                $imageQuery->select([
-                    'product_images.id',
-                    'product_images.product_id',
-                    'product_images.path',
-                    'product_images.alt_text',
-                    'product_images.sort_order',
-                    'product_images.is_default',
-                ]);
+            'media' => static function ($mediaQuery): void {
+                $mediaQuery
+                    ->whereIn('collection_name', ['thumbnail', 'product_images'])
+                    ->orderBy('order_column');
             },
-            'media',
         ]);
     }
 
@@ -1107,18 +1140,6 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         $locale = app()->getLocale();
 
         return $query->with([
-            // Load the explicit default/primary product image used by storefront cards.
-            'primaryImage' => static function ($imageQuery): void {
-                $imageQuery->select([
-                    'product_images.id',
-                    'product_images.product_id',
-                    'product_images.path',
-                    'product_images.alt_text',
-                    'product_images.sort_order',
-                    'product_images.is_default',
-                ]);
-            },
-
             // Load only essential brand fields
             'brand:id,name,slug',
 
@@ -1146,7 +1167,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             // Load only essential media fields for images
             'media' => function ($q): void {
                 $q->select('id', 'model_id', 'model_type', 'name', 'file_name', 'disk', 'conversions_disk', 'size', 'mime_type', 'manipulations', 'custom_properties', 'generated_conversions', 'responsive_images', 'order_column', 'created_at', 'updated_at')
-                    ->where('collection_name', 'images')
+                    ->whereIn('collection_name', ['thumbnail', 'product_images'])
                     ->orderBy('order_column');
             },
         ]);
@@ -1293,9 +1314,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getMainImageAttribute(): ?string
     {
-        $image = $this->resolvePrimaryImageModel();
-
-        return $image ? $this->resolvePublicUrl($image->path) : null;
+        return $this->getMainImage('image-md');
     }
 
     /**
@@ -1303,9 +1322,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getThumbnailAttribute(): ?string
     {
-        $image = $this->resolvePrimaryImageModel();
-
-        return $image ? $this->resolvePublicUrl($image->path) : null;
+        return $this->resolveSpatieProductImageUrl('thumb');
     }
 
     /**
@@ -1313,44 +1330,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getImageUrl(?string $size = null): ?string
     {
-        $image = $this->resolvePrimaryImageModel();
-
-        return $image ? $this->resolvePublicUrl($image->path) : null;
-    }
-
-    private function resolvePrimaryImageModel(): ?ProductImage
-    {
-        if ($this->relationLoaded('primaryImage')) {
-            $image = $this->getRelation('primaryImage');
-
-            return $image instanceof ProductImage ? $image : null;
-        }
-
-        if ($this->relationLoaded('images')) {
-            $images = $this->getRelation('images');
-
-            if ($images instanceof EloquentCollection) {
-                $image = $images
-                    ->filter(static fn ($item): bool => $item instanceof ProductImage)
-                    ->sortBy(static function (ProductImage $item): string {
-                        return sprintf(
-                            '%d-%06d-%010d',
-                            $item->is_default ? 0 : 1,
-                            (int) $item->sort_order,
-                            (int) $item->id
-                        );
-                    })
-                    ->first();
-
-                return $image instanceof ProductImage ? $image : null;
-            }
-
-            return null;
-        }
-
-        $image = $this->primaryImage()->first();
-
-        return $image instanceof ProductImage ? $image : null;
+        return $this->getMainImage($size);
     }
 
     /**
@@ -1358,30 +1338,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getGalleryImages(): array
     {
-        return $this->images()
-            ->orderByDesc('is_default')
-            ->orderBy('sort_order')
-            ->orderBy('id')
-            ->get()
-            ->map(function (ProductImage $img) {
-                $url = $this->resolvePublicUrl($img->path);
-                [$width, $height] = $this->resolveImageDimensions($img->path);
-
-                return [
-                    'original'   => $url,
-                    'xl'         => $url,
-                    'lg'         => $url,
-                    'md'         => $url,
-                    'sm'         => $url,
-                    'xs'         => $url,
-                    'alt'        => $img->alt_text ?: $this->name,
-                    'title'      => $this->name,
-                    'generated'  => true,
-                    'is_default' => (bool) $img->is_default,
-                    'width'      => $width,
-                    'height'     => $height,
-                ];
-            })->toArray();
+        return $this->resolveSpatieGalleryImages();
     }
 
     /**
@@ -1389,7 +1346,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getMainImage(?string $conversion = 'image-md'): ?string
     {
-        return $this->getFirstMediaUrl('images', $conversion) ?: null;
+        $spatieConversion = $this->mapSpatieProductConversion($conversion);
+
+        return $this->resolveSpatieProductImageUrl($spatieConversion);
     }
 
     /**
@@ -1397,11 +1356,11 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getAllImageSizes(): array
     {
-        $img = $this->resolvePrimaryImageModel();
-        if (! $img) {
+        $url = $this->resolveSpatieProductImageUrl('preview') ?? $this->resolveSpatieProductImageUrl();
+
+        if ($url === null) {
             return [];
         }
-        $url = $this->resolvePublicUrl($img->path);
 
         return ['original' => $url, 'xl' => $url, 'lg' => $url, 'md' => $url, 'sm' => $url, 'xs' => $url];
     }
@@ -1426,7 +1385,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function hasImages(): bool
     {
-        return $this->resolvePrimaryImageModel() !== null;
+        return $this->resolveSpatieProductImageUrl() !== null;
     }
 
     /**
@@ -1434,104 +1393,89 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getImagesCount(): int
     {
-        return (int) $this->images()->count();
+        $galleryCount = $this->getMedia('product_images')->count();
+        $thumbnailCount = $this->getFirstMedia('thumbnail') instanceof Media ? 1 : 0;
+
+        return $galleryCount + $thumbnailCount;
     }
 
-    // Media library removed for product images in favor of product_images table
-    // Media conversions removed
-
-    /**
-     * Handle resolvePublicUrl functionality with proper error handling.
-     */
-    private function resolvePublicUrl(string $path): string
+    private function resolveSpatieProductImageUrl(?string $conversion = null): ?string
     {
-        if ($path === '') {
-            return $path;
-        }
+        foreach (['thumbnail', 'product_images'] as $collection) {
+            $url = $this->resolveMediaUrl($collection, $conversion);
 
-        $absolutePrefixes = ['http://', 'https://'];
-        foreach ($absolutePrefixes as $prefix) {
-            if (str_starts_with($path, $prefix)) {
-                return $path;
+            if ($url !== null) {
+                return $url;
             }
         }
 
-        if (str_starts_with($path, '/')) {
-            return asset(ltrim($path, '/'));
+        return null;
+    }
+
+    private function resolveMediaUrl(string $collection, ?string $conversion = null): ?string
+    {
+        $url = $conversion !== null && $conversion !== ''
+            ? $this->getFirstMediaUrl($collection, $conversion)
+            : $this->getFirstMediaUrl($collection);
+
+        return $url !== '' ? $url : null;
+    }
+
+    private function mapSpatieProductConversion(?string $conversion): ?string
+    {
+        if ($conversion === null || $conversion === '') {
+            return null;
         }
 
-        $secureDisk = SecureStorage::disk();
-
-        foreach (self::candidateImageDisks() as $disk) {
-            try {
-                if (! Storage::disk($disk)->exists($path)) {
-                    continue;
-                }
-            } catch (Throwable) {
-                continue;
-            }
-
-            if ($disk === $secureDisk) {
-                return SecureStorage::temporarySignedUrl($path);
-            }
-
-            return Storage::disk($disk)->url($path);
-        }
-
-        // Fall back to the public disk URL even if the file is missing so the UI has a consistent path format
-        return Storage::disk('public')->url($path);
+        return match ($conversion) {
+            'thumb', 'image-thumb', 'image-xs', 'xs' => 'thumb',
+            'small' => 'thumb',
+            'preview', 'image-sm', 'image-md', 'image-lg', 'image-xl', 'image-medium', 'sm', 'md', 'lg', 'xl', 'medium', 'large' => 'preview',
+            default => $conversion,
+        };
     }
 
     /**
-     * Resolve local image dimensions for product images stored on filesystem disks.
-     *
-     * @return array{0:int,1:int}
+     * @return array<int, array<string, mixed>>
      */
-    private function resolveImageDimensions(string $path): array
+    private function resolveSpatieGalleryImages(): array
     {
-        if ($path === '') {
-            return [0, 0];
-        }
+        $mediaItems = $this->getMedia('product_images');
 
-        foreach (self::candidateImageDisks() as $disk) {
-            $filesystem = Storage::disk($disk);
+        if ($mediaItems->isEmpty()) {
+            $thumbnail = $this->getFirstMedia('thumbnail');
 
-            if (! $filesystem->exists($path) || ! method_exists($filesystem, 'path')) {
-                continue;
-            }
-
-            try {
-                $absolutePath = $filesystem->path($path);
-            } catch (Throwable) {
-                continue;
-            }
-
-            if (! is_string($absolutePath) || $absolutePath === '' || ! is_file($absolutePath)) {
-                continue;
-            }
-
-            $imageSize = @getimagesize($absolutePath);
-
-            if (is_array($imageSize) && isset($imageSize[0], $imageSize[1])) {
-                return [(int) $imageSize[0], (int) $imageSize[1]];
+            if ($thumbnail instanceof Media) {
+                $mediaItems = collect([$thumbnail]);
             }
         }
 
-        return [0, 0];
-    }
+        if ($mediaItems->isEmpty()) {
+            return [];
+        }
 
-    /**
-     * @return array<int, string>
-     */
-    private static function candidateImageDisks(): array
-    {
-        $defaultDisk = config('filesystems.default', 'public');
+        return $mediaItems
+            ->values()
+            ->map(static function (Media $media, int $index): array {
+                $url = $media->getUrl();
+                $label = $media->name !== '' ? $media->name : null;
 
-        return array_values(array_unique(array_filter([
-            'public',
-            SecureStorage::disk(),
-            $defaultDisk,
-        ], static fn (mixed $disk): bool => is_string($disk) && $disk !== '')));
+                return [
+                    'original'   => $url,
+                    'xl'         => $url,
+                    'lg'         => $url,
+                    'md'         => $url,
+                    'sm'         => $url,
+                    'xs'         => $url,
+                    'alt'        => $label,
+                    'title'      => $label,
+                    'generated'  => true,
+                    'is_default' => $index === 0,
+                    'width'      => 0,
+                    'height'     => 0,
+                ];
+            })
+            ->all();
     }
 
     // Translation methods

@@ -2,14 +2,7 @@
     {{-- Product Image --}}
     <div class="relative aspect-square overflow-hidden bg-gray-50">
         @php
-            // Use ProductImage model instead of MediaLibrary
-            $primaryImage = $product->relationLoaded('primaryImage') 
-                ? $product->primaryImage 
-                : $product->primaryImage()->first();
-            if (!$primaryImage) {
-                $primaryImage = $product->images()->ordered()->first();
-            }
-            $imageUrl = $primaryImage ? $primaryImage->url : null;
+            $imageUrl = $product->getImageUrl('preview') ?? $product->main_image ?? $product->thumbnail;
         @endphp
         @if($imageUrl)
             <img 

@@ -11,12 +11,47 @@
 
 @php
     $product = $product ?? new \App\Models\Product();
-    $images = $images ?? $product->getMedia('images');
+    $images = collect($images ?? $product->getGalleryImages())
+        ->map(static function ($image) use ($product): array {
+            if (is_array($image)) {
+                $url = $image['preview']
+                    ?? $image['lg']
+                    ?? $image['md']
+                    ?? $image['original']
+                    ?? $image['url']
+                    ?? null;
 
-    // If no images, use placeholder
+                return [
+                    'url' => $url,
+                    'alt' => $image['alt'] ?? ($product->name ?? __('ui.product_image')),
+                ];
+            }
+
+            if (is_object($image)) {
+                return [
+                    'url' => $image->url ?? null,
+                    'alt' => $image->alt ?? ($product->name ?? __('ui.product_image')),
+                ];
+            }
+
+            if (is_string($image)) {
+                return [
+                    'url' => $image,
+                    'alt' => $product->name ?? __('ui.product_image'),
+                ];
+            }
+
+            return [
+                'url' => null,
+                'alt' => $product->name ?? __('ui.product_image'),
+            ];
+        })
+        ->filter(static fn (array $image): bool => is_string($image['url']) && $image['url'] !== '')
+        ->values();
+
     if ($images->isEmpty()) {
         $images = collect([
-            (object) ['url' => product_placeholder_url('large'), 'alt' => $product->name ?? __('ui.product_image')],
+            ['url' => product_placeholder_url('large'), 'alt' => $product->name ?? __('ui.product_image')],
         ]);
     }
 
@@ -118,8 +153,8 @@
                                     :class="currentIndex === {{ $index }} ? 'ring-2 ring-blue-500' :
                                         'hover:ring-2 hover:ring-gray-300'"
                                     class="w-full aspect-w-1 aspect-h-1 bg-gray-100 rounded-lg overflow-hidden transition-all duration-200">
-                                <img src="{{ $image->url ?? $image }}"
-                                     alt="{{ $image->alt ?? ($product->name ?? __('ui.product_image')) }}"
+                                <img src="{{ $image['url'] }}"
+                                     alt="{{ $image['alt'] }}"
                                      class="w-full h-full object-cover">
                             </button>
                         @endforeach
@@ -192,7 +227,7 @@
 <script>
     function productGallery() {
         return {
-            images: {{ $images->map(function ($img) {return ['url' => $img->url ?? $img, 'alt' => $img->alt ?? __('ui.product_image')];})->toJson() }},
+            images: @js($images->all()),
             currentIndex: 0,
             showZoom: false,
             zoomEnabled: {{ $showZoom ? 'true' : 'false' }},

@@ -343,6 +343,8 @@ final class ProductVariantSelector extends Component
         }
 
         $candidates = [
+            $this->product->getImageUrl('thumb'),
+            $this->product->getImageUrl('preview'),
             $this->product->main_image,
             $this->product->thumbnail,
             $this->product->getImageUrl(),
@@ -354,11 +356,7 @@ final class ProductVariantSelector extends Component
             }
         }
 
-        $collection = (string) config('media.storage.collection_name', 'images');
-        $mediaImage = $this->product->getFirstMediaUrl($collection, 'thumb')
-            ?: $this->product->getFirstMediaUrl($collection);
-
-        return is_string($mediaImage) && $mediaImage !== '' ? $mediaImage : null;
+        return null;
     }
 
     public function render()

@@ -90,11 +90,15 @@ final class ProductContract
                 'slug' => (string) $primaryCategory->slug,
             ] : null,
             'media' => [
-                'images' => $product->getMedia('images')->map(static fn ($media): array => [
-                    'url'       => $media->getUrl(),
-                    'thumbnail' => $media->getUrl('thumb'),
-                    'alt'       => (string) $media->getCustomProperty('alt', ''),
-                ])->all(),
+                'images' => collect($product->getGalleryImages())
+                    ->map(static fn (array $image): array => [
+                        'url'       => $image['preview'] ?? $image['lg'] ?? $image['md'] ?? $image['original'] ?? null,
+                        'thumbnail' => $image['thumb'] ?? $image['sm'] ?? $image['xs'] ?? ($image['preview'] ?? $image['original'] ?? null),
+                        'alt'       => (string) ($image['alt'] ?? ''),
+                    ])
+                    ->filter(static fn (array $image): bool => is_string($image['url']) && $image['url'] !== '')
+                    ->values()
+                    ->all(),
             ],
             'variants' => $product->variants->map(static fn ($variant): array => [
                 'id'             => $variant->getKey(),

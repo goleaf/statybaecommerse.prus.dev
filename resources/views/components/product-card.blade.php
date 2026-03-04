@@ -11,18 +11,7 @@
 
 @php
     $product = $product ?? new \App\Models\Product();
-    // Use ProductImage model instead of MediaLibrary
-    // Load primaryImage relationship if not already loaded
-    if (!$product->relationLoaded('primaryImage')) {
-        $primaryImage = $product->primaryImage()->first();
-    } else {
-        $primaryImage = $product->primaryImage;
-    }
-    // Fallback to first ordered image if no primary image
-    if (!$primaryImage) {
-        $primaryImage = $product->images()->ordered()->first();
-    }
-    $imageUrl = $primaryImage ? $primaryImage->url : null;
+    $imageUrl = $product->getImageUrl('preview') ?? $product->main_image ?? $product->thumbnail;
     $isNew = $product->created_at && $product->created_at->diffInDays() < 30;
 @endphp
 

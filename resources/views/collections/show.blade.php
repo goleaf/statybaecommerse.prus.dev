@@ -89,9 +89,9 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($collection->products as $product)
                             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
-                                @if($product->getFirstMediaUrl('images'))
+                                @if($product->getImageUrl('preview'))
                                     <div class="aspect-w-16 aspect-h-9 mb-4">
-                                        <img src="{{ $product->getFirstMediaUrl('images', 'image-sm') }}" 
+                                        <img src="{{ $product->getImageUrl('preview') }}" 
                                              alt="{{ $product->getTranslatedName() }}"
                                              class="w-full h-32 object-cover rounded">
                                     </div>

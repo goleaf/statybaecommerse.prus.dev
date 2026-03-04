@@ -69,7 +69,7 @@ final class SEOService
             'canonical'      => $canonical,
             'og_title'       => $title,
             'og_description' => $description,
-            'og_image'       => $product->getFirstMediaUrl('images', 'image-lg') ?: $product->getFirstMediaUrl('images'),
+            'og_image'       => $product->getImageUrl('preview') ?: $product->getImageUrl(),
             'og_type'        => 'product',
             // Present a locale-aware currency string for Open Graph previews so
             // social platforms show prices with consistent symbols and
@@ -221,7 +221,7 @@ final class SEOService
             'name'        => (string) $product->name,
             'description' => strip_tags((string) $product->description),
             'sku'         => $product->sku,
-            'image'       => $product->getFirstMediaUrl('images', 'image-lg') ?: $product->getFirstMediaUrl('images'),
+            'image'       => $product->getImageUrl('preview') ?: $product->getImageUrl(),
             'brand'       => ['@type' => 'Brand', 'name' => $brandName],
             'offers'      => [
                 '@type'         => 'Offer',

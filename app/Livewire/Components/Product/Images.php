@@ -52,29 +52,41 @@ class Images extends Component
             }
 
             $this->thumbnail = $variant->getMedia(config('media.storage.thumbnail_collection'))->isNotEmpty()
-                ? ($variant->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: $variant->getFirstMediaUrl(config('media.storage.collection_name'), 'large'))
-                : ($variant->product->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: $variant->product->getFirstMediaUrl(config('media.storage.collection_name'), 'large'));
+                ? ($variant->getFirstMediaUrl(config('media.storage.thumbnail_collection')) ?: $variant->getFirstMediaUrl(config('media.storage.collection_name'), 'preview'))
+                : ($variant->product->getImageUrl('thumb') ?: $variant->product->getImageUrl('preview'));
 
             $this->images = $variant->getMedia(config('media.storage.collection_name'))->isNotEmpty()
                 ? $variant
                     ->getMedia(config('media.storage.collection_name'))
                     ->map(function ($media) use ($variant) {
                         return [
-                            'src'    => $media->getUrl('large') ?: $media->getUrl(),
-                            'srcset' => trim(($media->getUrl('medium') ?: '') . ' 500w, ' . ($media->getUrl('large') ?: '')),
+                            'src'    => $media->getUrl('preview') ?: ($media->getUrl('large') ?: $media->getUrl()),
+                            'srcset' => trim(($media->getUrl('thumb') ?: '') . ' 300w, ' . ($media->getUrl('preview') ?: $media->getUrl())),
                             'alt'    => $variant->product?->trans('name') ?? ($variant->product?->name ?? 'Product image'),
                         ];
                     })
                     ->toArray()
-                : $variant->product
-                    ->getMedia(config('media.storage.collection_name'))
-                    ->map(function ($media) use ($variant) {
+                : collect($variant->product->getGalleryImages())
+                    ->map(function (array $image) use ($variant) {
+                        $src = $image['preview']
+                            ?? $image['lg']
+                            ?? $image['md']
+                            ?? $image['original']
+                            ?? null;
+
+                        $thumb = $image['thumb']
+                            ?? $image['sm']
+                            ?? $image['xs']
+                            ?? $src;
+
                         return [
-                            'src'    => $media->getUrl('large') ?: $media->getUrl(),
-                            'srcset' => trim(($media->getUrl('medium') ?: '') . ' 500w, ' . ($media->getUrl('large') ?: '')),
-                            'alt'    => $variant->product?->trans('name') ?? ($variant->product?->name ?? 'Product image'),
+                            'src'    => $src,
+                            'srcset' => trim(($thumb ?? '') . ' 300w, ' . ($src ?? '')),
+                            'alt'    => $image['alt'] ?? ($variant->product?->trans('name') ?? ($variant->product?->name ?? 'Product image')),
                         ];
                     })
+                    ->filter(static fn (array $image): bool => is_string($image['src']) && $image['src'] !== '')
+                    ->values()
                     ->toArray();
         }
     }

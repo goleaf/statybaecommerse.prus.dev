@@ -5,6 +5,30 @@
 
 @php
     $product = $product ?? new \App\Models\Product();
+    $galleryImages = collect($product->getGalleryImages())
+        ->map(static function (array $image) use ($product): array {
+            $url = $image['preview']
+                ?? $image['lg']
+                ?? $image['md']
+                ?? $image['original']
+                ?? null;
+
+            return [
+                'url' => $url,
+                'alt' => $image['alt'] ?? $product->name,
+            ];
+        })
+        ->filter(static fn (array $image): bool => is_string($image['url']) && $image['url'] !== '')
+        ->values();
+
+    if ($galleryImages->isEmpty()) {
+        $galleryImages = collect([
+            [
+                'url' => product_placeholder_url('large'),
+                'alt' => $product->name ?? __('ui.product_image'),
+            ],
+        ]);
+    }
 @endphp
 
 <div x-data="quickViewModal()" x-show="show" x-transition:enter="transition ease-out duration-300"
@@ -37,14 +61,14 @@
                     </div>
 
                     {{-- Thumbnail Images --}}
-                    @if ($product->getMedia('images')->count() > 1)
+                    @if ($galleryImages->count() > 1)
                         <div class="grid grid-cols-4 gap-2">
-                            @foreach ($product->getMedia('images') as $index => $image)
+                            @foreach ($galleryImages as $index => $image)
                                 <button @click="setCurrentImage({{ $index }})"
                                         :class="currentIndex === {{ $index }} ? 'ring-2 ring-blue-500' :
                                             'hover:ring-2 hover:ring-gray-300'"
                                         class="aspect-w-1 aspect-h-1 bg-gray-100 rounded-lg overflow-hidden transition-all duration-200">
-                                    <img src="{{ $image->url }}" alt="{{ $product->name }}"
+                                    <img src="{{ $image['url'] }}" alt="{{ $image['alt'] ?? $product->name }}"
                                          class="w-full h-full object-cover">
                                 </button>
                             @endforeach
@@ -264,7 +288,7 @@
             selectedOptions: {},
 
             get images() {
-                return {{ $product->getMedia('images')->map(function ($img) {return ['url' => $img->url, 'alt' => $product->name];})->toJson() }};
+                return @js($galleryImages->all());
             },
 
             get currentImage() {

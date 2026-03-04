@@ -14,7 +14,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -27,13 +27,15 @@ class ProductsTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['brand', 'primaryImage', 'suppliers']))
+            ->modifyQueryUsing(fn ($query) => $query->with(['brand', 'suppliers', 'media']))
             ->columns([
-                ImageColumn::make('main_image')
+                SpatieMediaLibraryImageColumn::make('thumbnail')
                     ->label(__('messages.image'))
-                    ->disk('public')
-                    ->getStateUsing(static fn (Product $record): ?string => $record->main_image)
-                    ->circular(),
+                    ->collection('thumbnail')
+                    ->conversion('thumb')
+                    ->width(60)
+                    ->height(60)
+                    ->square(),
                 TextColumn::make('name')
                     ->label(__('messages.name'))
                     ->searchable()
