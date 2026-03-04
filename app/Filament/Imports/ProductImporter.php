@@ -7,6 +7,7 @@ namespace App\Filament\Imports;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Services\ProductImages\ProductImageWriteService;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
@@ -18,6 +19,7 @@ use Filament\Forms\Get;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Number;
@@ -32,6 +34,11 @@ class ProductImporter extends BaseImporter
 
     private mixed $pendingImageState = null;
 
+    /**
+     * @var array<string, mixed>
+     */
+    private array $pendingVariantState = [];
+
     private const IMPORT_IMAGE_MAX_WIDTH = 1600;
 
     private const IMPORT_IMAGE_MAX_HEIGHT = 1600;
@@ -41,6 +48,15 @@ class ProductImporter extends BaseImporter
     private const IMPORT_IMAGE_DOWNLOAD_TIMEOUT_SECONDS = 300;
 
     private const IMPORT_IMAGE_CONNECT_TIMEOUT_SECONDS = 30;
+
+    private const VARIANT_ATTRIBUTE_FIELDS = [
+        'size_type',
+        'color',
+        'pack_size',
+        'pack_size_type',
+        'volume',
+        'material',
+    ];
 
     private const SYNC_KEY_FIELDS = [
         'sku'     => 'SKU',
@@ -131,12 +147,13 @@ class ProductImporter extends BaseImporter
         $this->pendingImageUrl = is_string($rawImageUrl) ? trim($rawImageUrl) : null;
 
         $this->pendingImageState = $this->data['image'] ?? null;
+        $this->pendingVariantState = $this->data;
 
         if ($this->pendingImageUrl === '') {
             $this->pendingImageUrl = null;
         }
 
-        unset($this->data['image_url'], $this->data['image']);
+        unset($this->data['image_url'], $this->data['image'], $this->data['volume'], $this->data['material']);
 
         if ($this->record && ! $this->record->exists) {
             $this->applyVisibilityDefaults();
@@ -226,6 +243,7 @@ class ProductImporter extends BaseImporter
                 ->rules(['nullable', 'boolean']),
             ImportColumn::make('stock_quantity')
                 ->numeric()
+                ->guess(['stock quantity', 'stock_quantity', 'stock', 'sandelyje', 'kiekis'])
                 ->ignoreBlankState()
                 ->rules(['nullable', 'integer']),
             ImportColumn::make('low_stock_threshold')
@@ -258,11 +276,19 @@ class ProductImporter extends BaseImporter
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('pack_size')
                 ->label(__('attribute.pack_size'))
-                ->guess(['pack size', 'pack_size', 'pakuotes dydis'])
+                ->guess(['pack size', 'pack_size', 'pakuotes dydis', 'volume', 'turis'])
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('pack_size_type')
                 ->label(__('admin.labels.pack_size_type'))
                 ->guess(['pack size type', 'pack_size_type', 'pakuotes dydzio tipas'])
+                ->rules(['nullable', 'string', 'max:255']),
+            ImportColumn::make('volume')
+                ->label('Volume')
+                ->guess(['volume', 'turis'])
+                ->rules(['nullable', 'string', 'max:255']),
+            ImportColumn::make('material')
+                ->label('Material')
+                ->guess(['material', 'medziaga'])
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('is_enabled')
                 ->boolean()
@@ -339,6 +365,10 @@ class ProductImporter extends BaseImporter
             return $syncRecord;
         }
 
+        if ($nameRecord = $this->resolveRecordFromName()) {
+            return $nameRecord;
+        }
+
         return new Product;
     }
 
@@ -394,6 +424,8 @@ class ProductImporter extends BaseImporter
                 'color',
                 'pack_size',
                 'pack_size_type',
+                'volume',
+                'material',
             ],
             'Relations' => [
                 'brand',
@@ -419,6 +451,8 @@ class ProductImporter extends BaseImporter
             return;
         }
 
+        $this->upsertVariantForCurrentRow($this->record);
+
         $imageUrl = $this->pendingImageUrl;
 
         if (is_string($imageUrl) && trim($imageUrl) !== '') {
@@ -438,6 +472,30 @@ class ProductImporter extends BaseImporter
         }
 
         $this->attachImages($this->record, $paths);
+    }
+
+    private function resolveRecordFromName(): ?Product
+    {
+        $name = $this->toNullableString($this->data['name'] ?? null);
+
+        if ($name === null) {
+            return null;
+        }
+
+        $normalizedName = Str::lower(Str::squish($name));
+        $slug = Str::slug($name);
+
+        return Product::query()
+            ->withoutGlobalScopes()
+            ->where(function ($query) use ($normalizedName, $slug): void {
+                $query->whereRaw('LOWER(TRIM(name)) = ?', [$normalizedName]);
+
+                if ($slug !== '') {
+                    $query->orWhere('slug', $slug);
+                }
+            })
+            ->orderBy('id')
+            ->first();
     }
 
     /**
@@ -519,6 +577,291 @@ class ProductImporter extends BaseImporter
     private function shouldSync(): bool
     {
         return (bool) ($this->options['should_sync'] ?? false);
+    }
+
+    private function upsertVariantForCurrentRow(Product $product): void
+    {
+        if (! $this->shouldCreateVariant()) {
+            return;
+        }
+
+        $sku = $this->toNullableString($this->variantStateValue('sku'));
+        $barcode = $this->toNullableString($this->variantStateValue('barcode'));
+        $size = $this->toNullableString($this->variantStateValue('size'));
+        $price = $this->toNullableFloat($this->variantStateValue('price'))
+            ?? $this->toNullableFloat($product->price)
+            ?? 0.0;
+        $costPrice = $this->toNullableFloat($this->variantStateValue('cost_price'));
+        $weight = $this->toNullableFloat($this->variantStateValue('weight'));
+        $stockQuantity = $this->toNullableInteger($this->variantStateValue('stock_quantity'))
+            ?? $this->toNullableInteger($this->variantStateValue('stock'))
+            ?? 0;
+        $isEnabled = $this->toNullableBoolean($this->variantStateValue('is_enabled'))
+            ?? $this->toNullableBoolean($this->variantStateValue('status')) // defensive fallback for malformed CSVs
+            ?? true;
+        $trackInventory = $this->toNullableBoolean($this->variantStateValue('track_inventory'))
+            ?? $this->toNullableBoolean($this->variantStateValue('manage_stock'))
+            ?? true;
+        $allowBackorder = $this->toNullableBoolean($this->variantStateValue('allow_backorder'))
+            ?? false;
+        $lowStockThreshold = $this->toNullableInteger($this->variantStateValue('low_stock_threshold')) ?? 0;
+
+        $attributes = $this->extractVariantAttributes();
+        $variantName = $this->buildVariantName($product, $attributes, $size, $sku);
+
+        $variantQuery = ProductVariant::query()
+            ->withoutGlobalScopes()
+            ->where('product_id', $product->getKey());
+
+        if ($sku !== null) {
+            $variantQuery->where('sku', $sku);
+        } elseif ($barcode !== null) {
+            $variantQuery->where('barcode', $barcode);
+        } else {
+            $variantQuery->where('name', $variantName);
+
+            if ($size !== null) {
+                $variantQuery->where('size', $size);
+            } else {
+                $variantQuery->whereNull('size');
+            }
+        }
+
+        $variant = $variantQuery->first();
+        $isNewVariant = ! $variant instanceof ProductVariant;
+
+        if (! $variant instanceof ProductVariant) {
+            $variant = new ProductVariant;
+            $variant->product_id = $product->getKey();
+
+            $hasExistingVariants = ProductVariant::query()
+                ->withoutGlobalScopes()
+                ->where('product_id', $product->getKey())
+                ->exists();
+
+            $variant->is_default = ! $hasExistingVariants;
+            $variant->is_default_variant = ! $hasExistingVariants;
+        }
+
+        $variant->fill([
+            'product_id'          => $product->getKey(),
+            'name'                => $variantName,
+            'sku'                 => $sku,
+            'barcode'             => $barcode,
+            'price'               => $price,
+            'cost_price'          => $costPrice,
+            'stock_quantity'      => $stockQuantity,
+            'weight'              => $weight,
+            'track_inventory'     => $trackInventory,
+            'allow_backorder'     => $allowBackorder,
+            'low_stock_threshold' => $lowStockThreshold,
+            'size'                => $size,
+            'is_enabled'          => $isEnabled,
+            'attributes'          => $attributes !== [] ? $attributes : null,
+        ]);
+
+        $variant->save();
+        $this->attachVariantToProduct($product, $variant);
+
+        $this->syncParentProductVariantSnapshot($product, $variant, $isNewVariant);
+    }
+
+    private function shouldCreateVariant(): bool
+    {
+        $sku = $this->toNullableString($this->variantStateValue('sku'));
+        $size = $this->toNullableString($this->variantStateValue('size'));
+        $color = $this->toNullableString($this->variantStateValue('color'));
+        $packSize = $this->toNullableString($this->variantStateValue('pack_size'));
+        $volume = $this->toNullableString($this->variantStateValue('volume'));
+        $price = $this->toNullableFloat($this->variantStateValue('price'));
+        $stockQuantity = $this->toNullableInteger($this->variantStateValue('stock_quantity'))
+            ?? $this->toNullableInteger($this->variantStateValue('stock'));
+
+        return $sku !== null
+            || $size !== null
+            || $color !== null
+            || $packSize !== null
+            || $volume !== null
+            || $price !== null
+            || $stockQuantity !== null;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function extractVariantAttributes(): array
+    {
+        $attributes = [];
+
+        foreach (self::VARIANT_ATTRIBUTE_FIELDS as $field) {
+            $value = $this->toNullableString($this->variantStateValue($field));
+
+            if ($value === null) {
+                continue;
+            }
+
+            $attributes[$field] = $value;
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @param array<string, string> $attributes
+     */
+    private function buildVariantName(Product $product, array $attributes, ?string $size, ?string $sku): string
+    {
+        $parts = [];
+
+        foreach (['color', 'size', 'pack_size', 'volume', 'material'] as $field) {
+            if ($field === 'size' && $size !== null) {
+                $parts[] = $size;
+
+                continue;
+            }
+
+            if (! array_key_exists($field, $attributes)) {
+                continue;
+            }
+
+            $parts[] = $attributes[$field];
+        }
+
+        if ($parts !== []) {
+            return implode(' / ', array_values(array_unique($parts)));
+        }
+
+        if ($sku !== null) {
+            return $sku;
+        }
+
+        $name = $this->toNullableString($this->variantStateValue('name')) ?? $this->toNullableString($product->name);
+
+        return $name ?? 'Variant';
+    }
+
+    private function syncParentProductVariantSnapshot(Product $product, ProductVariant $variant, bool $isNewVariant): void
+    {
+        $baseVariantQuery = ProductVariant::query()
+            ->withoutGlobalScopes()
+            ->where('product_id', $product->getKey());
+
+        $minPrice = (clone $baseVariantQuery)
+            ->whereNotNull('price')
+            ->min('price');
+
+        $totalStock = (int) ((clone $baseVariantQuery)->sum('stock_quantity'));
+        $defaultSku = (clone $baseVariantQuery)
+            ->whereNotNull('sku')
+            ->where('sku', '!=', '')
+            ->orderByDesc('is_default_variant')
+            ->orderBy('id')
+            ->value('sku');
+
+        $productData = ['stock_quantity' => $totalStock];
+
+        if ($minPrice !== null) {
+            $productData['price'] = (float) $minPrice;
+        }
+
+        if (is_string($defaultSku) && trim($defaultSku) !== '') {
+            $productData['sku'] = trim($defaultSku);
+        }
+
+        if ($isNewVariant) {
+            $variantCount = (clone $baseVariantQuery)->count();
+            $productData['manage_stock'] = true;
+
+            if ($variantCount === 1) {
+                $productData['slug'] = filled($product->slug)
+                    ? $product->slug
+                    : Str::slug((string) $product->name);
+            }
+        }
+
+        $product->forceFill($productData)->saveQuietly();
+    }
+
+    private function attachVariantToProduct(Product $product, ProductVariant $variant): void
+    {
+        if (! Schema::hasTable('product_variant_product')) {
+            return;
+        }
+
+        $product->variants()->syncWithoutDetaching([$variant->getKey()]);
+    }
+
+    private function variantStateValue(string $key): mixed
+    {
+        return $this->pendingVariantState[$key] ?? null;
+    }
+
+    private function toNullableString(mixed $value): ?string
+    {
+        if (is_string($value)) {
+            $value = trim($value);
+
+            return $value !== '' ? $value : null;
+        }
+
+        if (is_numeric($value)) {
+            return (string) $value;
+        }
+
+        return null;
+    }
+
+    private function toNullableFloat(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        return (float) $value;
+    }
+
+    private function toNullableInteger(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        return (int) $value;
+    }
+
+    private function toNullableBoolean(mixed $value): ?bool
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_numeric($value)) {
+            return (int) $value === 1;
+        }
+
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $normalized = Str::lower(trim($value));
+
+        return match ($normalized) {
+            '1', 'true', 'yes', 'y' => true,
+            '0', 'false', 'no', 'n' => false,
+            default => null,
+        };
     }
 
     private function resolveRecordFromSyncKeys(): ?Product

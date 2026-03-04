@@ -7,6 +7,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\ProductVariant;
 use App\Models\User;
 use Filament\Actions\Imports\Jobs\ImportCsv;
 use Filament\Actions\Imports\Models\FailedImportRow;
@@ -430,4 +431,120 @@ it('replaces image_url and appends image column paths in the same import row', f
     expect($downloadedImage)->not->toBeNull()
         ->and((string) $downloadedImage?->path)->toStartWith('product-images/' . $existing->getKey() . '/')
         ->and((string) $downloadedImage?->path)->toEndWith('.png');
+});
+
+it('groups same-name rows under one product and creates multiple variants', function (): void {
+    $user = User::factory()->admin()->create();
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 3;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $baseRow = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+
+    $rows = [
+        array_merge($baseRow, [
+            'name'           => 'Beton M-150',
+            'sku'            => 'BET-M150-20',
+            'price'          => '12.50',
+            'stock_quantity' => '100',
+            'size'           => '20kg',
+            'description'    => 'Betonas',
+        ]),
+        array_merge($baseRow, [
+            'name'           => 'Beton M-150',
+            'sku'            => 'BET-M150-40',
+            'price'          => '22.00',
+            'stock_quantity' => '50',
+            'size'           => '40kg',
+            'description'    => 'Betonas',
+        ]),
+        array_merge($baseRow, [
+            'name'           => 'Dažai Dulux',
+            'sku'            => 'DAZ-001-R',
+            'price'          => '8.99',
+            'stock_quantity' => '200',
+            'color'          => 'Red',
+            'pack_size'      => '1L',
+        ]),
+    ];
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+
+    (new ImportCsv($import, $rows, $columnMap, []))->handle();
+
+    $import->refresh();
+
+    expect($import->successful_rows)->toBe(3)
+        ->and($import->failedRows)->toHaveCount(0)
+        ->and(Product::withoutGlobalScopes()->count())->toBe(2);
+
+    $beton = Product::withoutGlobalScopes()->where('name', 'Beton M-150')->first();
+    $dulux = Product::withoutGlobalScopes()->where('name', 'Dažai Dulux')->first();
+
+    expect($beton)->not->toBeNull()
+        ->and($dulux)->not->toBeNull();
+
+    $betonVariants = $beton?->variants()->withoutGlobalScopes()->orderBy('sku')->get();
+    $duluxVariants = $dulux?->variants()->withoutGlobalScopes()->get();
+
+    expect($betonVariants)->toHaveCount(2)
+        ->and($betonVariants?->pluck('sku')->all())->toBe(['BET-M150-20', 'BET-M150-40'])
+        ->and((float) ($beton?->price ?? 0))->toBe(12.5);
+
+    expect($duluxVariants)->toHaveCount(1)
+        ->and($duluxVariants?->first()?->sku)->toBe('DAZ-001-R');
+});
+
+it('updates existing variant instead of duplicating when sku is imported again', function (): void {
+    $user = User::factory()->admin()->create();
+
+    $import = new Import;
+    $import->user()->associate($user);
+    $import->file_name = 'product-import.csv';
+    $import->file_path = base_path('storage/imports/product-import.csv');
+    $import->importer = ProductImporter::class;
+    $import->total_rows = 2;
+    $import->save();
+
+    $columns = collect(ProductImporter::getColumns())->map->getName()->values();
+    $baseRow = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
+
+    $rows = [
+        array_merge($baseRow, [
+            'name'           => 'Beton M-150',
+            'sku'            => 'BET-001',
+            'price'          => '12.50',
+            'stock_quantity' => '100',
+            'size'           => '20kg',
+        ]),
+        array_merge($baseRow, [
+            'name'           => 'Beton M-150',
+            'sku'            => 'BET-001',
+            'price'          => '15.00',
+            'stock_quantity' => '200',
+            'size'           => '20kg',
+        ]),
+    ];
+
+    $columnMap = $columns->mapWithKeys(fn (string $name) => [$name => $name])->all();
+
+    (new ImportCsv($import, $rows, $columnMap, []))->handle();
+
+    $product = Product::withoutGlobalScopes()->where('name', 'Beton M-150')->first();
+    $variant = ProductVariant::withoutGlobalScopes()
+        ->where('product_id', $product?->getKey())
+        ->where('sku', 'BET-001')
+        ->first();
+
+    expect($product)->not->toBeNull()
+        ->and(ProductVariant::withoutGlobalScopes()->where('sku', 'BET-001')->count())->toBe(1)
+        ->and($variant)->not->toBeNull()
+        ->and((float) ($variant?->price ?? 0))->toBe(15.0)
+        ->and($variant?->stock_quantity)->toBe(200);
 });

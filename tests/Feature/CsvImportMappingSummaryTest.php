@@ -47,8 +47,9 @@ it('shows duplicate mapping errors', function () {
 
 it('shows success when mappings are valid', function () {
     $page = new MappingSummaryPage;
-    $html = $page->mappingSummary(['Name'], [
+    $html = $page->mappingSummary(['Name', 'SKU'], [
         'name' => 'Name',
+        'sku'  => 'SKU',
     ]);
 
     expect($html)->toContain(__('admin.import_mapping_ok'));
