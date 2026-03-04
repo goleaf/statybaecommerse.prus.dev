@@ -8,6 +8,7 @@ return [
         'published_at'   => 'Paskelbta',
         'stock_quantity' => 'Kiekis sandėlyje',
     ],
+    'color'    => 'Spalva',
     'in_stock' => 'Yra sandėlyje',
     'labels'   => [
         'unnamed_variant' => 'Be pavadinimo variantas',
@@ -56,5 +57,10 @@ return [
         'variant_option_from_price' => 'Nuo :price',
         'view_full_history'         => 'Peržiūrėti visą istoriją',
     ],
+    'size'         => 'Dydis',
+    'sku'          => 'Prekės kodas',
+    'variant'      => 'Variantas',
+    'variants'     => 'Variantai',
+    'volume'       => 'Tūris',
     'view_details' => 'Peržiūrėti detales',
 ];

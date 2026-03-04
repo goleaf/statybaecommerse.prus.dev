@@ -8,6 +8,7 @@ return [
         'published_at'   => 'Published At',
         'stock_quantity' => 'Stock quantity',
     ],
+    'color'    => 'Color',
     'in_stock' => 'In Stock',
     'labels'   => [
         'unnamed_variant' => 'Unnamed variant',
@@ -56,5 +57,10 @@ return [
         'variant_option_from_price' => 'From :price',
         'view_full_history'         => 'View full history',
     ],
+    'size'         => 'Size',
+    'sku'          => 'SKU',
+    'variant'      => 'Variant',
+    'variants'     => 'Variants',
+    'volume'       => 'Volume',
     'view_details' => 'View Details',
 ];
