@@ -25,7 +25,7 @@ it('shows brochures navigation and allows index for seeded super admin', functio
     $this->seed(AdminUserSeeder::class);
 
     $admin = AdminUser::query()
-        ->where('email', 'admin@example.com')
+        ->where('email', 'info@egisstatyba.lt')
         ->firstOrFail();
 
     $this->actingAs($admin, 'admin');

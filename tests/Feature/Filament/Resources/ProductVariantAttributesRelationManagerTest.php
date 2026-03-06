@@ -6,12 +6,13 @@ namespace Tests\Feature\Filament\Resources;
 
 use App\Filament\Resources\ProductVariantResource\Pages\EditProductVariants;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\AttributesRelationManager;
+use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantForm;
+use App\Models\AdminUser;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Currency;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -37,9 +38,7 @@ final class ProductVariantAttributesRelationManagerTest extends TestCase
             'is_enabled' => true,
         ]);
 
-        $admin = User::factory()->create([
-            'is_admin' => true,
-        ]);
+        $admin = AdminUser::factory()->create();
 
         $product = Product::query()->create([
             'name'           => 'Variant Attribute Product',
@@ -87,7 +86,7 @@ final class ProductVariantAttributesRelationManagerTest extends TestCase
             'is_active'    => true,
         ]);
 
-        $this->actingAs($admin);
+        $this->actingAs($admin, 'admin');
     }
 
     public function test_product_variant_edit_attributes_relation_page_does_not_return_server_error(): void
@@ -113,5 +112,73 @@ final class ProductVariantAttributesRelationManagerTest extends TestCase
             'attribute_id'       => $this->attributeValue->attribute_id,
             'attribute_value_id' => $this->attributeValue->getKey(),
         ]);
+    }
+
+    public function test_can_manage_variant_attributes_directly_from_edit_form_repeater(): void
+    {
+        $sizeAttribute = Attribute::withoutGlobalScopes()->create([
+            'name'          => 'Size',
+            'slug'          => 'size',
+            'type'          => 'select',
+            'is_filterable' => true,
+            'is_searchable' => true,
+            'is_visible'    => true,
+            'is_editable'   => true,
+            'is_sortable'   => true,
+            'sort_order'    => 2,
+            'is_enabled'    => true,
+            'is_active'     => true,
+        ]);
+
+        $sizeValue = AttributeValue::withoutGlobalScopes()->create([
+            'attribute_id' => $sizeAttribute->getKey(),
+            'value'        => 'XL',
+            'slug'         => 'xl',
+            'sort_order'   => 1,
+            'is_enabled'   => true,
+            'is_active'    => true,
+        ]);
+
+        Livewire::test(EditProductVariants::class, ['record' => $this->variant->getRouteKey()])
+            ->fillForm([
+                ProductVariantForm::ATTRIBUTE_SELECTIONS_FIELD => [
+                    [
+                        'attribute_id'       => $this->attributeValue->attribute_id,
+                        'attribute_value_id' => $this->attributeValue->getKey(),
+                    ],
+                    [
+                        'attribute_id'       => $sizeAttribute->getKey(),
+                        'attribute_value_id' => $sizeValue->getKey(),
+                    ],
+                ],
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('product_variant_attributes', [
+            'variant_id'         => $this->variant->getKey(),
+            'attribute_id'       => $this->attributeValue->attribute_id,
+            'attribute_value_id' => $this->attributeValue->getKey(),
+        ]);
+
+        $this->assertDatabaseHas('product_variant_attributes', [
+            'variant_id'         => $this->variant->getKey(),
+            'attribute_id'       => $sizeAttribute->getKey(),
+            'attribute_value_id' => $sizeValue->getKey(),
+        ]);
+
+        $freshVariant = ProductVariant::query()
+            ->withoutGlobalScopes()
+            ->findOrFail($this->variant->getKey());
+
+        self::assertSame([
+            'attribute_' . $this->attributeValue->attribute_id => $this->attributeValue->getKey(),
+            'attribute_' . $sizeAttribute->getKey()            => $sizeValue->getKey(),
+        ], $freshVariant->variant_attribute_matrix);
+
+        self::assertSame([
+            'Color' => 'Red',
+            'Size'  => 'XL',
+        ], $freshVariant->attributes);
     }
 }

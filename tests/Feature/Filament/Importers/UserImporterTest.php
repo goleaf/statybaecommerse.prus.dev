@@ -26,7 +26,7 @@ it('can import users', function () {
 
     $row = [
         'name'      => 'John Doe',
-        'email'     => 'john@example.com',
+        'email'     => 'info@egisstatyba.lt',
         'password'  => 'Password123!',
         'is_admin'  => '0',
         'is_active' => '1',
@@ -47,9 +47,9 @@ it('can import users', function () {
     expect($import->successful_rows)->toBe(1);
     $this->assertDatabaseHas('users', [
         'name'  => 'John Doe',
-        'email' => 'john@example.com',
+        'email' => 'info@egisstatyba.lt',
     ]);
 
-    $user = User::where('email', 'john@example.com')->first();
+    $user = User::where('email', 'info@egisstatyba.lt')->first();
     expect(Hash::check('Password123!', $user->password))->toBeTrue();
 });

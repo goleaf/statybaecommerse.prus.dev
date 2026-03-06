@@ -17,7 +17,7 @@ beforeEach(function (): void {
     $this->resolveAdminPanel();
 
     $this->admin = User::factory()->create([
-        'email'    => 'referral-reward-admin@example.test',
+        'email'    => 'info@egisstatyba.lt',
         'is_admin' => true,
     ]);
 

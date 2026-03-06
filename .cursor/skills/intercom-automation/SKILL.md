@@ -166,7 +166,7 @@ Automate Intercom operations through Composio's Intercom toolkit via Rube MCP.
 {
   "field": "email",
   "operator": "=",
-  "value": "user@example.com"
+  "value": "info@egisstatyba.lt"
 }
 ```
 

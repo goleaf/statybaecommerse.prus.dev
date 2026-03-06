@@ -164,7 +164,7 @@ Updated the email validation regex in AuthValidator.js to properly handle specia
 - src/utils/AuthValidator.js
 
 ## Verification
-Tested login with various special characters in email addresses (test+user@example.com, user%123@example.com).
+Tested login with various special characters in email addresses (info@egisstatyba.lt, info@egisstatyba.lt).
 ```
 
 ## 📋 DOCUMENTATION VERIFICATION CHECKLIST

@@ -28,7 +28,7 @@ final class SystemResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email' => 'info@egisstatyba.lt',
             'name'  => 'Admin User',
         ]);
 

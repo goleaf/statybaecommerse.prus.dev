@@ -30,7 +30,7 @@ final class PostResourceTest extends TestCase
 
         // Promote a reusable administrator with super admin access for the content workflows.
         $this->adminUser = User::factory()->create([
-            'email'    => 'post-admin@example.test',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
         $this->adminUser->assignRole('super_admin');

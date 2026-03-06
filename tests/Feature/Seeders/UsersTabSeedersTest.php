@@ -25,13 +25,13 @@ it('seeds company tab users with all related interface records and stays idempot
 
     $companyUsers = User::query()
         ->withoutGlobalScopes()
-        ->where('email', 'like', 'company.relations.%@example.test')
+        ->where('email', 'like', 'info@egisstatyba.lt')
         ->orderBy('email')
         ->get();
 
     $referredUsersCount = User::query()
         ->withoutGlobalScopes()
-        ->where('email', 'like', 'company.referred.%@example.test')
+        ->where('email', 'like', 'info@egisstatyba.lt')
         ->count();
 
     expect($companyUsers)->toHaveCount(12);
@@ -65,7 +65,7 @@ it('seeds customer groups tab users with two group assignments and stays idempot
 
     $users = User::query()
         ->withoutGlobalScopes()
-        ->where('email', 'like', 'customer-groups.tab.%@example.test')
+        ->where('email', 'like', 'info@egisstatyba.lt')
         ->orderBy('email')
         ->get();
 
@@ -89,7 +89,7 @@ it('seeds partners tab users with two partner assignments and stays idempotent',
 
     $users = User::query()
         ->withoutGlobalScopes()
-        ->where('email', 'like', 'partners.tab.%@example.test')
+        ->where('email', 'like', 'info@egisstatyba.lt')
         ->orderBy('email')
         ->get();
 

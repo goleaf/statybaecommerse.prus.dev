@@ -177,7 +177,7 @@
                    class="btn-gradient px-6 py-3 rounded-xl font-semibold">
                     {{ __('messages.frontend') }}
                 </a>
-                <a href="mailto:support@example.com"
+                <a href="mailto:info@egisstatyba.lt"
                    class="border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
                     {{ __('messages.frontend') }}
                 </a>

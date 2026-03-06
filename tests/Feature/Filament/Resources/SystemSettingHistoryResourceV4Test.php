@@ -36,7 +36,7 @@ final class SystemSettingHistoryResourceV4Test extends TestCase
 
         // Seed an administrator that satisfies Filament authorization policies for every request in this suite.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

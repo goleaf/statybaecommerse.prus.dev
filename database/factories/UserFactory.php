@@ -32,7 +32,7 @@ class UserFactory extends Factory
 
         // Generate a unique, deterministic email without querying the database to prevent SQLite "database is locked" errors during concurrent factory usage.
         $email = sprintf(
-            '%s.%s.%s@example.test',
+            '%info@egisstatyba.lt',
             Str::slug($firstName),
             Str::slug($lastName),
             Str::lower(Str::random(6))

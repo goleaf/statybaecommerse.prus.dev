@@ -20,7 +20,7 @@ class PartnerResourceTest extends TestCase
 
         // Create test user with admin role
         $this->user = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 
@@ -46,7 +46,7 @@ class PartnerResourceTest extends TestCase
             'code'            => 'TEST001',
             'tier_id'         => $this->partnerTier->id,
             'is_enabled'      => true,
-            'contact_email'   => 'partner@test.com',
+            'contact_email'   => 'info@egisstatyba.lt',
             'contact_phone'   => '+37060000000',
             'discount_rate'   => 10.5,
             'commission_rate' => 5.0,
@@ -62,7 +62,7 @@ class PartnerResourceTest extends TestCase
             'code'            => 'TEST001',
             'tier_id'         => $this->partnerTier->id,
             'is_enabled'      => true,
-            'contact_email'   => 'partner@test.com',
+            'contact_email'   => 'info@egisstatyba.lt',
             'contact_phone'   => '+37060000000',
             'discount_rate'   => 10.5,
             'commission_rate' => 5.0,

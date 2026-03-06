@@ -10,6 +10,11 @@
         : (\Illuminate\Support\Facades\Route::has('frontend.contact.send')
             ? route('frontend.contact.send', [])
             : url('/contact/send'));
+    $supportAddress = 'Jurbarkas, Lietuva';
+    $supportPhone = '+370 695 72123';
+    $supportPhoneHref = '+37069572123';
+    $supportEmail = 'info@egisstatyba.lt';
+    $supportAddressHref = 'https://maps.google.com/?q=' . urlencode($supportAddress);
 @endphp
 
 @section('content')
@@ -147,55 +152,57 @@
                 </div>
 
                 <aside class="space-y-6">
-                    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                        <h2 class="mb-4 text-xl font-semibold text-slate-900">
-                            {{ __('frontend.contact.support.title') }}
-                        </h2>
-                        <ul class="space-y-4 text-slate-700">
-                            @if ($supportEmail)
-                                <li>
-                                    <div class="text-sm uppercase tracking-wide text-slate-500">
-                                        {{ __('frontend.contact.support.email') }}
-                                    </div>
-                                    <a href="mailto:{{ $supportEmail }}" class="mt-1 inline-flex items-center gap-2 text-cyan-700 transition hover:text-cyan-800 hover:underline">
-                                        <x-untitledui-mail-02 class="h-5 w-5" />
-                                        <span>{{ $supportEmail }}</span>
-                                    </a>
-                                </li>
-                            @endif
-
-                            @if ($company?->phone)
-                                <li>
-                                    <div class="text-sm uppercase tracking-wide text-slate-500">
-                                        {{ __('frontend.contact.support.phone') }}
-                                    </div>
-                                    <a href="tel:{{ preg_replace('/\s+/', '', $company->phone) }}" class="mt-1 inline-flex items-center gap-2 text-cyan-700 transition hover:text-cyan-800 hover:underline">
-                                        <x-untitledui-phone class="h-5 w-5" />
-                                        <span>{{ $company->phone }}</span>
-                                    </a>
-                                </li>
-                            @endif
-
-                            @if ($company?->address)
-                                <li>
-                                    <div class="text-sm uppercase tracking-wide text-slate-500">
-                                        {{ __('frontend.contact.support.address') }}
-                                    </div>
-                                    <div class="mt-1 flex items-start gap-2">
-                                        <x-untitledui-info-circle class="h-5 w-5 text-cyan-600" />
-                                        <span>{{ $company->address }}</span>
-                                    </div>
-                                </li>
-                            @endif
-
+                    <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+                        <div class="border-b border-gray-200 bg-gray-900 px-6 py-4">
+                            <h2 class="text-xl font-semibold text-white">
+                                {{ __('frontend.contact.support.title') }}
+                            </h2>
+                        </div>
+                        <ul class="space-y-3 p-6">
                             <li>
-                                <div class="text-sm uppercase tracking-wide text-slate-500">
-                                    {{ __('frontend.contact.support.hours') }}
-                                </div>
-                                <div class="mt-1 flex items-start gap-2">
-                                    <x-untitledui-info-circle class="h-5 w-5 text-cyan-600" />
-                                    <span>{{ data_get($company, 'metadata.business_hours', __('frontend.contact.support.fallback_hours')) }}</span>
-                                </div>
+                                <a href="mailto:{{ $supportEmail }}" class="group flex items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-gray-800 transition hover:border-gray-300 hover:bg-white hover:shadow-sm">
+                                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition group-hover:text-indigo-600">
+                                        <x-untitledui-mail-02 class="h-5 w-5" />
+                                    </span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-medium text-gray-600">
+                                            {{ __('frontend.contact.support.email') }}
+                                        </span>
+                                        <span class="mt-1 block break-all text-base font-semibold text-gray-900 group-hover:text-indigo-700">
+                                            {{ $supportEmail }}
+                                        </span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="tel:{{ $supportPhoneHref }}" class="group flex items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-gray-800 transition hover:border-gray-300 hover:bg-white hover:shadow-sm">
+                                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition group-hover:text-indigo-600">
+                                        <x-untitledui-phone class="h-5 w-5" />
+                                    </span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-medium text-gray-600">
+                                            {{ __('frontend.contact.support.phone') }}
+                                        </span>
+                                        <span class="mt-1 block text-base font-semibold text-gray-900 group-hover:text-indigo-700">
+                                            {{ $supportPhone }}
+                                        </span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ $supportAddressHref }}" target="_blank" rel="noopener noreferrer" class="group flex items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-gray-800 transition hover:border-gray-300 hover:bg-white hover:shadow-sm">
+                                    <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-gray-200 bg-white text-gray-600 transition group-hover:text-indigo-600">
+                                        <x-untitledui-map-pin class="h-5 w-5" />
+                                    </span>
+                                    <span class="min-w-0">
+                                        <span class="block text-sm font-medium text-gray-600">
+                                            {{ __('frontend.contact.support.address') }}
+                                        </span>
+                                        <span class="mt-1 block text-base font-semibold text-gray-900 group-hover:text-indigo-700">
+                                            {{ $supportAddress }}
+                                        </span>
+                                    </span>
+                                </a>
                             </li>
                         </ul>
                     </div>

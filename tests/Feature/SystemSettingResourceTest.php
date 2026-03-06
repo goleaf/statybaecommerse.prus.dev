@@ -32,7 +32,7 @@ final class SystemSettingResourceTest extends TestCase
 
         // Provision a deterministic administrator and grant super admin privileges for configuration tasks.
         $this->adminUser = User::factory()->create([
-            'email'    => 'settings-admin@example.test',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
         $this->adminUser->assignRole('super_admin');

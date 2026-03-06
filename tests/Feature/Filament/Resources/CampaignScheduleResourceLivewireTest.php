@@ -30,7 +30,7 @@ final class CampaignScheduleResourceLivewireTest extends TestCase
 
         // Provision an administrator so the resource list authorizes successfully during the test run.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

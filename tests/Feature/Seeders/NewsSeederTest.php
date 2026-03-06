@@ -20,14 +20,14 @@ it('seeds lorem ipsum news for admin and frontend contexts', function (): void {
     $this->seed(NewsSeeder::class);
 
     $seededNews = News::withoutGlobalScopes()
-        ->where('author_email', 'like', 'seed-news-%@egistatyba.test')
+        ->where('author_email', 'like', 'info@egisstatyba.lt')
         ->orderBy('author_email')
         ->get();
 
     expect($seededNews)->toHaveCount(24);
 
     $frontendReadyCount = News::withoutGlobalScopes()
-        ->where('author_email', 'like', 'seed-news-%@egistatyba.test')
+        ->where('author_email', 'like', 'info@egisstatyba.lt')
         ->where('moderation_state', ModerationState::Published->value)
         ->where('is_visible', true)
         ->whereNotNull('published_at')
@@ -59,7 +59,7 @@ it('is idempotent when run multiple times', function (): void {
     $this->seed(NewsSeeder::class);
 
     $seededNewsCount = News::withoutGlobalScopes()
-        ->where('author_email', 'like', 'seed-news-%@egistatyba.test')
+        ->where('author_email', 'like', 'info@egisstatyba.lt')
         ->count();
 
     expect($seededNewsCount)->toBe(24);

@@ -39,7 +39,7 @@ Automate Zoho CRM operations through Composio's Zoho toolkit via Rube MCP.
 
 **Key parameters**:
 - `module`: Module name (e.g., 'Leads', 'Contacts', 'Deals', 'Accounts')
-- `criteria`: Search criteria string (e.g., 'Email:equals:john@example.com')
+- `criteria`: Search criteria string (e.g., 'Email:equals:info@egisstatyba.lt')
 - `fields`: Comma-separated list of fields to return
 - `per_page`: Number of records per page
 - `page`: Page number for pagination
@@ -48,7 +48,7 @@ Automate Zoho CRM operations through Composio's Zoho toolkit via Rube MCP.
 - Module names are case-sensitive (e.g., 'Leads' not 'leads')
 - Search criteria uses specific syntax: 'Field:operator:value'
 - Supported operators: equals, starts_with, contains, not_equal, greater_than, less_than
-- Complex criteria use parentheses and AND/OR: '(Email:equals:john@example.com)AND(Last_Name:equals:Doe)'
+- Complex criteria use parentheses and AND/OR: '(Email:equals:info@egisstatyba.lt)AND(Last_Name:equals:Doe)'
 - GET_ZOHO_RECORDS returns all records with optional filtering; SEARCH is for targeted lookups
 
 ### 2. Create Records
@@ -146,7 +146,7 @@ Automate Zoho CRM operations through Composio's Zoho toolkit via Rube MCP.
 
 **Simple search**:
 ```
-criteria: '(Email:equals:john@example.com)'
+criteria: '(Email:equals:info@egisstatyba.lt)'
 ```
 
 **Combined criteria**:

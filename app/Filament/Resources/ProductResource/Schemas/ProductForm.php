@@ -233,16 +233,16 @@ class ProductForm
                     ])
                     ->columnSpanFull(),
 
-                Section::make('Shipping Exclusions')
-                    ->description('Select shipping methods this product should be excluded from.')
+                Section::make(__('admin.products.shipping_exclusions'))
+                    ->description(__('admin.products.shipping_exclusions_description'))
                     ->schema([
                         Grid::make(2)
                             ->schema([
                                 Toggle::make('is_venipak_locker_excluded')
-                                    ->label('Exclude from Venipak Lockers')
+                                    ->label(__('admin.products.exclude_from_venipak_lockers'))
                                     ->default(false),
                                 Toggle::make('is_venipak_courier_excluded')
-                                    ->label('Exclude from Venipak Courier')
+                                    ->label(__('admin.products.exclude_from_venipak_courier'))
                                     ->default(false),
                             ]),
                     ])

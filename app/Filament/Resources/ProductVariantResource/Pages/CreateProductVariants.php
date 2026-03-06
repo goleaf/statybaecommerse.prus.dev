@@ -6,7 +6,9 @@ namespace App\Filament\Resources\ProductVariantResource\Pages;
 
 use App\Filament\Resources\ProductVariantResource;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\AttributesRelationManager;
+use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantForm;
 use App\Models\ProductVariant;
+use App\Services\ProductVariantAttributeMatrixService;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -17,8 +19,37 @@ class CreateProductVariants extends CreateRecord
 {
     protected static string $resource = ProductVariantResource::class;
 
+    /**
+     * @var array<int, array{attribute_id:int, attribute_value_id:int}>
+     */
+    private array $pendingAttributeSelections = [];
+
+    /**
+     * @var array<string, int>
+     */
+    private array $pendingVariantAttributeMatrix = [];
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        $selectionsState = $data[ProductVariantForm::ATTRIBUTE_SELECTIONS_FIELD] ?? [];
+        unset($data[ProductVariantForm::ATTRIBUTE_SELECTIONS_FIELD]);
+
+        $this->pendingAttributeSelections = ProductVariantForm::normalizeAttributeSelections($selectionsState);
+        $this->pendingVariantAttributeMatrix = ProductVariantForm::buildAttributeMatrixPayload($this->pendingAttributeSelections);
+        $legacyAttributes = ProductVariantForm::buildLegacyAttributesPayload($this->pendingAttributeSelections);
+
+        if ($this->pendingVariantAttributeMatrix !== []) {
+            $data['variant_attribute_matrix'] = $this->pendingVariantAttributeMatrix;
+        } elseif (! array_key_exists('variant_attribute_matrix', $data)) {
+            $data['variant_attribute_matrix'] = null;
+        }
+
+        if ($legacyAttributes !== []) {
+            $data['attributes'] = $legacyAttributes;
+        } elseif (! array_key_exists('attributes', $data)) {
+            $data['attributes'] = null;
+        }
+
         if (! is_numeric($data['product_id'] ?? null)) {
             $requestedProductId = request()->integer('product_id');
 
@@ -79,6 +110,29 @@ class CreateProductVariants extends CreateRecord
         }
 
         return $filteredData;
+    }
+
+    protected function afterCreate(): void
+    {
+        $record = $this->record;
+
+        if (! $record instanceof ProductVariant) {
+            return;
+        }
+
+        if (
+            ! Schema::hasTable('product_variant_attributes')
+            || ! Schema::hasTable('variant_attribute_values')
+            || ! Schema::hasTable('attribute_values')
+        ) {
+            return;
+        }
+
+        ProductVariantAttributeMatrixService::sync(
+            $record,
+            $this->pendingVariantAttributeMatrix,
+            $this->pendingAttributeSelections,
+        );
     }
 
     protected function handleRecordCreation(array $data): Model

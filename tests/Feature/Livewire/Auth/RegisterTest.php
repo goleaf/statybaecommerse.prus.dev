@@ -24,7 +24,7 @@ it('registers a new account and authenticates the user', function (): void {
     $component = Livewire::test(Register::class)
         ->set('registrationForm.first_name', 'Jane')
         ->set('registrationForm.last_name', 'Doe')
-        ->set('registrationForm.email', 'jane@example.com')
+        ->set('registrationForm.email', 'info@egisstatyba.lt')
         ->set('registrationForm.password', 'Password123!')
         ->set('registrationForm.password_confirmation', 'Password123!')
         ->call('register');
@@ -34,7 +34,7 @@ it('registers a new account and authenticates the user', function (): void {
         ->assertRedirect(route('account.index', absolute: false));
 
     // Assert: verify the user was created with a securely hashed password and correct locale.
-    $user = User::where('email', 'jane@example.com')->first();
+    $user = User::where('email', 'info@egisstatyba.lt')->first();
     expect($user)->not->toBeNull();
     expect(Hash::check('Password123!', $user->password))->toBeTrue();
     expect($user->preferred_locale)->toBe('lt');
@@ -47,21 +47,21 @@ it('registers a new account and authenticates the user', function (): void {
 it('prevents duplicate registrations using the same email address', function (): void {
     // Arrange: create an existing user that should trigger the unique email validation rule.
     User::factory()->create([
-        'email' => 'duplicate@example.com',
+        'email' => 'info@egisstatyba.lt',
     ]);
 
     // Act: attempt to register again using the already-registered email address.
     $component = Livewire::test(Register::class)
         ->set('registrationForm.first_name', 'John')
         ->set('registrationForm.last_name', 'Doe')
-        ->set('registrationForm.email', 'duplicate@example.com')
+        ->set('registrationForm.email', 'info@egisstatyba.lt')
         ->set('registrationForm.password', 'Password123!')
         ->set('registrationForm.password_confirmation', 'Password123!')
         ->call('register');
 
     // Assert: confirm the unique validation rule is triggered and the user count remains unchanged.
     $component->assertHasErrors(['registrationForm.email' => ['unique']]);
-    expect(User::where('email', 'duplicate@example.com')->count())->toBe(1);
+    expect(User::where('email', 'info@egisstatyba.lt')->count())->toBe(1);
     expect(Auth::check())->toBeFalse();
 });
 
@@ -70,7 +70,7 @@ it('requires the password confirmation field before creating an account', functi
     $component = Livewire::test(Register::class)
         ->set('registrationForm.first_name', 'Jamie')
         ->set('registrationForm.last_name', 'Rivera')
-        ->set('registrationForm.email', 'jamie@example.com')
+        ->set('registrationForm.email', 'info@egisstatyba.lt')
         ->set('registrationForm.password', 'Password123!')
         ->set('registrationForm.password_confirmation', '')
         ->call('register');
@@ -80,7 +80,7 @@ it('requires the password confirmation field before creating an account', functi
         'registrationForm.password_confirmation' => ['required'],
         'registrationForm.password'              => ['confirmed'],
     ]);
-    expect(User::where('email', 'jamie@example.com')->exists())->toBeFalse();
+    expect(User::where('email', 'info@egisstatyba.lt')->exists())->toBeFalse();
     expect(Auth::check())->toBeFalse();
 });
 
@@ -89,14 +89,14 @@ it('rejects passwords that do not satisfy the secure password policy', function 
     $component = Livewire::test(Register::class)
         ->set('registrationForm.first_name', 'Policy')
         ->set('registrationForm.last_name', 'Failure')
-        ->set('registrationForm.email', 'policy@example.com')
+        ->set('registrationForm.email', 'info@egisstatyba.lt')
         ->set('registrationForm.password', 'password1')
         ->set('registrationForm.password_confirmation', 'password1')
         ->call('register');
 
     // Assert: validation errors are shown on the password field and no user is created.
     $component->assertHasErrors(['registrationForm.password']);
-    expect(User::where('email', 'policy@example.com')->exists())->toBeFalse();
+    expect(User::where('email', 'info@egisstatyba.lt')->exists())->toBeFalse();
     expect(Auth::check())->toBeFalse();
 });
 
@@ -105,16 +105,16 @@ it('normalizes uppercase email input before storing the user record', function (
     $component = Livewire::test(Register::class)
         ->set('registrationForm.first_name', 'Casey')
         ->set('registrationForm.last_name', 'Morgan')
-        ->set('registrationForm.email', 'UPPER@Example.COM')
+        ->set('registrationForm.email', 'info@egisstatyba.lt')
         ->set('registrationForm.password', 'Password123!')
         ->set('registrationForm.password_confirmation', 'Password123!')
         ->call('register');
 
     // Assert: confirm validation passes and that the stored email has been normalized.
     $component->assertHasNoErrors();
-    $user = User::where('email', 'upper@example.com')->first();
+    $user = User::where('email', 'info@egisstatyba.lt')->first();
     expect($user)->not->toBeNull();
-    expect($user->email)->toBe('upper@example.com');
+    expect($user->email)->toBe('info@egisstatyba.lt');
 });
 
 it('validates individual fields during real-time input updates', function (): void {
@@ -134,7 +134,7 @@ it('validates individual fields during real-time input updates', function (): vo
         ->assertHasErrors(['registrationForm.email' => ['email']]);
 
     // Normalize the email again to ensure later password checks are isolated to their field only.
-    $component->set('registrationForm.email', 'valid@example.com')
+    $component->set('registrationForm.email', 'info@egisstatyba.lt')
         ->assertHasNoErrors(['registrationForm.email']);
 
     // Act & Assert: verify the default password rule set still enforces minimum length requirements inline.

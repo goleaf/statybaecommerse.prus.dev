@@ -199,8 +199,8 @@ Automate Gmail operations through Composio's Gmail toolkit via Rube MCP.
 ### Gmail Query Syntax
 
 **Operators**:
-- `from:sender@example.com` - Emails from sender
-- `to:recipient@example.com` - Emails to recipient
+- `from:info@egisstatyba.lt` - Emails from sender
+- `to:info@egisstatyba.lt` - Emails to recipient
 - `subject:"exact phrase"` - Subject contains exact phrase
 - `is:unread` - Unread messages
 - `is:starred` - Starred messages
@@ -219,7 +219,7 @@ Automate Gmail operations through Composio's Gmail toolkit via Rube MCP.
 - `()` - Group conditions
 
 **Examples**:
-- `from:boss@company.com is:unread` - Unread emails from boss
+- `from:info@egisstatyba.lt is:unread` - Unread emails from boss
 - `subject:invoice has:attachment after:2024/01/01` - Invoices with attachments this year
 - `(from:alice OR from:bob) is:starred` - Starred emails from Alice or Bob
 

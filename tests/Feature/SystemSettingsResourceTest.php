@@ -119,7 +119,7 @@ final class SystemSettingsResourceTest extends TestCase
 
         // Provision a deterministic administrator that mirrors the Filament guard expectations.
         $this->adminUser = AdminUser::factory()->create([
-            'email' => 'admin@example.com',
+            'email' => 'info@egisstatyba.lt',
             'name'  => 'Admin User',
         ]);
 

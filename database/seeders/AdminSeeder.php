@@ -34,7 +34,7 @@ use Throwable;
 /**
  * AdminSeeder
  *
- * Comprehensive seeder for admin@example.com user with all menu items
+ * Comprehensive seeder for info@egisstatyba.lt user with all menu items
  * and sample data for testing and demonstration purposes.
  */
 final class AdminSeeder extends BaseSeeder
@@ -118,7 +118,7 @@ final class AdminSeeder extends BaseSeeder
         }
 
         $this->logInfo('✅ Comprehensive Admin Seeder completed successfully!');
-        $this->logInfo('👤 Admin user: admin@example.com');
+        $this->logInfo('👤 Admin user: info@egisstatyba.lt');
         // Keep the printed credentials aligned with the seeded password for QA logins.
         $this->logInfo('🔑 Password: Admin123!');
     }
@@ -128,7 +128,7 @@ final class AdminSeeder extends BaseSeeder
         $this->logInfo('👤 Creating admin user...');
 
         return User::updateOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => 'info@egisstatyba.lt'],
             [
                 'name'              => 'Admin User',
                 'email_verified_at' => now(),
@@ -542,7 +542,7 @@ final class AdminSeeder extends BaseSeeder
                 'postal_code'    => '01234',
                 'country_code'   => 'LT',
                 'phone'          => '+37012345678',
-                'email'          => 'admin@example.com',
+                'email'          => 'info@egisstatyba.lt',
                 'is_default'     => true,
                 'is_active'      => true,
                 'is_shipping'    => true,
@@ -557,7 +557,7 @@ final class AdminSeeder extends BaseSeeder
                 'postal_code'    => '01235',
                 'country_code'   => 'LT',
                 'phone'          => '+37012345679',
-                'email'          => 'admin@example.com',
+                'email'          => 'info@egisstatyba.lt',
                 'is_default'     => false,
                 'is_active'      => true,
                 'is_billing'     => true,
@@ -804,11 +804,11 @@ final class AdminSeeder extends BaseSeeder
         $this->logInfo('📧 Creating subscribers...');
 
         $emails = [
-            'subscriber1@example.com',
-            'subscriber2@example.com',
-            'subscriber3@example.com',
-            'subscriber4@example.com',
-            'subscriber5@example.com',
+            'info@egisstatyba.lt',
+            'info@egisstatyba.lt',
+            'info@egisstatyba.lt',
+            'info@egisstatyba.lt',
+            'info@egisstatyba.lt',
         ];
 
         foreach ($emails as $email) {

@@ -22,7 +22,7 @@ class ProductRequestResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 
@@ -46,7 +46,7 @@ class ProductRequestResourceTest extends TestCase
             'product_id' => $product->id,
             'user_id'    => $this->adminUser->id,
             'name'       => 'Test Request',
-            'email'      => 'test@example.com',
+            'email'      => 'info@egisstatyba.lt',
             'status'     => 'pending',
         ]);
 
@@ -63,7 +63,7 @@ class ProductRequestResourceTest extends TestCase
                 'product_id'         => $product->id,
                 'user_id'            => $this->adminUser->id,
                 'name'               => 'New Request',
-                'email'              => 'new@example.com',
+                'email'              => 'info@egisstatyba.lt',
                 'phone'              => '+37012345678',
                 'message'            => 'Test message',
                 'requested_quantity' => 2,
@@ -74,7 +74,7 @@ class ProductRequestResourceTest extends TestCase
 
         $this->assertDatabaseHas('product_requests', [
             'name'    => 'New Request',
-            'email'   => 'new@example.com',
+            'email'   => 'info@egisstatyba.lt',
             'status'  => 'pending',
             'user_id' => $this->adminUser->id,
         ]);
@@ -134,7 +134,7 @@ class ProductRequestResourceTest extends TestCase
             'product_id' => $product->id,
             'user_id'    => $this->adminUser->id,
             'name'       => 'Test Request',
-            'email'      => 'test@example.com',
+            'email'      => 'info@egisstatyba.lt',
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ViewProductRequest::class, [
@@ -194,7 +194,7 @@ class ProductRequestResourceTest extends TestCase
             'product_id' => $product->id,
             'user_id'    => $this->adminUser->id,
             'name'       => 'Test Request',
-            'email'      => 'test@example.com',
+            'email'      => 'info@egisstatyba.lt',
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ListProductRequests::class)

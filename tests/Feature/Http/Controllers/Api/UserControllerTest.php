@@ -22,7 +22,7 @@ final class UserControllerTest extends TestCase
         $user = User::factory()->create([
             'first_name' => 'Ada',
             'last_name'  => 'Lovelace',
-            'email'      => 'ada@example.com',
+            'email'      => 'info@egisstatyba.lt',
         ]);
         $request = Request::create('/api/users/profile', 'GET');
         $request->setUserResolver(static fn () => $user);

@@ -29,7 +29,7 @@ beforeEach(function (): void {
 it('unit: finds customers by email and phone', function (): void {
     $user = User::unguarded(fn () => User::create([
         'name'      => 'Aistė Statybaitė',
-        'email'     => 'aiste@example.test',
+        'email'     => 'info@egisstatyba.lt',
         'phone'     => '+37060000000',
         'is_active' => true,
     ]));
@@ -39,7 +39,7 @@ it('unit: finds customers by email and phone', function (): void {
     expect($results)
         ->toHaveCount(1)
         ->and($results[0]->get('email'))
-        ->toEqual('aiste@example.test')
+        ->toEqual('info@egisstatyba.lt')
         ->and($results[0]->get('customer_id'))
         ->toEqual($user->getKey());
 });

@@ -26,7 +26,7 @@
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" for="email">{{ __('frontend.profile.fields.email_label') }}</label>
                     <input id="email" name="email" type="email" value="{{ old('email', $user->email) }}" required 
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        placeholder="john@example.com">
+                        placeholder="info@egisstatyba.lt">
                     @error('email')
                         <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                     @enderror

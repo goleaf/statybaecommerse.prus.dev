@@ -155,7 +155,7 @@ When creating an envelope from a template:
    {
      "roleName": "Signer 1",     // Must match template role name exactly
      "name": "John Smith",
-     "email": "john@example.com"
+     "email": "info@egisstatyba.lt"
    }
 3. Include ALL required roles in templateRoles array
 ```

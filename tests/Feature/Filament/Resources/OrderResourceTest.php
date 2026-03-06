@@ -33,7 +33,7 @@ beforeEach(function () {
     $this->resolveAdminPanel();
 
     $this->admin = AdminUser::factory()->create([
-        'email' => 'admin@example.com',
+        'email' => 'info@egisstatyba.lt',
     ]);
 
     // Acting as admin

@@ -29,7 +29,7 @@ final class LegalResourceLivewireTest extends TestCase
 
         // Authenticate as the canonical administrator account expected by the panel.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

@@ -25,17 +25,17 @@ final class UserRelationsSeeder extends BaseSeeder
     public function run(): void
     {
         // 0. Cleanup existing test user to allow re-runs
-        User::query()->where('email', 'test@example.com')->each(function (User $user): void {
+        User::query()->where('email', 'info@egisstatyba.lt')->each(function (User $user): void {
             $user->customerGroups()->detach();
             $user->partners()->detach();
             $user->delete();
         });
-        Subscriber::query()->where('email', 'test@example.com')->delete();
+        Subscriber::query()->where('email', 'info@egisstatyba.lt')->delete();
 
         // 1. Create a primary test user with ALL relationships
         $testUser = User::factory()->create([
             'name'     => 'Test User All Relations',
-            'email'    => 'test@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

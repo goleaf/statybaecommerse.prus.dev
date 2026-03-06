@@ -39,7 +39,7 @@ final class ReferralResourcesSmokeTest extends TestCase
 
         // Authenticate as the default admin user so all resource policies allow list page access.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

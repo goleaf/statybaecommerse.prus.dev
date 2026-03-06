@@ -30,7 +30,7 @@ describe('ContactMessage model', function (): void {
         // Arrange: persist a record so the timestamps are populated.
         $contactMessage = ContactMessage::query()->create([
             'name'    => 'Jane Doe',
-            'email'   => 'jane@example.com',
+            'email'   => 'info@egisstatyba.lt',
             'subject' => 'Question',
             'message' => 'Could you help me?',
         ]);
@@ -44,21 +44,21 @@ describe('ContactMessage model', function (): void {
         // Arrange: create records in a non-alphabetical order to verify the scope sorting.
         ContactMessage::query()->create([
             'name'    => 'Charlie Contact',
-            'email'   => 'charlie@example.com',
+            'email'   => 'info@egisstatyba.lt',
             'subject' => 'Support',
             'message' => 'Need some assistance.',
         ]);
 
         ContactMessage::query()->create([
             'name'    => 'Alice Contact',
-            'email'   => 'alice@example.com',
+            'email'   => 'info@egisstatyba.lt',
             'subject' => 'Feedback',
             'message' => 'Just sharing feedback.',
         ]);
 
         ContactMessage::query()->create([
             'name'    => 'Bob Contact',
-            'email'   => 'bob@example.com',
+            'email'   => 'info@egisstatyba.lt',
             'subject' => 'Request',
             'message' => 'Requesting more info.',
         ]);

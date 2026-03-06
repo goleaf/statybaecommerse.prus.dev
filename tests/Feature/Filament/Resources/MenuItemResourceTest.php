@@ -33,7 +33,7 @@ final class MenuItemResourceTest extends TestCase
 
         // Provision and authenticate a reusable administrator account.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

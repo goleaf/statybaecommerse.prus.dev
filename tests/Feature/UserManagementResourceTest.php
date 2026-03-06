@@ -33,7 +33,7 @@ final class UserManagementResourceTest extends TestCase
 
         // Promote a freshly created user to super_admin for unrestricted access to the management screens.
         $this->adminUser = User::factory()->create([
-            'email' => 'admin-user-management@example.test',
+            'email' => 'info@egisstatyba.lt',
         ]);
         $this->adminUser->assignRole('super_admin');
     }
@@ -72,7 +72,7 @@ final class UserManagementResourceTest extends TestCase
             ->test(CreateUser::class)
             ->fillForm([
                 'name'               => 'New Admin User',
-                'email'              => 'new-admin@example.test',
+                'email'              => 'info@egisstatyba.lt',
                 'password'           => 'secret-pass',
                 'preferred_locale'   => 'en',
                 'is_active'          => true,
@@ -82,7 +82,7 @@ final class UserManagementResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('users', [
-            'email' => 'new-admin@example.test',
+            'email' => 'info@egisstatyba.lt',
             'name'  => 'New Admin User',
         ]);
     }

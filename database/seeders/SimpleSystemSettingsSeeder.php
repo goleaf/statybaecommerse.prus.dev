@@ -235,7 +235,7 @@ final class SimpleSystemSettingsSeeder extends BaseSeeder
         SystemSetting::factory()->inCategory($emailCategory)->active()->private()->required()->ofType('string')->state([
             'key'         => 'mail.from_address',
             'name'        => 'From Email Address',
-            'value'       => 'noreply@statybaecommerse.prus.dev',
+            'value'       => 'info@egisstatyba.lt',
             'group'       => 'email',
             'description' => 'Default sender email address',
             'sort_order'  => 1,

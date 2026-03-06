@@ -18,19 +18,28 @@ class SupplierFactory extends Factory
     public function definition(): array
     {
         $name = $this->faker->company();
-        $base = Str::upper(Str::slug($name, '-'));
+        $base = Str::slug($name);
+        $companyCode = $this->faker->unique()->numerify('#########');
 
         if ($base === '') {
-            $base = 'SUPPLIER';
+            $base = 'supplier';
         }
 
         return [
-            'name'          => $name,
-            'code'          => $base . '-' . $this->faker->unique()->numerify('###'),
-            'contact_email' => $this->faker->unique()->safeEmail(),
-            'contact_phone' => $this->faker->phoneNumber(),
-            'notes'         => $this->faker->optional()->sentence(),
-            'is_enabled'    => $this->faker->boolean(90),
+            'name'           => $name,
+            'company_code'   => $companyCode,
+            'code'           => $base . '-' . $this->faker->unique()->numerify('##'),
+            'vat_code'       => 'LT' . $companyCode,
+            'contact_person' => $this->faker->name(),
+            'contact_email'  => $this->faker->unique()->safeEmail(),
+            'contact_phone'  => $this->faker->phoneNumber(),
+            'website'        => $this->faker->url(),
+            'address'        => $this->faker->streetAddress(),
+            'city'           => $this->faker->city(),
+            'postal_code'    => $this->faker->postcode(),
+            'country'        => $this->faker->country(),
+            'notes'          => $this->faker->optional()->sentence(),
+            'is_enabled'     => true,
         ];
     }
 }

@@ -87,7 +87,7 @@ final class CustomerResourceTest extends TestCase
 
         $payload = [
             'name'        => 'John Doe',
-            'email'       => 'john@example.test',
+            'email'       => 'info@egisstatyba.lt',
             'phone'       => '+37060000001',
             'address'     => 'Konstitucijos pr. 1',
             'country_id'  => $country->id,
@@ -101,7 +101,7 @@ final class CustomerResourceTest extends TestCase
         $this->post('/admin/customers', $payload)->assertStatus(302);
 
         $this->assertDatabaseHas('customers', [
-            'email'      => 'john@example.test',
+            'email'      => 'info@egisstatyba.lt',
             'name'       => 'John Doe',
             'country_id' => $country->id,
             'city_id'    => $city->id,
@@ -145,7 +145,7 @@ final class CustomerResourceTest extends TestCase
 
         $customer = Customer::factory()->create([
             'name'       => 'Initial',
-            'email'      => 'initial@example.test',
+            'email'      => 'info@egisstatyba.lt',
             'country_id' => $country->id,
             'city_id'    => $city1->id,
             'company_id' => $company1->id,
@@ -154,7 +154,7 @@ final class CustomerResourceTest extends TestCase
 
         $update = [
             'name'       => 'Updated Name',
-            'email'      => 'updated@example.test',
+            'email'      => 'info@egisstatyba.lt',
             'phone'      => '+37060000005',
             'city_id'    => $city2->id,
             'company_id' => $company2->id,
@@ -166,7 +166,7 @@ final class CustomerResourceTest extends TestCase
         $this->assertDatabaseHas('customers', [
             'id'         => $customer->id,
             'name'       => 'Updated Name',
-            'email'      => 'updated@example.test',
+            'email'      => 'info@egisstatyba.lt',
             'city_id'    => $city2->id,
             'company_id' => $company2->id,
             'is_active'  => false,

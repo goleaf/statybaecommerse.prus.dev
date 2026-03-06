@@ -76,6 +76,11 @@ return [
             'unavailable_variants'  => 'Unavailable variants',
             'under_50_euros'        => 'Under €50',
         ],
+        'badges' => [
+            'new'        => 'New',
+            'featured'   => 'Featured',
+            'bestseller' => 'Bestseller',
+        ],
         'messages' => [
             'added_to_cart'         => 'Variant added to cart',
             'in_stock'              => 'In stock',

@@ -61,7 +61,7 @@ final class VariantCombinationResourceTest extends TestCase
 
         // Authenticate a deterministic admin user so Filament policies allow access in every test.
         $this->adminUser = AdminUser::factory()->create([
-            'email' => 'admin@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         // Create a product to ensure combination relationships resolve cleanly.

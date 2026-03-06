@@ -33,7 +33,7 @@ final class UserPreferenceResourceTest extends TestCase
 
         // Create an acting administrator and elevate them to the super_admin role for unrestricted access.
         $this->adminUser = User::factory()->create([
-            'email' => 'admin-user-preferences@example.test',
+            'email' => 'info@egisstatyba.lt',
         ]);
         $this->adminUser->assignRole('super_admin');
     }
@@ -54,7 +54,7 @@ final class UserPreferenceResourceTest extends TestCase
         // Create a related user to associate with the new preference entry.
         $user = User::factory()->create([
             'name'  => 'Preference Owner',
-            'email' => 'preference-owner@example.test',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         Livewire::actingAs($this->adminUser)

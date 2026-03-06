@@ -78,7 +78,7 @@ Automate Google Drive workflows including file upload/download, search, folder m
 - Query complexity limits: >5-10 OR clauses may error "The query is too complex"
 - Wildcards (*) NOT supported in `name`; use `contains` for partial matching
 - 'My Drive' is NOT searchable by name; use `folder_id='root'` for root folder
-- User email searches: use `'user@example.com' in owners` (NOT `owner:user@example.com`)
+- User email searches: use `'info@egisstatyba.lt' in owners` (NOT `owner:info@egisstatyba.lt`)
 
 ### 3. Share Files and Manage Permissions
 

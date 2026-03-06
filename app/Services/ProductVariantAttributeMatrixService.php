@@ -25,7 +25,8 @@ final class ProductVariantAttributeMatrixService
         }
 
         $attributeValues = AttributeValue::query()
-            ->with('attribute')
+            ->withoutGlobalScopes()
+            ->with(['attribute' => static fn ($query) => $query->withoutGlobalScopes()])
             ->whereIn('id', $selections->pluck('attribute_value_id')->all())
             ->get()
             ->keyBy(static fn (AttributeValue $value) => $value->getKey());

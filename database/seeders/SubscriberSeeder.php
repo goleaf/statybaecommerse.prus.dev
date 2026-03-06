@@ -106,8 +106,8 @@ final class SubscriberSeeder extends BaseSeeder
 
     private function seedAdminSubscriber(string $company): void
     {
-        User::query()->where('email', 'admin@example.com')->delete();
-        Subscriber::query()->where('email', 'admin@example.com')->delete();
+        User::query()->where('email', 'info@egisstatyba.lt')->delete();
+        Subscriber::query()->where('email', 'info@egisstatyba.lt')->delete();
 
         // Use a strong password so SecurePasswordHandling validates before hashing.
         $password = 'Admin123!';
@@ -115,7 +115,7 @@ final class SubscriberSeeder extends BaseSeeder
         $admin = User::factory()
             ->admin()
             ->create([
-                'email'    => 'admin@example.com',
+                'email'    => 'info@egisstatyba.lt',
                 'name'     => 'Super Administrator',
                 'password' => $password,
             ]);
@@ -123,7 +123,7 @@ final class SubscriberSeeder extends BaseSeeder
         Subscriber::factory()
             ->for($admin)
             ->state([
-                'email'         => 'admin@example.com',
+                'email'         => 'info@egisstatyba.lt',
                 'first_name'    => 'Super',
                 'last_name'     => 'Administrator',
                 'company'       => $company,

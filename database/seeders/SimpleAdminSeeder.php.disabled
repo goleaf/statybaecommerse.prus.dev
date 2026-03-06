@@ -48,10 +48,10 @@ final class SimpleAdminSeeder extends BaseSeeder
 
         // Create super admin user (idempotent)
         $admin = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => 'info@egisstatyba.lt'],
             [
                 'name'  => 'Super Administrator',
-                'email' => 'admin@example.com',
+                'email' => 'info@egisstatyba.lt',
                 // Use a strong password so the User mutator validates before hashing.
                 'password'          => 'Admin123!',
                 'email_verified_at' => now(),
@@ -64,7 +64,7 @@ final class SimpleAdminSeeder extends BaseSeeder
         $admin->assignRole($superAdminRole);
 
         $this->command->info('✅ Super Admin created successfully!');
-        $this->command->info('📧 Email: admin@example.com');
+        $this->command->info('📧 Email: info@egisstatyba.lt');
         $this->command->info('🔑 Password: Admin123!');
         $this->command->info('🎭 Role: super-admin');
     }

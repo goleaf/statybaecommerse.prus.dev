@@ -260,16 +260,16 @@ final class SubscriberTest extends TestCase
 
     public function test_subscriber_static_subscribe_method(): void
     {
-        $user = User::factory()->create(['email' => 'test@example.com']);
+        $user = User::factory()->create(['email' => 'info@egisstatyba.lt']);
 
         $subscriber = Subscriber::subscribe([
-            'email'      => 'test@example.com',
+            'email'      => 'info@egisstatyba.lt',
             'first_name' => 'John',
             'last_name'  => 'Doe',
         ]);
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
-        $this->assertEquals('test@example.com', $subscriber->email);
+        $this->assertEquals('info@egisstatyba.lt', $subscriber->email);
         $this->assertEquals('active', $subscriber->status);
         $this->assertEquals($user->id, $subscriber->user_id);
         $this->assertNotNull($subscriber->subscribed_at);
@@ -278,22 +278,22 @@ final class SubscriberTest extends TestCase
     public function test_subscriber_static_subscribe_without_existing_user(): void
     {
         $subscriber = Subscriber::subscribe([
-            'email'      => 'new@example.com',
+            'email'      => 'info@egisstatyba.lt',
             'first_name' => 'Jane',
             'last_name'  => 'Doe',
         ]);
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
-        $this->assertEquals('new@example.com', $subscriber->email);
+        $this->assertEquals('info@egisstatyba.lt', $subscriber->email);
         $this->assertNull($subscriber->user_id);
     }
 
     public function test_subscriber_static_find_by_email(): void
     {
-        $subscriber = Subscriber::factory()->create(['email' => 'test@example.com']);
+        $subscriber = Subscriber::factory()->create(['email' => 'info@egisstatyba.lt']);
 
-        $foundSubscriber = Subscriber::findByEmail('test@example.com');
-        $notFoundSubscriber = Subscriber::findByEmail('notfound@example.com');
+        $foundSubscriber = Subscriber::findByEmail('info@egisstatyba.lt');
+        $notFoundSubscriber = Subscriber::findByEmail('info@egisstatyba.lt');
 
         $this->assertInstanceOf(Subscriber::class, $foundSubscriber);
         $this->assertEquals($subscriber->id, $foundSubscriber->id);

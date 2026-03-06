@@ -330,7 +330,7 @@ async def search_users(params: UserSearchInput) -> str:
                 {
                     "id": str,      # User ID (e.g., "U123456789")
                     "name": str,    # Full name (e.g., "John Doe")
-                    "email": str,   # Email address (e.g., "john@example.com")
+                    "email": str,   # Email address (e.g., "info@egisstatyba.lt")
                     "team": str     # Team name (e.g., "Marketing") - optional
                 }
             ]
@@ -596,7 +596,7 @@ class UserData(TypedDict):
 @mcp.tool()
 async def get_user_typed(user_id: str) -> UserData:
     '''Returns structured data - FastMCP handles serialization.'''
-    return {"id": user_id, "name": "John Doe", "email": "john@example.com"}
+    return {"id": user_id, "name": "John Doe", "email": "info@egisstatyba.lt"}
 
 # Pydantic models for complex validation
 class DetailedUser(BaseModel):

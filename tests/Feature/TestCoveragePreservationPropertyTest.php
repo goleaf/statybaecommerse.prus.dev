@@ -27,7 +27,7 @@ final class TestCoveragePreservationPropertyTest extends TestCase
             'is_visible'   => true,
             'is_featured'  => false,
             'author_name'  => 'Test Author',
-            'author_email' => 'test@example.com',
+            'author_email' => 'info@egisstatyba.lt',
         ]);
 
         $this->assertInstanceOf(News::class, $news);

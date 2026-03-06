@@ -26,7 +26,7 @@ it('can import partners', function () {
     $row = [
         'name'          => 'Imported Partner',
         'code'          => 'IP-001',
-        'contact_email' => 'partner@example.com',
+        'contact_email' => 'info@egisstatyba.lt',
         'is_enabled'    => '1',
     ];
 

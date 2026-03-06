@@ -27,8 +27,8 @@ it('orders users alphabetically when the name column exists', function (): void 
         User::factory()->create(['name' => 'Anna']);
     } catch (Throwable) {
         // Provide a guarded fallback when factories are disabled in the project configuration.
-        User::query()->create(['name' => 'Zoe', 'email' => 'zoe@example.test', 'password' => bcrypt('secret')]);
-        User::query()->create(['name' => 'Anna', 'email' => 'anna@example.test', 'password' => bcrypt('secret')]);
+        User::query()->create(['name' => 'Zoe', 'email' => 'info@egisstatyba.lt', 'password' => bcrypt('secret')]);
+        User::query()->create(['name' => 'Anna', 'email' => 'info@egisstatyba.lt', 'password' => bcrypt('secret')]);
     }
 
     expect(User::orderedByName()->pluck('name')->all())->toBe(['Anna', 'Zoe']);

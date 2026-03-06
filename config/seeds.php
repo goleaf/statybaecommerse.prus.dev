@@ -19,6 +19,7 @@ use Database\Seeders\NewsSeeder;
 use Database\Seeders\OptimizedFullSeeder;
 use Database\Seeders\ServiceSeeder;
 use Database\Seeders\SettingsSeeder;
+use Database\Seeders\SupplierSeeder;
 use Database\Seeders\UsersCustomerGroupsTabSeeder;
 use Database\Seeders\UsersPartnersTabSeeder;
 use Database\Seeders\WarehouseSeeder;
@@ -100,6 +101,7 @@ return [
         AttributeValueSeeder::class,
         WarehouseSeeder::class,
         InventorySeeder::class,
+        SupplierSeeder::class,
         FeatureFlagSeeder::class,
         BrochureSeeder::class,
         SettingsSeeder::class,

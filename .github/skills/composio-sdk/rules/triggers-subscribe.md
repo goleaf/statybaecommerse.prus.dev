@@ -92,7 +92,7 @@ interface TriggerEvent {
   payload: {
     // Trigger-specific data
     // Example for Gmail:
-    // { id: 'msg_123', subject: 'Hello', from: 'user@example.com' }
+    // { id: 'msg_123', subject: 'Hello', from: 'info@egisstatyba.lt' }
   };
   metadata: {
     triggerId: string;

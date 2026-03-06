@@ -31,7 +31,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_list_subscribers(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $subscribers = Subscriber::factory()->count(5)->create();
         $first = $subscribers->first();
 
@@ -45,14 +45,14 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_create_subscriber(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $user = User::factory()->create();
 
         $this->actingAs($adminUser);
 
         Livewire::test(CreateSubscriber::class)
             ->fillForm([
-                'email'      => 'test@example.com',
+                'email'      => 'info@egisstatyba.lt',
                 'first_name' => 'John',
                 'last_name'  => 'Doe',
                 'phone'      => '+37060000000',
@@ -68,7 +68,7 @@ final class SubscriberResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('subscribers', [
-            'email'      => 'test@example.com',
+            'email'      => 'info@egisstatyba.lt',
             'first_name' => 'John',
             'last_name'  => 'Doe',
             'status'     => 'active',
@@ -77,7 +77,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_edit_subscriber(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $subscriber = Subscriber::factory()->create();
 
         $this->actingAs($adminUser);
@@ -101,7 +101,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_view_subscriber(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $subscriber = Subscriber::factory()->create();
 
         $this->actingAs($adminUser);
@@ -112,7 +112,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_delete_subscriber(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $subscriber = Subscriber::factory()->create();
 
         $this->actingAs($adminUser);
@@ -126,7 +126,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_filter_subscribers_by_status(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $activeSubscriber = Subscriber::factory()->active()->create();
         $inactiveSubscriber = Subscriber::factory()->inactive()->create();
 
@@ -140,7 +140,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_filter_subscribers_by_source(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $websiteSubscriber = Subscriber::factory()->fromSource('website')->create();
         $adminSubscriber = Subscriber::factory()->fromSource('admin')->create();
 
@@ -154,9 +154,9 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_search_subscribers(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
-        $subscriber1 = Subscriber::factory()->create(['email' => 'john@example.com']);
-        $subscriber2 = Subscriber::factory()->create(['email' => 'jane@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
+        $subscriber1 = Subscriber::factory()->create(['email' => 'info@egisstatyba.lt']);
+        $subscriber2 = Subscriber::factory()->create(['email' => 'info@egisstatyba.lt']);
 
         $this->actingAs($adminUser);
 
@@ -168,7 +168,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_bulk_verify_subscribers(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $subscribers = Subscriber::factory()->count(3)->create(['is_verified' => false]);
 
         $this->actingAs($adminUser);
@@ -186,7 +186,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_bulk_unsubscribe_subscribers(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $subscribers = Subscriber::factory()->active()->count(3)->create();
 
         $this->actingAs($adminUser);
@@ -204,7 +204,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_verify_individual_subscriber(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $subscriber = Subscriber::factory()->create(['is_verified' => false]);
 
         $this->actingAs($adminUser);
@@ -221,7 +221,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_unsubscribe_individual_subscriber(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $subscriber = Subscriber::factory()->active()->create();
 
         $this->actingAs($adminUser);
@@ -238,7 +238,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_can_resubscribe_individual_subscriber(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $subscriber = Subscriber::factory()->unsubscribed()->create();
 
         $this->actingAs($adminUser);
@@ -255,7 +255,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_subscriber_validation_rules(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
 
         $this->actingAs($adminUser);
 
@@ -270,14 +270,14 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_subscriber_unique_email_validation(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
-        $existingSubscriber = Subscriber::factory()->create(['email' => 'existing@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
+        $existingSubscriber = Subscriber::factory()->create(['email' => 'info@egisstatyba.lt']);
 
         $this->actingAs($adminUser);
 
         Livewire::test(CreateSubscriber::class)
             ->fillForm([
-                'email'      => 'existing@example.com',
+                'email'      => 'info@egisstatyba.lt',
                 'first_name' => 'John',
                 'last_name'  => 'Doe',
                 'status'     => 'active',
@@ -289,7 +289,7 @@ final class SubscriberResourceTest extends TestCase
 
     public function test_subscriber_relationship_with_user(): void
     {
-        $adminUser = User::factory()->create(['email' => 'admin@example.com']);
+        $adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt']);
         $user = User::factory()->create();
         $subscriber = Subscriber::factory()->create(['user_id' => $user->id]);
 

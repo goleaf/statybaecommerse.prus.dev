@@ -34,7 +34,7 @@ final class ProductRequestFormTest extends TestCase
             'product' => $product,
         ])
             ->set('name', 'Guest Visitor')
-            ->set('email', 'guest.visitor@example.com')
+            ->set('email', 'info@egisstatyba.lt')
             ->set('phone', '+37065555555')
             ->set('message', 'Need a tailored offer.')
             ->set('requested_quantity', 3)
@@ -44,7 +44,7 @@ final class ProductRequestFormTest extends TestCase
             'product_id'         => $product->getKey(),
             'user_id'            => null,
             'name'               => 'Guest Visitor',
-            'email'              => 'guest.visitor@example.com',
+            'email'              => 'info@egisstatyba.lt',
             'requested_quantity' => 3,
             'status'             => ProductRequest::STATUS_PENDING,
         ]);

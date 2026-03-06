@@ -21,7 +21,7 @@ it('creates partner users with a password from the relation manager', function (
     $partner = Partner::factory()->create();
 
     $password = 'Admin123!';
-    $email = 'partner.user@example.test';
+    $email = 'info@egisstatyba.lt';
 
     livewire(UsersRelationManager::class, [
         'ownerRecord' => $partner,

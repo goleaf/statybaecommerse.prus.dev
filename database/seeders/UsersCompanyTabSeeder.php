@@ -167,7 +167,7 @@ final class UsersCompanyTabSeeder extends BaseSeeder
 
     private function upsertCompanyUser(int $index, Company $company): User
     {
-        $email = sprintf('company.relations.%02d@example.test', $index);
+        $email = sprintf('info@egisstatyba.lt', $index);
 
         $user = User::query()->withoutGlobalScopes()->firstOrNew([
             'email' => $email,
@@ -441,7 +441,7 @@ final class UsersCompanyTabSeeder extends BaseSeeder
 
     private function upsertReferredUser(int $index): User
     {
-        $email = sprintf('company.referred.%02d@example.test', $index);
+        $email = sprintf('info@egisstatyba.lt', $index);
 
         $user = User::query()->withoutGlobalScopes()->firstOrNew([
             'email' => $email,

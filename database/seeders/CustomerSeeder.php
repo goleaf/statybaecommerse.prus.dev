@@ -15,7 +15,7 @@ final class CustomerSeeder extends BaseSeeder
         // Create 1 named primary customer with addresses
         /** @var User $primary */
         $primary = User::firstOrCreate(
-            ['email' => 'primary.customer@example.com'],
+            ['email' => 'info@egisstatyba.lt'],
             [
                 'name'              => 'Primary Customer',
                 'first_name'        => 'Primary',
@@ -45,7 +45,7 @@ final class CustomerSeeder extends BaseSeeder
         // Given this is a seeder, we can just loop.
 
         for ($i = 1; $i <= 100; $i++) {
-            $email = sprintf('customer%03d@example.com', $i);
+            $email = sprintf('info@egisstatyba.lt', $i);
 
             if (User::where('email', $email)->exists()) {
                 continue;

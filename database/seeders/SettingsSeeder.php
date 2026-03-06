@@ -88,7 +88,7 @@ final class SettingsSeeder extends BaseSeeder
             [
                 'key'          => 'admin_email',
                 'display_name' => __('Admin Email'),
-                'value'        => 'admin@statybaecommerse.prus.dev',
+                'value'        => 'info@egisstatyba.lt',
                 'type'         => 'email',
                 'group'        => 'email',
                 'description'  => __('Main administrator email address'),
@@ -98,7 +98,7 @@ final class SettingsSeeder extends BaseSeeder
             [
                 'key'          => 'from_email',
                 'display_name' => __('From Email'),
-                'value'        => 'noreply@statybaecommerse.prus.dev',
+                'value'        => 'info@egisstatyba.lt',
                 'type'         => 'email',
                 'group'        => 'email',
                 'description'  => __('Email address used for outgoing emails'),

@@ -76,6 +76,11 @@ return [
             'unavailable_variants'  => 'Neprieinami variantai',
             'under_50_euros'        => 'Iki 50 €',
         ],
+        'badges' => [
+            'new'        => 'Nauja',
+            'featured'   => 'Rekomenduojama',
+            'bestseller' => 'Perkamiausia',
+        ],
         'messages' => [
             'added_to_cart'         => 'Variantas pridėtas į krepšelį',
             'in_stock'              => 'Yra sandėlyje',

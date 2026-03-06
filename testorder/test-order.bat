@@ -60,7 +60,7 @@ if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
    echo     },
    echo     "payer": {
    echo         "name": "Mantas T",
-   echo         "email": "mantas.tamasauskas@7yes.lt",
+   echo         "email": "info@egisstatyba.lt",
    echo         "phone": "+37060000000"
    echo     }
    echo }

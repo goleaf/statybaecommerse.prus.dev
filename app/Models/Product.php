@@ -31,6 +31,7 @@ use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Tiptap\Editor;
 
 /**
  * Product
@@ -222,6 +223,12 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     private static function resolveTranslatedScalar(array $value): ?string
     {
+        $richEditorHtml = self::resolveRichEditorDocument($value);
+
+        if ($richEditorHtml !== null) {
+            return $richEditorHtml;
+        }
+
         $preferredLocales = array_values(array_filter([
             (string) app()->getLocale(),
             (string) config('app.locale', ''),
@@ -231,20 +238,82 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         ], static fn (string $locale): bool => $locale !== ''));
 
         foreach ($preferredLocales as $locale) {
-            $candidate = $value[$locale] ?? null;
+            $candidate = self::resolveScalarCandidate($value[$locale] ?? null);
 
-            if (is_string($candidate) && trim($candidate) !== '') {
+            if ($candidate !== null) {
                 return $candidate;
+            }
+        }
+
+        foreach (['value', 'text'] as $key) {
+            $candidate = self::resolveScalarCandidate($value[$key] ?? null);
+
+            if ($candidate !== null) {
+                return $candidate;
+            }
+        }
+
+        foreach ($value as $key => $candidate) {
+            if (! is_int($key)) {
+                continue;
+            }
+
+            $resolvedCandidate = self::resolveScalarCandidate($candidate);
+
+            if ($resolvedCandidate !== null) {
+                return $resolvedCandidate;
             }
         }
 
         foreach ($value as $candidate) {
-            if (is_string($candidate) && trim($candidate) !== '') {
-                return $candidate;
+            if (! is_array($candidate)) {
+                continue;
+            }
+
+            $resolvedCandidate = self::resolveScalarCandidate($candidate);
+
+            if ($resolvedCandidate !== null) {
+                return $resolvedCandidate;
             }
         }
 
         return null;
+    }
+
+    private static function resolveScalarCandidate(mixed $candidate): ?string
+    {
+        if (is_string($candidate)) {
+            $trimmed = trim($candidate);
+
+            return $trimmed !== '' ? $trimmed : null;
+        }
+
+        if (! is_array($candidate)) {
+            return null;
+        }
+
+        return self::resolveTranslatedScalar($candidate);
+    }
+
+    /**
+     * @param array<array-key, mixed> $value
+     */
+    private static function resolveRichEditorDocument(array $value): ?string
+    {
+        if (($value['type'] ?? null) !== 'doc' || ! array_key_exists('content', $value)) {
+            return null;
+        }
+
+        try {
+            /** @var Editor $editor */
+            $editor = app(Editor::class);
+            $editor->setContent($value);
+            $html = trim((string) $editor->getHTML());
+
+            return $html !== '' ? $html : null;
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**

@@ -28,9 +28,17 @@ beforeEach(function () {
         Schema::create('suppliers', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
+            $table->string('company_code');
             $table->string('code')->unique();
+            $table->string('vat_code')->nullable();
+            $table->string('contact_person')->nullable();
             $table->string('contact_email')->nullable();
             $table->string('contact_phone')->nullable();
+            $table->string('website')->nullable();
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('country')->nullable();
             $table->text('notes')->nullable();
             $table->boolean('is_enabled')->default(true);
             $table->timestamps();
@@ -206,6 +214,37 @@ it('requires a supplier before publishing from the edit form', function () {
         ->status->toBe('draft');
 });
 
+it('allows editing pricing for already published products without suppliers', function () {
+    $publishedProduct = Product::factory()->create([
+        'status'       => 'published',
+        'published_at' => now()->subDay(),
+        'brand_id'     => $this->brand->id,
+        'price'        => 50.00,
+        'cost_price'   => 25.00,
+    ]);
+
+    // Ensure this record matches the problematic scenario.
+    $publishedProduct->suppliers()->detach();
+
+    Livewire::test(ProductResource\Pages\EditProduct::class, [
+        'record' => $publishedProduct->getRouteKey(),
+    ])
+        ->fillForm([
+            'price'      => 75.25,
+            'cost_price' => 30.10,
+            'status'     => 'published',
+            'suppliers'  => [],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $publishedProduct->refresh();
+
+    expect((float) $publishedProduct->price)->toBe(75.25);
+    expect((float) $publishedProduct->cost_price)->toBe(30.10);
+    expect($publishedProduct->status)->toBe('published');
+});
+
 it('validates required fields when creating product', function () {
     Livewire::test(ProductResource\Pages\CreateProduct::class)
         ->fillForm([
@@ -294,6 +333,82 @@ it('can save product', function () {
 
     // Handle decimal comparison for price
     expect((float) $freshProduct->price)->toBe(199.99);
+});
+
+it('saves all editable product fields including prices', function () {
+    $updatedData = [
+        'name'                        => 'Fully Updated Product',
+        'slug'                        => 'fully-updated-product',
+        'sku'                         => 'UPDATED-ALL-001',
+        'barcode'                     => '1234567890123',
+        'description'                 => '<p>Updated description</p>',
+        'detailed_description'        => '<p>Updated detailed description</p>',
+        'short_description'           => 'Updated short description',
+        'price'                       => 321.45,
+        'cost_price'                  => 210.10,
+        'stock_quantity'              => 45,
+        'low_stock_threshold'         => 7,
+        'manage_stock'                => false,
+        'allow_backorder'             => true,
+        'is_featured'                 => true,
+        'status'                      => 'draft',
+        'brand_id'                    => $this->brand->id,
+        'published_at'                => now()->subHour(),
+        'weight'                      => 1.25,
+        'length'                      => 30.50,
+        'width'                       => 20.75,
+        'height'                      => 10.15,
+        'size'                        => 'XL',
+        'size_type'                   => 'EU',
+        'color'                       => 'Black',
+        'pack_size'                   => '6',
+        'pack_size_type'              => 'pcs',
+        'is_venipak_locker_excluded'  => true,
+        'is_venipak_courier_excluded' => false,
+        'suppliers'                   => [$this->supplier->id],
+        'collections'                 => [$this->collection->id],
+    ];
+
+    Livewire::test(ProductResource\Pages\EditProduct::class, [
+        'record' => $this->product->getRouteKey(),
+    ])
+        ->fillForm($updatedData)
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $freshProduct = $this->product->fresh();
+
+    expect($freshProduct)
+        ->name->toBe('Fully Updated Product')
+        ->slug->toBe('fully-updated-product')
+        ->sku->toBe('UPDATED-ALL-001')
+        ->barcode->toBe('1234567890123')
+        ->short_description->toBe('Updated short description')
+        ->stock_quantity->toBe(45)
+        ->low_stock_threshold->toBe(7)
+        ->manage_stock->toBeFalse()
+        ->allow_backorder->toBeTrue()
+        ->is_featured->toBeTrue()
+        ->status->toBe('published')
+        ->brand_id->toBe($this->brand->id)
+        ->size->toBe('XL')
+        ->size_type->toBe('EU')
+        ->color->toBe('Black')
+        ->pack_size->toBe('6')
+        ->pack_size_type->toBe('pcs')
+        ->is_venipak_locker_excluded->toBeTrue()
+        ->is_venipak_courier_excluded->toBeFalse();
+
+    expect((float) $freshProduct->price)->toBe(321.45);
+    expect((float) $freshProduct->cost_price)->toBe(210.10);
+    expect((float) $freshProduct->weight)->toBe(1.25);
+    expect((float) $freshProduct->length)->toBe(30.50);
+    expect((float) $freshProduct->width)->toBe(20.75);
+    expect((float) $freshProduct->height)->toBe(10.15);
+    expect($freshProduct->published_at)->not->toBeNull();
+
+    expect($freshProduct->suppliers()->pluck('suppliers.id')->all())->toBe([$this->supplier->id]);
+    expect($freshProduct->collections()->pluck('collections.id')->all())->toBe([$this->collection->id]);
 });
 
 it('can delete product', function () {

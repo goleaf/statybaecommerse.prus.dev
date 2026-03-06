@@ -5,7 +5,7 @@
         canonical="{{ url()->current() }}" />
 @endsection
 
-<div class="bg-sage">
+<div class="bg-sage brands-page">
     <div class="bg-dark text-sage">
         <x-container class="px-4 py-12 sm:py-16">
             <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('messages.brands') }}">
@@ -135,8 +135,10 @@
                                                       class="max-h-24 object-contain transition duration-500 group-hover:scale-105" />
                                             </div>
                                         @else
-                                            <div class="flex h-full w-full items-center justify-center bg-ash/10 text-4xl font-semibold text-dark">
-                                                {{ mb_strtoupper(mb_substr($brand->name ?? '', 0, 2)) }}
+                                            <div class="flex h-full w-full items-center justify-center bg-ash/10">
+                                                <svg class="h-12 w-12 text-stone/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M15 9h.01M9 13h.01M15 13h.01" />
+                                                </svg>
                                             </div>
                                         @endif
                                         @if ($brand->is_featured ?? false)

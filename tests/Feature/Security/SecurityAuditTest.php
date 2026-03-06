@@ -23,7 +23,7 @@ class SecurityAuditTest extends TestCase
     {
         $userData = [
             'name'     => 'Test User',
-            'email'    => 'test@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'password' => 'should-not-be-set',
         ];
 
@@ -34,7 +34,7 @@ class SecurityAuditTest extends TestCase
         // Create user without password to test mass assignment protection
         $userDataSafe = [
             'name'  => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'info@egisstatyba.lt',
         ];
 
         $user = User::create($userDataSafe);
@@ -46,7 +46,7 @@ class SecurityAuditTest extends TestCase
     {
         $user = new User([
             'name'  => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         // Test weak passwords
@@ -69,7 +69,7 @@ class SecurityAuditTest extends TestCase
     {
         $user = new User([
             'name'  => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         $securePassword = 'SecureP@ssw0rd!';
@@ -266,7 +266,7 @@ class SecurityAuditTest extends TestCase
     {
         $adminUser = new AdminUser([
             'name'  => 'Admin User',
-            'email' => 'admin@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         // Password should not be mass assignable

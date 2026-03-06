@@ -31,7 +31,7 @@ final class ReferralRewardLogsResourceTest extends TestCase
 
         // Create and authenticate a privileged administrator to satisfy Filament authorization checks.
         $this->admin = User::factory()->create([
-            'email'    => 'reward-logs-admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

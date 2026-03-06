@@ -63,7 +63,7 @@ final class ProductRequestsRelationManagerTest extends TestCase
             'product_id'         => $this->product->getKey(),
             'user_id'            => $this->requestUser->getKey(),
             'name'               => 'Need more quantity',
-            'email'              => 'request@example.com',
+            'email'              => 'info@egisstatyba.lt',
             'phone'              => '+37060000000',
             'message'            => 'Please confirm availability.',
             'requested_quantity' => 3,
@@ -80,7 +80,7 @@ final class ProductRequestsRelationManagerTest extends TestCase
             'product_id'         => $this->product->getKey(),
             'user_id'            => $this->requestUser->getKey(),
             'name'               => 'Request from relation test',
-            'email'              => 'relation-request@example.com',
+            'email'              => 'info@egisstatyba.lt',
             'phone'              => '+37061111111',
             'message'            => 'Need delivery date.',
             'requested_quantity' => 5,
@@ -91,7 +91,7 @@ final class ProductRequestsRelationManagerTest extends TestCase
             'product_id'         => $this->product->getKey(),
             'user_id'            => $this->requestUser->getKey(),
             'name'               => 'Cancelled relation request',
-            'email'              => 'cancelled-request@example.com',
+            'email'              => 'info@egisstatyba.lt',
             'phone'              => '+37062222222',
             'message'            => 'No longer needed.',
             'requested_quantity' => 1,
@@ -112,7 +112,7 @@ final class ProductRequestsRelationManagerTest extends TestCase
             'product_id'         => $this->product->getKey(),
             'user_id'            => $this->requestUser->getKey(),
             'name'               => 'Visitor pending request',
-            'email'              => 'visitor-pending@example.com',
+            'email'              => 'info@egisstatyba.lt',
             'phone'              => '+37063333333',
             'message'            => 'Please update me.',
             'requested_quantity' => 2,
@@ -123,7 +123,7 @@ final class ProductRequestsRelationManagerTest extends TestCase
             'product_id'         => $this->product->getKey(),
             'user_id'            => $this->requestUser->getKey(),
             'name'               => 'Visitor cancelled request',
-            'email'              => 'visitor-cancelled@example.com',
+            'email'              => 'info@egisstatyba.lt',
             'phone'              => '+37064444444',
             'message'            => 'This was cancelled.',
             'requested_quantity' => 1,
@@ -132,7 +132,7 @@ final class ProductRequestsRelationManagerTest extends TestCase
 
         $this->get('/admin/product-requests')
             ->assertOk()
-            ->assertSee('visitor-pending@example.com')
-            ->assertSee('visitor-cancelled@example.com');
+            ->assertSee('info@egisstatyba.lt')
+            ->assertSee('info@egisstatyba.lt');
     }
 }

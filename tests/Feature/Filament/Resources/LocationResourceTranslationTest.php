@@ -26,7 +26,7 @@ beforeEach(function () {
     app()->setLocale('lt');
 
     $this->admin = User::factory()->create([
-        'email'    => 'admin@example.com',
+        'email'    => 'info@egisstatyba.lt',
         'is_admin' => true,
     ]);
 

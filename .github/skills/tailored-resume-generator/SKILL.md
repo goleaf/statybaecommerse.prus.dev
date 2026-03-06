@@ -97,7 +97,7 @@ My background:
 
 ```markdown
 # JOHN DOE
-Email: john.doe@email.com | Phone: (555) 123-4567 | LinkedIn: linkedin.com/in/johndoe
+Email: info@egisstatyba.lt | Phone: (555) 123-4567 | LinkedIn: linkedin.com/in/johndoe
 
 ## PROFESSIONAL SUMMARY
 Results-driven Data Analyst with 5+ years of experience leveraging SQL, Python, and advanced

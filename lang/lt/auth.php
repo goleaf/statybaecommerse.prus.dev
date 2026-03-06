@@ -20,7 +20,7 @@ return [
             'connecting'            => 'Jungiamasi...',
             'continue_with'         => 'Arba prisijunkite su',
             'create_account'        => 'Sukurti paskyrą',
-            'email_placeholder'     => 'jusu@pastas.lt',
+            'email_placeholder'     => 'info@egisstatyba.lt',
             'new_user'              => 'Naujas StatyBae vartotojas?',
             'new_user_description'  => 'Sukurkite paskyrą, kad galėtumėte naudotis išskirtinėmis privilegijomis ir greitesniu atsiskaitymu.',
             'no_account'            => 'Neturite paskyros?',

@@ -28,7 +28,7 @@ beforeEach(function () {
         'billing_address' => [
             'first_name'   => 'John',
             'last_name'    => 'Doe',
-            'email'        => 'john@example.com',
+            'email'        => 'info@egisstatyba.lt',
             'address'      => 'Test Street 1',
             'city'         => 'Vilnius',
             'country_code' => 'LT',

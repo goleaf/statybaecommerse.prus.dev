@@ -20,7 +20,7 @@ return [
             'connecting'            => 'Connecting...',
             'continue_with'         => 'Or continue with',
             'create_account'        => 'Create an account',
-            'email_placeholder'     => 'your@email.com',
+            'email_placeholder'     => 'info@egisstatyba.lt',
             'new_user'              => 'New to StatyBae?',
             'new_user_description'  => 'Create an account to enjoy exclusive benefits and faster checkout.',
             'no_account'            => 'Don\'t have an account?',

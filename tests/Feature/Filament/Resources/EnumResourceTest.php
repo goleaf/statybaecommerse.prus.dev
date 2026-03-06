@@ -31,7 +31,7 @@ final class EnumResourceTest extends TestCase
 
         // Authenticate a deterministic administrator that can access enum management tools.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

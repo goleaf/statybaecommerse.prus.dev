@@ -47,17 +47,17 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Create test users with different roles
         $this->adminUser = User::factory()->create([
-            'email'    => 'admin@test.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 
         $this->viewerUser = User::factory()->create([
-            'email'    => 'viewer@test.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => false,
         ]);
 
         $this->superAdmin = AdminUser::factory()->create([
-            'email' => 'super@test.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         // Assign roles

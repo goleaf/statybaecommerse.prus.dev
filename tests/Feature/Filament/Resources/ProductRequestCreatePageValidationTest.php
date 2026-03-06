@@ -42,7 +42,7 @@ it('blocks create when required identity fields are missing', function (): void 
 it('fills identity fields from selected user before create', function (): void {
     $user = User::factory()->create([
         'name'  => 'John Doe',
-        'email' => 'john@example.com',
+        'email' => 'info@egisstatyba.lt',
         'phone' => '+37060000000',
     ]);
 
@@ -59,7 +59,7 @@ it('fills identity fields from selected user before create', function (): void {
     ]);
 
     expect($payload['name'])->toBe('John Doe');
-    expect($payload['email'])->toBe('john@example.com');
+    expect($payload['email'])->toBe('info@egisstatyba.lt');
     expect($payload['phone'])->toBe('+37060000000');
 });
 
@@ -72,7 +72,7 @@ it('blocks create when selected user does not exist', function (): void {
             'requested_quantity' => 1,
             'user_id'            => 999999,
             'name'               => 'Fallback',
-            'email'              => 'fallback@example.com',
+            'email'              => 'info@egisstatyba.lt',
             'status'             => 'pending',
         ]);
 

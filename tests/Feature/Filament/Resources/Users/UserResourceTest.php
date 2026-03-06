@@ -303,7 +303,7 @@ class UserResourceTest extends TestCase
             ->mountFormComponentAction('company_id', 'createOption')
             ->setFormComponentActionData([
                 'name'            => 'Inline Company',
-                'email'           => 'contact@inline-company.test',
+                'email'           => 'info@egisstatyba.lt',
                 'phone'           => '+37060000001',
                 'website'         => 'https://inline-company.test',
                 'address'         => 'Inline street 10, Vilnius',
@@ -328,7 +328,7 @@ class UserResourceTest extends TestCase
 
         $this->assertNotNull($company);
         $this->assertSame('Inline Company', $company->name);
-        $this->assertSame('contact@inline-company.test', $company->email);
+        $this->assertSame('info@egisstatyba.lt', $company->email);
         $this->assertSame('+37060000001', $company->phone);
         $this->assertSame('https://inline-company.test', $company->website);
         $this->assertSame('Inline street 10, Vilnius', $company->address);
@@ -827,7 +827,7 @@ class UserResourceTest extends TestCase
         $partner = Partner::factory()->create([
             'name'            => 'Original Partner',
             'code'            => 'ORI-' . strtoupper(substr(md5((string) microtime(true)), 0, 7)),
-            'contact_email'   => 'original-partner@example.com',
+            'contact_email'   => 'info@egisstatyba.lt',
             'contact_phone'   => '+37060002222',
             'discount_rate'   => 5.5,
             'commission_rate' => 2.2,
@@ -848,7 +848,7 @@ class UserResourceTest extends TestCase
             ->mountTableAction('edit', $partner)
             ->set('mountedActions.0.data.name', 'Updated Partner')
             ->set('mountedActions.0.data.code', $updatedCode)
-            ->set('mountedActions.0.data.contact_email', 'updated-partner@example.com')
+            ->set('mountedActions.0.data.contact_email', 'info@egisstatyba.lt')
             ->set('mountedActions.0.data.contact_phone', '+37060003333')
             ->set('mountedActions.0.data.discount_rate', 18.75)
             ->set('mountedActions.0.data.commission_rate', 7.15)
@@ -865,7 +865,7 @@ class UserResourceTest extends TestCase
 
         $this->assertSame('Updated Partner', $partner->name);
         $this->assertSame($updatedCode, $partner->code);
-        $this->assertSame('updated-partner@example.com', $partner->contact_email);
+        $this->assertSame('info@egisstatyba.lt', $partner->contact_email);
         $this->assertSame('+37060003333', $partner->contact_phone);
         $this->assertSame(18.75, (float) $partner->discount_rate);
         $this->assertSame(7.15, (float) $partner->commission_rate);

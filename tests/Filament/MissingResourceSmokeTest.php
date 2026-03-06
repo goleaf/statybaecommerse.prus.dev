@@ -66,7 +66,7 @@ final class MissingResourceSmokeTest extends TestCase
 
         // Seed a privileged administrator so Filament pages authenticate successfully in tests.
         $this->adminUser = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
         $this->actingAs($this->adminUser);

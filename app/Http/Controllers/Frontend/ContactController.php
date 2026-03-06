@@ -7,9 +7,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Frontend\SendContactMessageRequest;
 use App\Jobs\SendContactMessageJob;
-use App\Models\Company;
 use App\Models\ContactMessage;
-use App\Models\SystemSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -17,13 +15,7 @@ final class ContactController extends Controller
 {
     public function index(): View
     {
-        $supportEmail = SystemSetting::getPublic('mail.support_email', config('mail.from.address'));
-        $company = Company::query()->active()->first();
-
-        return view('frontend.contact.index', [
-            'supportEmail' => $supportEmail,
-            'company'      => $company,
-        ]);
+        return view('frontend.contact.index');
     }
 
     public function send(SendContactMessageRequest $request): RedirectResponse

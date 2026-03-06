@@ -30,7 +30,7 @@ final class LegalResourceTest extends TestCase
 
         // Authenticate as an administrator so resource policies permit the upcoming interactions.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

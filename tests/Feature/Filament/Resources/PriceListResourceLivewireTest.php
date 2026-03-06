@@ -30,7 +30,7 @@ final class PriceListResourceLivewireTest extends TestCase
 
         // Seed an administrator account that has permission to open catalog resources.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

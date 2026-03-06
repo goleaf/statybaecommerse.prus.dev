@@ -38,7 +38,7 @@ final class AdminUserTest extends TestCase
         // Prepare a payload that touches each fillable attribute so mass assignment remains safe.
         $payload = [
             'name'              => 'Jane Doe',
-            'email'             => 'jane@example.com',
+            'email'             => 'info@egisstatyba.lt',
             'password'          => 'secret-password',
             'email_verified_at' => now(),
         ];
@@ -48,7 +48,7 @@ final class AdminUserTest extends TestCase
 
         // Verify the primary fields are stored and the password mutator hashes the raw secret.
         $this->assertSame('Jane Doe', $user->name);
-        $this->assertSame('jane@example.com', $user->email);
+        $this->assertSame('info@egisstatyba.lt', $user->email);
         $this->assertTrue(Hash::check('secret-password', $user->getAuthPassword()));
     }
 

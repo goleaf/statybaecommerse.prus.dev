@@ -131,7 +131,7 @@ final class SingleProduct extends Component
     {
         return Route::has('frontend.contact.index')
             ? route('frontend.contact.index')
-            : 'mailto:' . (config('mail.from.address') ?? 'info@example.com');
+            : 'mailto:' . (config('mail.from.address') ?? 'info@egisstatyba.lt');
     }
 
     #[Computed]

@@ -303,7 +303,7 @@ const tools = await composio.tools.getRawComposioTools({
 // Execute tools directly
 const result = await composio.tools.execute('GMAIL_SEND_EMAIL', {
   userId: 'user_123',
-  arguments: { to: 'test@example.com', subject: 'Hello' },
+  arguments: { to: 'info@egisstatyba.lt', subject: 'Hello' },
   version: '15082025_00' // Version REQUIRED for manual execution
 });
 

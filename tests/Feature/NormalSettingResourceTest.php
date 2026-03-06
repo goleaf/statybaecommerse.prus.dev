@@ -24,7 +24,7 @@ final class NormalSettingResourceTest extends TestCase
 
         // Create admin user with proper permissions
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

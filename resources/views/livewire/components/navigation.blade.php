@@ -94,7 +94,7 @@
             // [
             //     'key' => 'support',
             //     'label' => __('messages.nav_support_center'),
-            //     'url' => 'mailto:eegidia@gmail.com',
+            //     'url' => 'mailto:info@egisstatyba.lt',
             // ],
         ])->filter(fn($link) => !empty($link['url']));
     @endphp

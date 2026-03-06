@@ -29,7 +29,7 @@ final class WarehouseResourceTest extends TestCase
         app()->setLocale('en');
 
         $this->admin = User::factory()->create([
-            'email'    => 'warehouse-admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

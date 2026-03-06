@@ -83,9 +83,9 @@
                 <h3
                     class="{{ $isCompact ? 'text-sm font-medium text-gray-900' : 'text-base font-semibold text-gray-900' }}">
                     {{ __('frontend.contact_info.email.label') }}</h3>
-                <a href="mailto:{{ app_setting('company_email') ?? 'info@example.com' }}"
+                <a href="mailto:{{ app_setting('company_email') ?? 'info@egisstatyba.lt' }}"
                    class="{{ $isCompact ? 'text-sm text-blue-600 hover:text-blue-700' : 'text-blue-600 hover:text-blue-700' }} transition-colors duration-200">
-                    {{ app_setting('company_email') ?? 'info@example.com' }}
+                    {{ app_setting('company_email') ?? 'info@egisstatyba.lt' }}
                 </a>
                 @if ($isDetailed)
                     <p class="text-sm text-gray-500 mt-1">

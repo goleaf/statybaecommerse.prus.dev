@@ -7,7 +7,7 @@
   Γ¿» it can delete an order
   ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ  
    FAILED  Tests\Feature\Filament\Resources\OrderRΓÇª  QueryException   
-  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: :memory:, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Americo Wisoky, admin@example.com, 2026-01-26 11:14:38, $2y$04$hElgDQ.6QQDOMnHhvqbj.e6dslsnASbViN2jKWD08t6Cfeb43NtwS, lt, 0, 1DxaSPaRsK, Americo, Wisoky, 1, admin, 2026-01-26 11:14:38, 2026-01-26 11:14:38))
+  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: :memory:, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Americo Wisoky, info@egisstatyba.lt, 2026-01-26 11:14:38, $2y$04$hElgDQ.6QQDOMnHhvqbj.e6dslsnASbViN2jKWD08t6Cfeb43NtwS, lt, 0, 1DxaSPaRsK, Americo, Wisoky, 1, admin, 2026-01-26 11:14:38, 2026-01-26 11:14:38))
 
   at vendor\laravel\framework\src\Illuminate\Database\Connection.php:571
     567Γûò             if ($this->pretending()) {
@@ -25,7 +25,7 @@
 
   ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ  
    FAILED  Tests\Feature\Filament\Resources\OrderRΓÇª  QueryException   
-  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_480.sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Jany Rogahn, admin@example.com, 2026-01-26 11:14:39, $2y$04$xWcFpHkd2nCJ50SxAJMqDeMFhk1dAfQcBmOvsTSd1BjBryCinewya, en, 0, Irg58zjeQ3, Jany, Rogahn, 1, admin, 2026-01-26 11:14:39, 2026-01-26 11:14:39))
+  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_480.sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Jany Rogahn, info@egisstatyba.lt, 2026-01-26 11:14:39, $2y$04$xWcFpHkd2nCJ50SxAJMqDeMFhk1dAfQcBmOvsTSd1BjBryCinewya, en, 0, Irg58zjeQ3, Jany, Rogahn, 1, admin, 2026-01-26 11:14:39, 2026-01-26 11:14:39))
 
   at vendor\laravel\framework\src\Illuminate\Database\Connection.php:571
     567Γûò             if ($this->pretending()) {
@@ -43,7 +43,7 @@
 
   ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ  
    FAILED  Tests\Feature\Filament\Resources\OrderRΓÇª  QueryException   
-  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_480.sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Baylee Reichert, admin@example.com, 2026-01-26 11:14:40, $2y$04$edPwcNJyindGrG.uzyNKk.HHNxL08uNTiqIBkWsitDo9aK6y89WPa, en, 0, glQ3nAGfER, Baylee, Reichert, 1, admin, 2026-01-26 11:14:40, 2026-01-26 11:14:40))
+  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_480.sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Baylee Reichert, info@egisstatyba.lt, 2026-01-26 11:14:40, $2y$04$edPwcNJyindGrG.uzyNKk.HHNxL08uNTiqIBkWsitDo9aK6y89WPa, en, 0, glQ3nAGfER, Baylee, Reichert, 1, admin, 2026-01-26 11:14:40, 2026-01-26 11:14:40))
 
   at vendor\laravel\framework\src\Illuminate\Database\Connection.php:571
     567Γûò             if ($this->pretending()) {
@@ -61,7 +61,7 @@
 
   ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ  
    FAILED  Tests\Feature\Filament\Resources\OrderRΓÇª  QueryException   
-  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_480.sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Watson Haley, admin@example.com, 2026-01-26 11:14:40, $2y$04$OujaaJIgC9uKtVBy7SRd..L2mSPtXroze9kaxN7kyHTttqAbjbLu., lt, 0, d86j3nM4Wv, Watson, Haley, 1, admin, 2026-01-26 11:14:40, 2026-01-26 11:14:40))
+  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_480.sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Watson Haley, info@egisstatyba.lt, 2026-01-26 11:14:40, $2y$04$OujaaJIgC9uKtVBy7SRd..L2mSPtXroze9kaxN7kyHTttqAbjbLu., lt, 0, d86j3nM4Wv, Watson, Haley, 1, admin, 2026-01-26 11:14:40, 2026-01-26 11:14:40))
 
   at vendor\laravel\framework\src\Illuminate\Database\Connection.php:571
     567Γûò             if ($this->pretending()) {
@@ -79,7 +79,7 @@
 
   ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ  
    FAILED  Tests\Feature\Filament\Resources\OrderRΓÇª  QueryException   
-  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_480.sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Garry Nitzsche, admin@example.com, 2026-01-26 11:14:40, $2y$04$5cFyGJ/lsR72Vhn0NLUVFeo.Ifm2gZU5UpduLK9jCe1CcwZe067EO, lt, 0, 38BrlUjVEy, Garry, Nitzsche, 1, admin, 2026-01-26 11:14:40, 2026-01-26 11:14:40))
+  SQLSTATE[HY000]: General error: 1 table users has no column named role (Connection: sqlite, Database: C:\Dropbox\projects\egistatyba/database/testing/databases\testing_parallel_pid_480.sqlite, SQL: insert into "users" ("name", "email", "email_verified_at", "password", "preferred_locale", "is_admin", "remember_token", "first_name", "last_name", "is_active", "role", "updated_at", "created_at") values (Garry Nitzsche, info@egisstatyba.lt, 2026-01-26 11:14:40, $2y$04$5cFyGJ/lsR72Vhn0NLUVFeo.Ifm2gZU5UpduLK9jCe1CcwZe067EO, lt, 0, 38BrlUjVEy, Garry, Nitzsche, 1, admin, 2026-01-26 11:14:40, 2026-01-26 11:14:40))
 
   at vendor\laravel\framework\src\Illuminate\Database\Connection.php:571
     567Γûò             if ($this->pretending()) {

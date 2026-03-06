@@ -24,7 +24,7 @@ final class NewsletterSubscriptionTest extends TestCase
 
         $component
             // Provide the minimum data required for a valid subscription alongside optional profile fields.
-            ->set('email', 'popup.subscriber@example.test')
+            ->set('email', 'info@egisstatyba.lt')
             ->set('first_name', 'Popup')
             ->set('last_name', 'Subscriber')
             ->set('company', 'OptIn Corp')
@@ -33,13 +33,13 @@ final class NewsletterSubscriptionTest extends TestCase
 
         // Assert the subscriber record exists with the custom source to verify the override flowed through persistence.
         $this->assertDatabaseHas('subscribers', [
-            'email'  => 'popup.subscriber@example.test',
+            'email'  => 'info@egisstatyba.lt',
             'source' => 'popup-widget',
             'status' => 'active',
         ]);
 
         // Refresh the subscriber to confirm interest metadata persisted as expected.
-        $subscriber = Subscriber::query()->where('email', 'popup.subscriber@example.test')->first();
+        $subscriber = Subscriber::query()->where('email', 'info@egisstatyba.lt')->first();
         $this->assertSame(['promotions'], $subscriber?->interests ?? []);
 
         // Confirm the component reset the captured form fields so the frontend renders a clean state post-submit.

@@ -136,7 +136,7 @@ Automate Freshdesk customer support workflows including ticket management, conta
 8. `FRESHDESK_LIST_COMPANY_FIELDS` - Check available company fields [Optional]
 
 **Key parameters for FRESHDESK_SEARCH_CONTACTS**:
-- `query`: Search string like `"email:'user@example.com'"` (required)
+- `query`: Search string like `"email:'info@egisstatyba.lt'"` (required)
 - `page`: Pagination (1-10, max 30 per page)
 
 **Key parameters for FRESHDESK_CREATE_COMPANIES**:
@@ -157,7 +157,7 @@ Automate Freshdesk customer support workflows including ticket management, conta
 
 ### ID Resolution
 Always resolve display values to IDs before operations:
-- **Requester email -> requester_id**: `FRESHDESK_SEARCH_CONTACTS` with `"email:'user@example.com'"`
+- **Requester email -> requester_id**: `FRESHDESK_SEARCH_CONTACTS` with `"email:'info@egisstatyba.lt'"`
 - **Company name -> company_id**: `FRESHDESK_GET_COMPANIES` and match by name (search by name not supported)
 - **Agent name -> agent_id**: Not directly available; use agent_id from ticket responses or admin configuration
 

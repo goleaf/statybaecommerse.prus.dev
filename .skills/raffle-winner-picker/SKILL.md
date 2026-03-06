@@ -44,9 +44,9 @@ Pick 3 random winners from entries.csv
 
 ```
 Pick a random winner from this list:
-- Alice (alice@email.com)
-- Bob (bob@email.com)
-- Carol (carol@email.com)
+- Alice (info@egisstatyba.lt)
+- Bob (info@egisstatyba.lt)
+- Carol (info@egisstatyba.lt)
 ...
 ```
 
@@ -72,7 +72,7 @@ Randomly selecting winner...
 
 Row #142
 Name: Sarah Johnson
-Email: sarah.j@email.com
+Email: info@egisstatyba.lt
 Entry Date: March 10, 2024
 Comment: "Love your newsletter!"
 

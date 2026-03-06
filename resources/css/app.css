@@ -1946,6 +1946,51 @@ footer .footer-contact-item {
 .brands-page .bg-white .text-gray-400 {
   color: #9ca3af !important;
 }
+.brands-page .bg-dark a {
+  color: #e3ebd2 !important;
+}
+.brands-page .bg-dark a:hover {
+  color: #ffffff !important;
+}
+.brands-page .bg-dark a[class*=bg-sage],
+.brands-page .bg-dark a.bg-sage {
+  color: #000000 !important;
+}
+.brands-page .bg-dark a[class*=bg-sage]:hover,
+.brands-page .bg-dark a.bg-sage:hover {
+  color: #000000 !important;
+}
+.brands-page .brands-pagination nav[role=navigation] p {
+  color: rgba(227, 235, 210, 0.85) !important;
+}
+.brands-page .brands-pagination nav[role=navigation] .border-gray-300 {
+  border-color: rgba(227, 235, 210, 0.35) !important;
+}
+.brands-page .brands-pagination nav[role=navigation] .bg-white {
+  background-color: rgba(227, 235, 210, 0.08) !important;
+}
+.brands-page .brands-pagination nav[role=navigation] .text-gray-800,
+.brands-page .brands-pagination nav[role=navigation] .text-gray-700,
+.brands-page .brands-pagination nav[role=navigation] .text-gray-600,
+.brands-page .brands-pagination nav[role=navigation] .text-gray-500,
+.brands-page .brands-pagination nav[role=navigation] .text-gray-400 {
+  color: #e3ebd2 !important;
+}
+.brands-page .brands-pagination nav[role=navigation] .bg-gray-200 {
+  background-color: #e3ebd2 !important;
+  border-color: #e3ebd2 !important;
+}
+.brands-page .brands-pagination nav[role=navigation] .bg-gray-200.text-gray-700,
+.brands-page .brands-pagination nav[role=navigation] .bg-gray-200 .text-gray-700 {
+  color: #262523 !important;
+}
+.brands-page .brands-pagination nav[role=navigation] a:hover {
+  background-color: rgba(227, 235, 210, 0.18) !important;
+  color: #ffffff !important;
+}
+.brands-page .brands-pagination nav[role=navigation] .cursor-not-allowed {
+  color: rgba(227, 235, 210, 0.45) !important;
+}
 .brands-page .brand-card .text-dark, .brands-page .featured-brand-card .text-dark {
   color: #262523 !important;
 }

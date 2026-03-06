@@ -29,9 +29,17 @@ final class Supplier extends Model implements HasMedia
 
     protected $fillable = [
         'name',
+        'company_code',
         'code',
+        'vat_code',
+        'contact_person',
         'contact_email',
         'contact_phone',
+        'website',
+        'address',
+        'city',
+        'postal_code',
+        'country',
         'notes',
         'is_enabled',
     ];
@@ -45,14 +53,24 @@ final class Supplier extends Model implements HasMedia
 
     protected static function booted(): void
     {
-        self::creating(static function (Supplier $supplier): void {
-            $supplier->code = $supplier->generateUniqueCode();
-        });
-
         self::saving(static function (Supplier $supplier): void {
-            if (trim((string) $supplier->code) === '') {
+            $supplier->company_code = $supplier->resolveCompanyCode();
+
+            $normalizedCode = $supplier->normalizeSystemCode($supplier->code);
+
+            if ($normalizedCode === null) {
                 $supplier->code = $supplier->generateUniqueCode();
+
+                return;
             }
+
+            if ($supplier->isCodeTaken($normalizedCode)) {
+                $supplier->code = $supplier->generateUniqueCode($normalizedCode);
+
+                return;
+            }
+
+            $supplier->code = $normalizedCode;
         });
 
         self::deleting(static function (Supplier $supplier): void {
@@ -112,28 +130,80 @@ final class Supplier extends Model implements HasMedia
             ->optimize();
     }
 
-    public function generateUniqueCode(): string
+    public function generateUniqueCode(?string $source = null): string
     {
-        $base = Str::upper(Str::slug((string) ($this->name ?: 'supplier'), '-'));
+        $base = Str::slug((string) ($source ?: $this->name ?: 'supplier'));
 
         if ($base === '') {
-            $base = 'SUPPLIER';
+            $base = 'supplier';
         }
 
-        $suffix = 1;
+        $candidate = $base;
+        $suffix = 2;
 
-        do {
-            $candidate = sprintf('%s-%03d', $base, $suffix);
+        while ($this->isCodeTaken($candidate)) {
+            $candidate = sprintf('%s-%d', $base, $suffix);
             $suffix++;
-        } while (self::query()
-            ->where('code', $candidate)
+        }
+
+        return $candidate;
+    }
+
+    private function isCodeTaken(string $code): bool
+    {
+        return self::query()
+            ->where('code', $code)
             ->when(
                 $this->exists,
                 fn (Builder $query): Builder => $query->whereKeyNot($this->getKey())
             )
-            ->exists());
+            ->exists();
+    }
 
-        return $candidate;
+    private function resolveCompanyCode(): string
+    {
+        $normalized = $this->normalizeCompanyCode($this->company_code)
+            ?? $this->normalizeCompanyCode($this->code);
+
+        if ($normalized !== null) {
+            return $normalized;
+        }
+
+        $fallback = Str::upper(Str::slug((string) ($this->name ?: 'supplier'), ''));
+
+        return $fallback !== '' ? $fallback : 'SUPPLIER';
+    }
+
+    private function normalizeCompanyCode(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+
+        if ($trimmed === '') {
+            return null;
+        }
+
+        $compact = preg_replace('/\s+/', '', $trimmed);
+
+        if (! is_string($compact) || $compact === '') {
+            return null;
+        }
+
+        return Str::upper($compact);
+    }
+
+    private function normalizeSystemCode(mixed $value): ?string
+    {
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $slug = Str::slug($value);
+
+        return $slug !== '' ? $slug : null;
     }
 
     protected static function newFactory(): SupplierFactory

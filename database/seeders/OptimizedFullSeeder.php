@@ -35,6 +35,7 @@ final class OptimizedFullSeeder extends BaseSeeder
         AttributeValueSeeder::class,
         WarehouseSeeder::class,
         InventorySeeder::class,
+        SupplierSeeder::class,
         FeatureFlagSeeder::class,
         BrochureSeeder::class,
         SettingsSeeder::class,

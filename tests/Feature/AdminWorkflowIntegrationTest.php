@@ -36,7 +36,7 @@ final class AdminWorkflowIntegrationTest extends TestCase
 
         // Create admin user for testing
         $this->adminUser = User::factory()->create([
-            'email'    => 'admin@test.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
     }

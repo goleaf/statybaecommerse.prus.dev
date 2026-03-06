@@ -56,7 +56,7 @@ final class ProductRequestControllerTest extends TestCase
         $payload = [
             'product_id'         => $product->getKey(),
             'name'               => 'Test Requester',
-            'email'              => 'requester@example.com',
+            'email'              => 'info@egisstatyba.lt',
             'phone'              => '+37060000000',
             'message'            => 'Please let me know when this is back in stock.',
             'requested_quantity' => 2,
@@ -90,7 +90,7 @@ final class ProductRequestControllerTest extends TestCase
         $payload = [
             'product_id'         => $product->getKey(),
             'name'               => 'Disallowed Requester',
-            'email'              => 'blocked@example.com',
+            'email'              => 'info@egisstatyba.lt',
             'phone'              => null,
             'message'            => 'Attempting to request a non-requestable product.',
             'requested_quantity' => 1,

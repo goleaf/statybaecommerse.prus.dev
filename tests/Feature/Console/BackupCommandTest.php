@@ -68,8 +68,8 @@ it('feature: creates and verifies a sqlite backup snapshot with metadata counts'
     });
 
     DB::connection('backup_snapshot')->table('users')->insert([
-        ['name' => 'Ada Lovelace', 'email' => 'ada@example.test', 'password' => bcrypt('secret'), 'created_at' => now(), 'updated_at' => now()],
-        ['name' => 'Alan Turing', 'email' => 'alan@example.test', 'password' => bcrypt('secret'), 'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'Ada Lovelace', 'email' => 'info@egisstatyba.lt', 'password' => bcrypt('secret'), 'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'Alan Turing', 'email' => 'info@egisstatyba.lt', 'password' => bcrypt('secret'), 'created_at' => now(), 'updated_at' => now()],
     ]);
 
     DB::connection('backup_snapshot')->table('products')->insert([

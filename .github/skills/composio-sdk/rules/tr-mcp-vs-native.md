@@ -117,7 +117,7 @@ const tools = await session.tools(modifiers);
 
 // Now when agent executes tools, you see:
 // [session_abc123] Executing GMAIL_FETCH_EMAILS
-// Parameters: { "maxResults": 10, "query": "from:user@example.com" }
+// Parameters: { "maxResults": 10, "query": "from:info@egisstatyba.lt" }
 // [session_abc123] Completed GMAIL_FETCH_EMAILS
 // Success: true
 ```

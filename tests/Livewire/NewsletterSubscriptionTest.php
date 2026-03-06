@@ -14,14 +14,14 @@ it('subscribes a new email address and dispatches the subscriber event', functio
     $component = Livewire::test(NewsletterSubscription::class);
 
     $component
-        ->set('email', 'new-subscriber@example.test')
+        ->set('email', 'info@egisstatyba.lt')
         ->set('first_name', 'New')
         ->set('last_name', 'Subscriber')
         ->set('company', 'Statyba')
         ->set('interests', ['promotions', 'news'])
         ->call('subscribe');
 
-    $subscriber = Subscriber::query()->where('email', 'new-subscriber@example.test')->first();
+    $subscriber = Subscriber::query()->where('email', 'info@egisstatyba.lt')->first();
 
     expect($subscriber)->not->toBeNull();
     expect($subscriber->status)->toBe('active');
@@ -37,7 +37,7 @@ it('subscribes a new email address and dispatches the subscriber event', functio
 
 it('re-subscribes an existing unsubscribed subscriber', function (): void {
     $existing = Subscriber::factory()->unsubscribed()->create([
-        'email'      => 'jane@example.test',
+        'email'      => 'info@egisstatyba.lt',
         'first_name' => 'Jane',
         'last_name'  => 'Doe',
         'status'     => 'unsubscribed',
@@ -46,7 +46,7 @@ it('re-subscribes an existing unsubscribed subscriber', function (): void {
     $component = Livewire::test(NewsletterSubscription::class);
 
     $component
-        ->set('email', 'jane@example.test')
+        ->set('email', 'info@egisstatyba.lt')
         ->call('subscribe');
 
     expect($existing->fresh()->status)->toBe('active');
@@ -57,7 +57,7 @@ it('re-subscribes an existing unsubscribed subscriber', function (): void {
 
 it('provides an info message when the subscriber is already active', function (): void {
     Subscriber::factory()->active()->create([
-        'email'      => 'active@example.test',
+        'email'      => 'info@egisstatyba.lt',
         'first_name' => 'Active',
         'last_name'  => 'Subscriber',
     ]);
@@ -65,10 +65,10 @@ it('provides an info message when the subscriber is already active', function ()
     $component = Livewire::test(NewsletterSubscription::class);
 
     $component
-        ->set('email', 'active@example.test')
+        ->set('email', 'info@egisstatyba.lt')
         ->call('subscribe');
 
-    expect(Subscriber::query()->where('email', 'active@example.test')->count())->toBe(1);
+    expect(Subscriber::query()->where('email', 'info@egisstatyba.lt')->count())->toBe(1);
 
     $dispatches = collect(data_get($component->effects, 'dispatches') ?? []);
     expect($dispatches)->toBeEmpty();

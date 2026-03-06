@@ -21,8 +21,8 @@ it('seeds curated admin accounts with super admin role and brochure permissions'
 
     expect($admins)->toHaveCount(2);
     expect($admins->pluck('email')->all())->toBe([
-        'admin@example.com',
-        'eegidia@gmail.com',
+        'info@egisstatyba.lt',
+        'info@egisstatyba.lt',
     ]);
 
     foreach ($admins as $admin) {

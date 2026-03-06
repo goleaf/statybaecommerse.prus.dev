@@ -20,7 +20,7 @@ return [
             'connecting'            => 'Verbinden...',
             'continue_with'         => 'Oder fortfahren mit',
             'create_account'        => 'Konto erstellen',
-            'email_placeholder'     => 'dein@email.com',
+            'email_placeholder'     => 'info@egisstatyba.lt',
             'new_user'              => 'Neu bei StatyBae?',
             'new_user_description'  => 'Erstellen Sie ein Konto, um exklusive Vorteile und einen schnelleren Checkout zu genießen.',
             'no_account'            => 'Noch kein Konto?',

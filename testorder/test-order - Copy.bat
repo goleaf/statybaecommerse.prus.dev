@@ -51,7 +51,7 @@ if not exist "%OUT_DIR%" mkdir "%OUT_DIR%"
     echo   },
     echo   "payer": {
     echo     "name": "Adena Blair",
-    echo     "email": "noqoqodoqy@mailinator.com"
+    echo     "email": "info@egisstatyba.lt"
     echo   }
     echo }
 )

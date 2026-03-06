@@ -38,9 +38,17 @@ beforeEach(function () {
         Schema::create('suppliers', function (Blueprint $table): void {
             $table->id();
             $table->string('name');
+            $table->string('company_code');
             $table->string('code')->unique();
+            $table->string('vat_code')->nullable();
+            $table->string('contact_person')->nullable();
             $table->string('contact_email')->nullable();
             $table->string('contact_phone')->nullable();
+            $table->string('website')->nullable();
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->string('country')->nullable();
             $table->text('notes')->nullable();
             $table->boolean('is_enabled')->default(true);
             $table->timestamps();

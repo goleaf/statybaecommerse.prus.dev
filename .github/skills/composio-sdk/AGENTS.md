@@ -364,7 +364,7 @@ const session = await composio.create('default', {
 const userId = user.id; // "550e8400-e29b-41d4-a716-446655440000"
 
 // ❌ Bad: Email (mutable)
-const userId = user.email; // "john@example.com" -> changes to "john@newdomain.com"
+const userId = user.email; // "info@egisstatyba.lt" -> changes to "info@egisstatyba.lt"
 
 // ❌ Bad: Username (mutable)
 const userId = user.username; // "john_doe" -> changes to "john_smith"
@@ -432,7 +432,7 @@ async function handleRequest(req: Request) {
   // Use same ID for direct tool execution
   await composio.tools.execute('GMAIL_SEND_EMAIL', {
     userId: userId,
-    arguments: { to: 'user@example.com', subject: 'Test' }
+    arguments: { to: 'info@egisstatyba.lt', subject: 'Test' }
   });
 
   // Use same ID for connected accounts
@@ -1284,7 +1284,7 @@ const tools = await session.tools(modifiers);
 
 // Now when agent executes tools, you see:
 // [session_abc123] Executing GMAIL_FETCH_EMAILS
-// Parameters: { "maxResults": 10, "query": "from:user@example.com" }
+// Parameters: { "maxResults": 10, "query": "from:info@egisstatyba.lt" }
 // [session_abc123] Completed GMAIL_FETCH_EMAILS
 // Success: true
 ```
@@ -2992,7 +2992,7 @@ const tools = await composio.tools.getRawComposioTools({
 // Execute tools directly
 const result = await composio.tools.execute('GMAIL_SEND_EMAIL', {
   userId: 'user_123',
-  arguments: { to: 'test@example.com', subject: 'Hello' },
+  arguments: { to: 'info@egisstatyba.lt', subject: 'Hello' },
   version: '15082025_00' // Version REQUIRED for manual execution
 });
 
@@ -3515,7 +3515,7 @@ interface TriggerEvent {
   payload: {
     // Trigger-specific data
     // Example for Gmail:
-    // { id: 'msg_123', subject: 'Hello', from: 'user@example.com' }
+    // { id: 'msg_123', subject: 'Hello', from: 'info@egisstatyba.lt' }
   };
   metadata: {
     triggerId: string;
@@ -6170,7 +6170,7 @@ interface TriggerEvent {
   payload: {
     // Trigger-specific data
     // Example for Gmail:
-    // { id: 'msg_123', subject: 'Hello', from: 'user@example.com' }
+    // { id: 'msg_123', subject: 'Hello', from: 'info@egisstatyba.lt' }
   };
   metadata: {
     triggerId: string;
@@ -6818,7 +6818,7 @@ const userId = `user_${user.id}`; // "user_12345"
 ### Email (Not Recommended)
 
 ```typescript
-const userId = user.email; // "user@example.com"
+const userId = user.email; // "info@egisstatyba.lt"
 ```
 
 **Only use when:**

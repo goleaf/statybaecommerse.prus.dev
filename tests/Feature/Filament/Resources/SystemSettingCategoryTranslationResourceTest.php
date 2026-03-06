@@ -38,7 +38,7 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
         $this->seed(RolesAndPermissionsSeeder::class);
 
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

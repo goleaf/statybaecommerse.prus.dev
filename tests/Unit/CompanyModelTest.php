@@ -34,13 +34,13 @@ final class CompanyModelTest extends TestCase
     {
         $company = Company::factory()->create([
             'name'      => 'Test Company',
-            'email'     => 'test@example.com',
+            'email'     => 'info@egisstatyba.lt',
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('companies', [
             'name'      => 'Test Company',
-            'email'     => 'test@example.com',
+            'email'     => 'info@egisstatyba.lt',
             'is_active' => true,
         ]);
     }

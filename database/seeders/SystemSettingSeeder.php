@@ -17,7 +17,7 @@ final class SystemSettingSeeder extends BaseSeeder
     {
         // Ensure admin user exists using factory
         $adminUser = User::firstOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => 'info@egisstatyba.lt'],
             User::factory()->make(['name' => 'Admin User'])->toArray()
         );
 

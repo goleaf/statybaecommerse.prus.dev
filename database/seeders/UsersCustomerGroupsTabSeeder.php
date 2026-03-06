@@ -76,7 +76,7 @@ final class UsersCustomerGroupsTabSeeder extends BaseSeeder
 
     private function upsertUser(int $index, Company $company): User
     {
-        $email = sprintf('customer-groups.tab.%02d@example.test', $index);
+        $email = sprintf('info@egisstatyba.lt', $index);
 
         $user = User::query()->withoutGlobalScopes()->firstOrNew([
             'email' => $email,

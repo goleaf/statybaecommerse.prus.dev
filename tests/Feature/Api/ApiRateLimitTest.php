@@ -31,7 +31,7 @@ final class ApiRateLimitTest extends RateLimitTestCase
         config(['api.rate_limits.autocomplete' => 1]);
 
         $user = User::factory()->create();
-        User::factory()->create(['name' => 'Jane Example', 'email' => 'jane@example.com']);
+        User::factory()->create(['name' => 'Jane Example', 'email' => 'info@egisstatyba.lt']);
 
         $this->clearRateLimit($user, 'autocomplete', 'api.autocomplete');
         Sanctum::actingAs($user, ['system.autocomplete']);

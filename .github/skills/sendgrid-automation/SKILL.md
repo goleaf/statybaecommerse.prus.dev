@@ -130,7 +130,7 @@ Automate SendGrid email delivery workflows including marketing campaigns (Single
 - `limit` / `offset`: Pagination (default 500)
 
 **Key parameters for SENDGRID_FILTER_ALL_MESSAGES**:
-- `query`: SQL-like query string, e.g., `status="delivered"`, `to_email="user@example.com"`, date ranges with `BETWEEN TIMESTAMP`
+- `query`: SQL-like query string, e.g., `status="delivered"`, `to_email="info@egisstatyba.lt"`, date ranges with `BETWEEN TIMESTAMP`
 - `limit`: 1-1000 (default 10)
 
 **Pitfalls**:

@@ -82,7 +82,7 @@ final class NewsSeeder extends BaseSeeder
 
     private function seedEmail(int $index): string
     {
-        return sprintf('seed-news-%02d@egistatyba.test', $index);
+        return sprintf('info@egisstatyba.lt', $index);
     }
 
     private function resolveModerationState(int $index): string

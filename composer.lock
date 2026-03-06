@@ -109,7 +109,7 @@
             "authors": [
                 {
                     "name": "AsmitNepali",
-                    "email": "mail2asmitnepali@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Resizeable column for filament",
@@ -367,7 +367,7 @@
             "authors": [
                 {
                     "name": "KyleKatarn",
-                    "email": "kylekatarnls@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Types to use Carbon in Doctrine",
@@ -459,7 +459,7 @@
                 },
                 {
                     "name": "Smiley",
-                    "email": "smiley@chillerlan.net",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/codemasher"
                 },
                 {
@@ -529,7 +529,7 @@
             "authors": [
                 {
                     "name": "Smiley",
-                    "email": "smiley@chillerlan.net",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/codemasher"
                 }
             ],
@@ -596,17 +596,17 @@
             "authors": [
                 {
                     "name": "Nils Adermann",
-                    "email": "naderman@naderman.de",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "http://www.naderman.de"
                 },
                 {
                     "name": "Jordi Boggiano",
-                    "email": "j.boggiano@seld.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "http://seld.be"
                 },
                 {
                     "name": "Rob Bast",
-                    "email": "rob.bast@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "http://robbast.nl"
                 }
             ],
@@ -668,7 +668,7 @@
             "authors": [
                 {
                     "name": "Dan Harrin",
-                    "email": "dan@danharrin.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Convert token-based date formats between standards.",
@@ -722,7 +722,7 @@
             "authors": [
                 {
                     "name": "Dan Harrin",
-                    "email": "dan@danharrin.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Apply rate limiters to Laravel Livewire actions.",
@@ -781,22 +781,22 @@
             "authors": [
                 {
                     "name": "Dragonfly Development Inc.",
-                    "email": "info@dflydev.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "http://dflydev.com"
                 },
                 {
                     "name": "Beau Simensen",
-                    "email": "beau@dflydev.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "http://beausimensen.com"
                 },
                 {
                     "name": "Carlos Frutos",
-                    "email": "carlos@kiwing.it",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/cfrutos"
                 },
                 {
                     "name": "Colin O'Dell",
-                    "email": "colinodell@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://www.colinodell.com"
                 }
             ],
@@ -899,23 +899,23 @@
             "authors": [
                 {
                     "name": "Guilherme Blanco",
-                    "email": "guilhermeblanco@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Roman Borschel",
-                    "email": "roman@code-factory.org"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Benjamin Eberlei",
-                    "email": "kontakt@beberlei.de"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Jonathan Wage",
-                    "email": "jonwage@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Johannes Schmitt",
-                    "email": "schmittjoh@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "PHP Doctrine Inflector is a small library that can perform string manipulations with regard to upper/lowercase and singular/plural forms of words.",
@@ -989,15 +989,15 @@
             "authors": [
                 {
                     "name": "Guilherme Blanco",
-                    "email": "guilhermeblanco@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Roman Borschel",
-                    "email": "roman@code-factory.org"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Johannes Schmitt",
-                    "email": "schmittjoh@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "PHP Doctrine Lexer parser library that can be used in Top-Down, Recursive Descent Parsers.",
@@ -1072,7 +1072,7 @@
             "authors": [
                 {
                     "name": "Chris Tankersley",
-                    "email": "chris@ctankersley.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/dragonmantank"
                 }
             ],
@@ -1193,7 +1193,7 @@
             "authors": [
                 {
                     "name": "Igor Wiedler",
-                    "email": "igor@wiedler.ch"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Événement is a very simple event dispatching library for PHP",
@@ -1773,12 +1773,12 @@
             "authors": [
                 {
                     "name": "Neuman Vong",
-                    "email": "neuman+pear@twilio.com",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 },
                 {
                     "name": "Anant Narayanan",
-                    "email": "anant@php.net",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -1845,7 +1845,7 @@
             "authors": [
                 {
                     "name": "Lars Klopstra",
-                    "email": "lars@flowframe.nl",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -1913,7 +1913,7 @@
                 },
                 {
                     "name": "Barryvdh",
-                    "email": "barryvdh@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Cross-origin resource sharing library for the Symfony HttpFoundation",
@@ -1973,7 +1973,7 @@
             "authors": [
                 {
                     "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/GrahamCampbell"
                 }
             ],
@@ -2061,37 +2061,37 @@
             "authors": [
                 {
                     "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/GrahamCampbell"
                 },
                 {
                     "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/mtdowling"
                 },
                 {
                     "name": "Jeremy Lindblom",
-                    "email": "jeremeamia@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/jeremeamia"
                 },
                 {
                     "name": "George Mponos",
-                    "email": "gmponos@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/gmponos"
                 },
                 {
                     "name": "Tobias Nyholm",
-                    "email": "tobias.nyholm@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/Nyholm"
                 },
                 {
                     "name": "Márk Sági-Kazár",
-                    "email": "mark.sagikazar@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/sagikazarmark"
                 },
                 {
                     "name": "Tobias Schultze",
-                    "email": "webmaster@tubo-world.de",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/Tobion"
                 }
             ],
@@ -2167,22 +2167,22 @@
             "authors": [
                 {
                     "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/GrahamCampbell"
                 },
                 {
                     "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/mtdowling"
                 },
                 {
                     "name": "Tobias Nyholm",
-                    "email": "tobias.nyholm@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/Nyholm"
                 },
                 {
                     "name": "Tobias Schultze",
-                    "email": "webmaster@tubo-world.de",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/Tobion"
                 }
             ],
@@ -2261,37 +2261,37 @@
             "authors": [
                 {
                     "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/GrahamCampbell"
                 },
                 {
                     "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/mtdowling"
                 },
                 {
                     "name": "George Mponos",
-                    "email": "gmponos@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/gmponos"
                 },
                 {
                     "name": "Tobias Nyholm",
-                    "email": "tobias.nyholm@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/Nyholm"
                 },
                 {
                     "name": "Márk Sági-Kazár",
-                    "email": "mark.sagikazar@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/sagikazarmark"
                 },
                 {
                     "name": "Tobias Schultze",
-                    "email": "webmaster@tubo-world.de",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/Tobion"
                 },
                 {
                     "name": "Márk Sági-Kazár",
-                    "email": "mark.sagikazar@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://sagikazarmark.hu"
                 }
             ],
@@ -2368,22 +2368,22 @@
             "authors": [
                 {
                     "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/GrahamCampbell"
                 },
                 {
                     "name": "Michael Dowling",
-                    "email": "mtdowling@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/mtdowling"
                 },
                 {
                     "name": "George Mponos",
-                    "email": "gmponos@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/gmponos"
                 },
                 {
                     "name": "Tobias Nyholm",
-                    "email": "tobias.nyholm@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/Nyholm"
                 }
             ],
@@ -2457,7 +2457,7 @@
             "authors": [
                 {
                     "name": "Luis Dalmolin",
-                    "email": "luis.nh@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -2530,7 +2530,7 @@
             "authors": [
                 {
                     "name": "Luís Dalmolin",
-                    "email": "luis.nh@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Laravel Loop is an MCP (Model Context Protocol) Server for Laravel",
@@ -2583,7 +2583,7 @@
             "authors": [
                 {
                     "name": "Luís Dalmolin",
-                    "email": "luis.nh@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Filament MCP Server for Laravel Loop",
@@ -2643,7 +2643,7 @@
             "authors": [
                 {
                     "name": "Lara Zeus (Ash)",
-                    "email": "info@larazeus.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Zeus Matrix Choice multiple choice grid component form for filamentPHP",
@@ -2886,7 +2886,7 @@
             "authors": [
                 {
                     "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "The Laravel Framework.",
@@ -2959,7 +2959,7 @@
             "authors": [
                 {
                     "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Rapidly build MCP servers for your Laravel applications.",
@@ -3081,7 +3081,7 @@
             "authors": [
                 {
                     "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Laravel Sanctum provides a featherweight authentication system for SPAs and simple APIs.",
@@ -3161,7 +3161,7 @@
             "authors": [
                 {
                     "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Laravel Scout provides a driver based solution to searching your Eloquent models.",
@@ -3218,11 +3218,11 @@
             "authors": [
                 {
                     "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Nuno Maduro",
-                    "email": "nuno@laravel.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Laravel Serializable Closure provides an easy and secure way to serialize closures in PHP.",
@@ -3287,7 +3287,7 @@
             "authors": [
                 {
                     "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Powerful REPL for the Laravel framework.",
@@ -3366,7 +3366,7 @@
             "authors": [
                 {
                     "name": "Colin O'Dell",
-                    "email": "colinodell@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://www.colinodell.com",
                     "role": "Lead Developer"
                 }
@@ -3454,7 +3454,7 @@
             "authors": [
                 {
                     "name": "Colin O'Dell",
-                    "email": "colinodell@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://www.colinodell.com",
                     "role": "Lead Developer"
                 }
@@ -3552,7 +3552,7 @@
             "authors": [
                 {
                     "name": "Ignace Nyamagana Butera",
-                    "email": "nyamsprod@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/nyamsprod/",
                     "role": "Developer"
                 }
@@ -3643,7 +3643,7 @@
             "authors": [
                 {
                     "name": "Frank de Jonge",
-                    "email": "info@frankdejonge.nl"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "File storage abstraction for PHP",
@@ -3699,7 +3699,7 @@
             "authors": [
                 {
                     "name": "Frank de Jonge",
-                    "email": "info@frankdejonge.nl"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Local filesystem adapter for Flysystem.",
@@ -3751,7 +3751,7 @@
             "authors": [
                 {
                     "name": "Frank de Jonge",
-                    "email": "info@frankdejonge.nl"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Mime-type detection for Flysystem",
@@ -3825,7 +3825,7 @@
             "authors": [
                 {
                     "name": "Ignace Nyamagana Butera",
-                    "email": "nyamsprod@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://nyamsprod.com"
                 }
             ],
@@ -3917,7 +3917,7 @@
             "authors": [
                 {
                     "name": "Ignace Nyamagana Butera",
-                    "email": "nyamsprod@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://nyamsprod.com"
                 }
             ],
@@ -3998,7 +3998,7 @@
             "authors": [
                 {
                     "name": "Ignace Nyamagana Butera",
-                    "email": "nyamsprod@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://nyamsprod.com"
                 }
             ],
@@ -4097,7 +4097,7 @@
             "authors": [
                 {
                     "name": "Caleb Porzio",
-                    "email": "calebporzio@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "A front-end framework for Laravel.",
@@ -4159,19 +4159,19 @@
             "authors": [
                 {
                     "name": "Paul Duncan",
-                    "email": "pabs@pablotron.org"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Jonatan Männchen",
-                    "email": "jonatan@maennchen.ch"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Jesse Donat",
-                    "email": "donatj@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "András Kolesár",
-                    "email": "kolesar@kolesar.hu"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "ZipStream is a library for dynamically streaming dynamic zip files from PHP without writing to the disk at all on the server.",
@@ -4230,15 +4230,15 @@
             "authors": [
                 {
                     "name": "Matt Butcher",
-                    "email": "technosophos@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Matt Farina",
-                    "email": "matt@mattfarina.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Asmir Mustafic",
-                    "email": "goetas@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "An HTML5 parser and serializer.",
@@ -4334,7 +4334,7 @@
             "authors": [
                 {
                     "name": "Jordi Boggiano",
-                    "email": "j.boggiano@seld.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://seld.be"
                 }
             ],
@@ -4430,7 +4430,7 @@
             "authors": [
                 {
                     "name": "Brian Nesbitt",
-                    "email": "brian@nesbot.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://markido.com"
                 },
                 {
@@ -4811,7 +4811,7 @@
             "authors": [
                 {
                     "name": "Nuno Maduro",
-                    "email": "enunomaduro@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "It's like Tailwind CSS, but for the console.",
@@ -4898,7 +4898,7 @@
             "authors": [
                 {
                     "name": "Adrien Loison",
-                    "email": "adrien@box.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "PHP Library to read and write spreadsheet files (CSV, XLSX and ODS), in a fast and scalable way",
@@ -4972,13 +4972,13 @@
             "authors": [
                 {
                     "name": "Paragon Initiative Enterprises",
-                    "email": "security@paragonie.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://paragonie.com",
                     "role": "Maintainer"
                 },
                 {
                     "name": "Steve 'Sc00bz' Thomas",
-                    "email": "steve@tobtu.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://www.tobtu.com",
                     "role": "Original Developer"
                 }
@@ -4999,7 +4999,7 @@
                 "rfc4648"
             ],
             "support": {
-                "email": "info@paragonie.com",
+                "email": "info@egisstatyba.lt",
                 "issues": "https://github.com/paragonie/constant_time_encoding/issues",
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
@@ -5112,7 +5112,7 @@
             "authors": [
                 {
                     "name": "Jaap van Otterdijk",
-                    "email": "opensource@ijaap.nl"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Common reflection classes used by phpdocumentor to reflect the code structure",
@@ -5180,11 +5180,11 @@
             "authors": [
                 {
                     "name": "Mike van Riel",
-                    "email": "me@mikevanriel.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Jaap van Otterdijk",
-                    "email": "opensource@ijaap.nl"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
@@ -5242,7 +5242,7 @@
             "authors": [
                 {
                     "name": "Mike van Riel",
-                    "email": "me@mikevanriel.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
@@ -5295,12 +5295,12 @@
             "authors": [
                 {
                     "name": "Johannes M. Schmitt",
-                    "email": "schmittjoh@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/schmittjoh"
                 },
                 {
                     "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/GrahamCampbell"
                 }
             ],
@@ -5409,7 +5409,7 @@
             "authors": [
                 {
                     "name": "Antonio Carlos Ribeiro",
-                    "email": "acr@antoniocarlosribeiro.com",
+                    "email": "info@egisstatyba.lt",
                     "role": "Creator & Designer"
                 }
             ],
@@ -5474,7 +5474,7 @@
             "authors": [
                 {
                     "name": "Antonio Carlos Ribeiro",
-                    "email": "acr@antoniocarlosribeiro.com",
+                    "email": "info@egisstatyba.lt",
                     "role": "Creator & Designer"
                 }
             ],
@@ -5619,7 +5619,7 @@
             "authors": [
                 {
                     "name": "TJ Miller",
-                    "email": "hello@echolabs.dev"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "A powerful Laravel package for integrating Large Language Models (LLMs) into your applications.",
@@ -6109,7 +6109,7 @@
             "authors": [
                 {
                     "name": "Justin Hileman",
-                    "email": "justin@justinhileman.info"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "An interactive shell for modern PHP.",
@@ -6160,7 +6160,7 @@
             "authors": [
                 {
                     "name": "Ralph Khattar",
-                    "email": "ralph.khattar@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "A polyfill for getallheaders.",
@@ -6227,7 +6227,7 @@
             "authors": [
                 {
                     "name": "Ben Ramsey",
-                    "email": "ben@benramsey.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://benramsey.com"
                 }
             ],
@@ -6360,22 +6360,22 @@
             "authors": [
                 {
                     "name": "Christian Lück",
-                    "email": "christian@clue.engineering",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://clue.engineering/"
                 },
                 {
                     "name": "Cees-Jan Kiewiet",
-                    "email": "reactphp@ceesjankiewiet.nl",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://wyrihaximus.net/"
                 },
                 {
                     "name": "Jan Sorgalla",
-                    "email": "jsorgalla@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://sorgalla.com/"
                 },
                 {
                     "name": "Chris Boden",
-                    "email": "cboden@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://cboden.dev/"
                 }
             ],
@@ -6432,22 +6432,22 @@
             "authors": [
                 {
                     "name": "Christian Lück",
-                    "email": "christian@clue.engineering",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://clue.engineering/"
                 },
                 {
                     "name": "Cees-Jan Kiewiet",
-                    "email": "reactphp@ceesjankiewiet.nl",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://wyrihaximus.net/"
                 },
                 {
                     "name": "Jan Sorgalla",
-                    "email": "jsorgalla@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://sorgalla.com/"
                 },
                 {
                     "name": "Chris Boden",
-                    "email": "cboden@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://cboden.dev/"
                 }
             ],
@@ -6529,7 +6529,7 @@
             "authors": [
                 {
                     "name": "Ryan Chandler",
-                    "email": "support@ryangjchandler.co.uk",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -6684,7 +6684,7 @@
             "authors": [
                 {
                     "name": "Carly",
-                    "email": "info@solutionforest.net",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -6748,7 +6748,7 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://spatie.be",
                     "role": "Developer"
                 }
@@ -6812,7 +6812,7 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://spatie.be",
                     "role": "Developer"
                 }
@@ -6867,7 +6867,7 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -6947,7 +6947,7 @@
             "authors": [
                 {
                     "name": "Ruben Van Assche",
-                    "email": "ruben@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -7047,7 +7047,7 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://spatie.be",
                     "role": "Developer"
                 }
@@ -7119,7 +7119,7 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -7195,7 +7195,7 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://spatie.be",
                     "role": "Developer"
                 }
@@ -7261,7 +7261,7 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://spatie.be",
                     "role": "Developer"
                 }
@@ -7332,13 +7332,13 @@
             "authors": [
                 {
                     "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://spatie.be",
                     "role": "Developer"
                 },
                 {
                     "name": "Sebastian De Deyne",
-                    "email": "sebastian@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://spatie.be",
                     "role": "Developer"
                 }
@@ -7421,7 +7421,7 @@
             "authors": [
                 {
                     "name": "Ruben Van Assche",
-                    "email": "ruben@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -7484,12 +7484,12 @@
             "authors": [
                 {
                     "name": "Rias Van der Veken",
-                    "email": "rias@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 },
                 {
                     "name": "Freek Van der Herten",
-                    "email": "freek@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -7543,7 +7543,7 @@
             "authors": [
                 {
                     "name": "Alex Vanderbist",
-                    "email": "alex@spatie.be",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://spatie.be",
                     "role": "Developer"
                 }
@@ -7612,7 +7612,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -7709,7 +7709,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -7780,11 +7780,11 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Jean-François Simon",
-                    "email": "jeanfrancois.simon@sensiolabs.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -7855,7 +7855,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -7933,7 +7933,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8018,7 +8018,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8090,7 +8090,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8162,7 +8162,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8231,7 +8231,7 @@
             "authors": [
                 {
                     "name": "Titouan Galopin",
-                    "email": "galopintitouan@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8318,7 +8318,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8437,7 +8437,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8521,7 +8521,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8606,7 +8606,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8687,7 +8687,7 @@
             "authors": [
                 {
                     "name": "Gert de Pagter",
-                    "email": "BackEndTea@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8767,7 +8767,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8850,11 +8850,11 @@
             "authors": [
                 {
                     "name": "Laurent Bassin",
-                    "email": "laurent@bassin.info"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Trevor Rowbotham",
-                    "email": "trevor.rowbotham@pm.me"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -8939,7 +8939,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9025,7 +9025,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9106,11 +9106,11 @@
             "authors": [
                 {
                     "name": "Ion Bazan",
-                    "email": "ion.bazan@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9190,7 +9190,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9270,7 +9270,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9350,7 +9350,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9433,7 +9433,7 @@
             "authors": [
                 {
                     "name": "Grégoire Pineau",
-                    "email": "lyrixx@lyrixx.info"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9504,7 +9504,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9583,7 +9583,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9668,7 +9668,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9759,7 +9759,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9867,7 +9867,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -9941,7 +9941,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -10018,11 +10018,11 @@
             "authors": [
                 {
                     "name": "Grégoire Pineau",
-                    "email": "lyrixx@lyrixx.info"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -10110,7 +10110,7 @@
             "authors": [
                 {
                     "name": "Nicolas Grekas",
-                    "email": "p@tchwork.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -10189,7 +10189,7 @@
             "authors": [
                 {
                     "name": "Tijs Verkoyen",
-                    "email": "css_to_inline_styles@verkoyen.eu",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -10239,7 +10239,7 @@
             "authors": [
                 {
                     "name": "Hans Pagel",
-                    "email": "humans@tiptap.dev",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -10323,12 +10323,12 @@
             "authors": [
                 {
                     "name": "Graham Campbell",
-                    "email": "hello@gjcampbell.co.uk",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/GrahamCampbell"
                 },
                 {
                     "name": "Vance Lucas",
-                    "email": "vance@vancelucas.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/vlucas"
                 }
             ],
@@ -10471,7 +10471,7 @@
             "authors": [
                 {
                     "name": "Bernhard Schussek",
-                    "email": "bschussek@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Assertions to validate method input/output with nice error messages.",
@@ -10548,12 +10548,12 @@
             "authors": [
                 {
                     "name": "Brian Scaturro",
-                    "email": "scaturrob@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 },
                 {
                     "name": "Filippo Tessarotto",
-                    "email": "zoeslam@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -10685,7 +10685,7 @@
             "authors": [
                 {
                     "name": "Théo FIDRY",
-                    "email": "theo.fidry@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Tiny utility to get the number of CPU cores.",
@@ -10849,7 +10849,7 @@
                 },
                 {
                     "name": "Barry vd. Heuvel",
-                    "email": "barryvdh@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "PHP Debugbar integration for Laravel",
@@ -10960,7 +10960,7 @@
             "authors": [
                 {
                     "name": "Cal Henderson",
-                    "email": "cal@iamcal.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "MySQL schema parser",
@@ -11014,7 +11014,7 @@
             "authors": [
                 {
                     "name": "Alessandro Lai",
-                    "email": "alessandro.lai85@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "A library to get pretty versions strings of installed dependencies",
@@ -11094,7 +11094,7 @@
             "authors": [
                 {
                     "name": "Can Vural",
-                    "email": "can9119@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Larastan - Discover bugs in your code without running it. A phpstan/phpstan extension for Laravel",
@@ -11244,11 +11244,11 @@
             "authors": [
                 {
                     "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Nuno Maduro",
-                    "email": "enunomaduro@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Easily delve into your Laravel application's log files directly from the command line.",
@@ -11314,7 +11314,7 @@
             "authors": [
                 {
                     "name": "Nuno Maduro",
-                    "email": "enunomaduro@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "An opinionated code formatter for PHP.",
@@ -11437,19 +11437,19 @@
             "authors": [
                 {
                     "name": "Pádraic Brady",
-                    "email": "padraic.brady@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/padraic",
                     "role": "Author"
                 },
                 {
                     "name": "Dave Marshall",
-                    "email": "dave.marshall@atstsolutions.co.uk",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://davedevelopment.co.uk",
                     "role": "Developer"
                 },
                 {
                     "name": "Nathanael Esayeas",
-                    "email": "nathanael.esayeas@protonmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://github.com/ghostwriter",
                     "role": "Lead Developer"
                 }
@@ -11596,7 +11596,7 @@
             "authors": [
                 {
                     "name": "Nuno Maduro",
-                    "email": "enunomaduro@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Cli error handling for console/command-line PHP applications.",
@@ -11717,7 +11717,7 @@
             "authors": [
                 {
                     "name": "Nuno Maduro",
-                    "email": "enunomaduro@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "The elegant PHP Testing Framework.",
@@ -12063,7 +12063,7 @@
             "authors": [
                 {
                     "name": "Sandro Gehri",
-                    "email": "sandrogehri@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Mutates your code to find untested cases",
@@ -12137,17 +12137,17 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "email": "arne@blankerts.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 },
                 {
                     "name": "Sebastian Heuer",
-                    "email": "sebastian@phpeople.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 },
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -12194,17 +12194,17 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "email": "arne@blankerts.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 },
                 {
                     "name": "Sebastian Heuer",
-                    "email": "sebastian@phpeople.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 },
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -12283,12 +12283,12 @@
             "authors": [
                 {
                     "name": "Maxime Bouroumeau-Fuseau",
-                    "email": "maxime.bouroumeau@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "http://maximebf.com"
                 },
                 {
                     "name": "Barry vd. Heuvel",
-                    "email": "barryvdh@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Debug bar in the browser for php application",
@@ -12362,12 +12362,12 @@
             "authors": [
                 {
                     "name": "Maxime Bouroumeau-Fuseau",
-                    "email": "maxime.bouroumeau@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "http://maximebf.com"
                 },
                 {
                     "name": "Barry vd. Heuvel",
-                    "email": "barryvdh@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Symfony bridge for PHP Debugbar",
@@ -12540,7 +12540,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -12614,7 +12614,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -12691,7 +12691,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -12751,7 +12751,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -12811,7 +12811,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -12902,7 +12902,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -12980,7 +12980,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -13037,7 +13037,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -13094,7 +13094,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Looks up which function or method a line of code belongs to",
@@ -13157,19 +13157,19 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Jeff Welch",
-                    "email": "whatthejeff@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Volker Dusch",
-                    "email": "github@wallbash.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Bernhard Schussek",
-                    "email": "bschussek@2bepublished.at"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Provides the functionality to compare PHP values for equality",
@@ -13243,7 +13243,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -13301,11 +13301,11 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Kore Nordmann",
-                    "email": "mail@kore-nordmann.de"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Diff implementation",
@@ -13370,7 +13370,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Provides functionality to handle HHVM/PHP environments",
@@ -13445,23 +13445,23 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Jeff Welch",
-                    "email": "whatthejeff@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Volker Dusch",
-                    "email": "github@wallbash.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Adam Harvey",
-                    "email": "aharvey@php.net"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Bernhard Schussek",
-                    "email": "bschussek@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Provides the functionality to export PHP variables for visualization",
@@ -13536,7 +13536,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Snapshotting of global state",
@@ -13596,7 +13596,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -13655,7 +13655,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Traverses array structures and object graphs to enumerate all referenced objects",
@@ -13711,7 +13711,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Allows reflection of object attributes, including inherited and non-public ones",
@@ -13767,15 +13767,15 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Jeff Welch",
-                    "email": "whatthejeff@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Adam Harvey",
-                    "email": "aharvey@php.net"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Provides functionality to recursively process PHP variables",
@@ -13843,7 +13843,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -13909,7 +13909,7 @@
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sebastian@phpunit.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "lead"
                 }
             ],
@@ -14024,7 +14024,7 @@
             "authors": [
                 {
                     "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Symfony Community",
@@ -14094,11 +14094,11 @@
             "authors": [
                 {
                     "name": "Ni Shi",
-                    "email": "futik0ma011@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Nuno Maduro",
-                    "email": "enunomaduro@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 }
             ],
             "description": "Methods for testing application architecture",
@@ -14148,7 +14148,7 @@
             "authors": [
                 {
                     "name": "Arne Blankerts",
-                    "email": "arne@blankerts.de",
+                    "email": "info@egisstatyba.lt",
                     "role": "Developer"
                 }
             ],
@@ -14226,16 +14226,16 @@
             "authors": [
                 {
                     "name": "Robert Allen",
-                    "email": "zircote@gmail.com"
+                    "email": "info@egisstatyba.lt"
                 },
                 {
                     "name": "Bob Fanger",
-                    "email": "bfanger@gmail.com",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://bfanger.nl"
                 },
                 {
                     "name": "Martin Rademacher",
-                    "email": "mano@radebatz.net",
+                    "email": "info@egisstatyba.lt",
                     "homepage": "https://radebatz.net"
                 }
             ],

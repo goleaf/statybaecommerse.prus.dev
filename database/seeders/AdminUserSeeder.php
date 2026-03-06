@@ -18,12 +18,12 @@ final class AdminUserSeeder extends BaseSeeder
      */
     private const ADMIN_ACCOUNTS = [
         [
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'name'     => 'Administrator',
             'password' => 'Admin123!',
         ],
         [
-            'email'    => 'eegidia@gmail.com',
+            'email'    => 'info@egisstatyba.lt',
             'name'     => 'Egidijus Kalinauskas',
             'password' => '47077ca8d1099D@',
         ],

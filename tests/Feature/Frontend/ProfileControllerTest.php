@@ -31,21 +31,21 @@ final class ProfileControllerTest extends TestCase
 
         $response = $this->actingAs($user)->put(route('frontend.profile.update'), [
             'name'  => 'Updated Name',
-            'email' => 'updated@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         $response->assertRedirect(route('frontend.profile.index'));
-        $this->assertDatabaseHas('users', ['id' => $user->id, 'name' => 'Updated Name', 'email' => 'updated@example.com']);
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'name' => 'Updated Name', 'email' => 'info@egisstatyba.lt']);
     }
 
     public function test_update_profile_requires_unique_email(): void
     {
-        $user = User::factory()->create(['email' => 'first@example.com']);
-        User::factory()->create(['email' => 'existing@example.com']);
+        $user = User::factory()->create(['email' => 'info@egisstatyba.lt']);
+        User::factory()->create(['email' => 'info@egisstatyba.lt']);
 
         $response = $this->actingAs($user)->put(route('frontend.profile.update'), [
             'name'  => 'Updated Name',
-            'email' => 'existing@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         $response->assertSessionHasErrors('email');

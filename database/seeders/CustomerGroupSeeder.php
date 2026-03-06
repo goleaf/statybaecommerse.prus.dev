@@ -55,7 +55,7 @@ final class CustomerGroupSeeder extends BaseSeeder
                 'can_place_orders'     => true,
                 'is_default'           => false,
                 'metadata'             => [
-                    'support_email'  => 'vip@statyba.lt',
+                    'support_email'  => 'info@egisstatyba.lt',
                     'priority_hours' => '08:00-18:00',
                 ],
                 'conditions' => [

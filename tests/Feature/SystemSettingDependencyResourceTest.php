@@ -20,7 +20,7 @@ final class SystemSettingDependencyResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]));
     }
 

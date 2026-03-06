@@ -57,7 +57,7 @@ return [
         'description' => 'Išsiųskite kvietimą ir gaukite atlygį kartu.',
         'fields'      => [
             'referred_email'             => 'Draugo el. pašto adresas',
-            'referred_email_placeholder' => 'draugas@pastas.lt',
+            'referred_email_placeholder' => 'info@egisstatyba.lt',
             'title'                      => 'Kvietimo žinutės antraštė (nebūtina)',
             'title_placeholder'          => 'Pažiūrėk šią puikią parduotuvę!',
             'description'                => 'Asmeninė žinutė (nebūtina)',

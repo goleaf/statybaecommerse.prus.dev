@@ -24,7 +24,7 @@ it('can import subscribers', function () {
     $import->save();
 
     $row = [
-        'email'      => 'subscriber@example.com',
+        'email'      => 'info@egisstatyba.lt',
         'first_name' => 'Sub',
         'last_name'  => 'Scrib',
         'status'     => 'subscribed',
@@ -43,6 +43,6 @@ it('can import subscribers', function () {
 
     expect($import->successful_rows)->toBe(1);
     $this->assertDatabaseHas('subscribers', [
-        'email' => 'subscriber@example.com',
+        'email' => 'info@egisstatyba.lt',
     ]);
 });

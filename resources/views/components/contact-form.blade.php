@@ -218,9 +218,9 @@
                                 <div>
                                     <h3 class="font-semibold text-gray-900 mb-1">{{ __('frontend.contact_info.email.label') }}</h3>
                                     <p class="text-gray-600">
-                                        <a href="mailto:{{ app_setting('company_email') ?? 'info@example.com' }}"
+                                        <a href="mailto:{{ app_setting('company_email') ?? 'info@egisstatyba.lt' }}"
                                            class="hover:text-blue-600 transition-colors duration-200">
-                                            {{ app_setting('company_email') ?? 'info@example.com' }}
+                                            {{ app_setting('company_email') ?? 'info@egisstatyba.lt' }}
                                         </a>
                                     </p>
                                 </div>

@@ -38,7 +38,7 @@ final class AdminSeederTest extends TestCase
 
         // Verify admin user was created
         $this->assertDatabaseHas('users', [
-            'email'     => 'admin@example.com',
+            'email'     => 'info@egisstatyba.lt',
             'is_admin'  => true,
             'is_active' => true,
         ]);
@@ -471,27 +471,27 @@ final class AdminSeederTest extends TestCase
         $this->assertDatabaseCount('subscribers', 5);
 
         $this->assertDatabaseHas('subscribers', [
-            'email'  => 'subscriber1@example.com',
+            'email'  => 'info@egisstatyba.lt',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email'  => 'subscriber2@example.com',
+            'email'  => 'info@egisstatyba.lt',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email'  => 'subscriber3@example.com',
+            'email'  => 'info@egisstatyba.lt',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email'  => 'subscriber4@example.com',
+            'email'  => 'info@egisstatyba.lt',
             'status' => 'active',
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email'  => 'subscriber5@example.com',
+            'email'  => 'info@egisstatyba.lt',
             'status' => 'active',
         ]);
     }
@@ -550,7 +550,7 @@ final class AdminSeederTest extends TestCase
     {
         $this->seed(AdminSeeder::class);
 
-        $admin = User::where('email', 'admin@example.com')->first();
+        $admin = User::where('email', 'info@egisstatyba.lt')->first();
         $this->assertNotNull($admin);
 
         $addresses = $admin->addresses;
@@ -568,7 +568,7 @@ final class AdminSeederTest extends TestCase
     {
         $this->seed(AdminSeeder::class);
 
-        $admin = User::where('email', 'admin@example.com')->first();
+        $admin = User::where('email', 'info@egisstatyba.lt')->first();
         $this->assertNotNull($admin);
 
         $orders = $admin->orders;
@@ -624,7 +624,7 @@ final class AdminSeederTest extends TestCase
         $this->seed(AdminSeeder::class);
 
         // Verify all essential data exists for admin panel functionality
-        $this->assertDatabaseHas('users', ['email' => 'admin@example.com']);
+        $this->assertDatabaseHas('users', ['email' => 'info@egisstatyba.lt']);
         $this->assertDatabaseCount('countries', 3);
         $this->assertDatabaseCount('zones', 3);
         $this->assertDatabaseCount('cities', 3);

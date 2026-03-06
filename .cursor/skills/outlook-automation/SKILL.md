@@ -137,8 +137,8 @@ Automate Microsoft Outlook operations through Composio's Outlook toolkit via Rub
 ### KQL Search Syntax
 
 **Property filters**:
-- `from:user@example.com` - From sender
-- `to:recipient@example.com` - To recipient
+- `from:info@egisstatyba.lt` - From sender
+- `to:info@egisstatyba.lt` - To recipient
 - `subject:invoice` - Subject contains
 - `received>=2025-01-01` - Date filter
 - `hasattachment:yes` - Has attachments

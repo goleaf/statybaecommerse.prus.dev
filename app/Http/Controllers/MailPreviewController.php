@@ -87,7 +87,7 @@ final class MailPreviewController
                     $passwordBroker = is_string($passwordBroker) && $passwordBroker !== '' ? $passwordBroker : 'users';
                     $expireConfig = config("auth.passwords.{$passwordBroker}.expire", 60);
                     $minutes = is_int($expireConfig) ? $expireConfig : (is_numeric($expireConfig) ? (int) $expireConfig : 60);
-                    $url = url('reset-password/' . Str::random(32) . '?email=' . urlencode('customer@example.test'));
+                    $url = url('reset-password/' . Str::random(32) . '?email=' . urlencode('info@egisstatyba.lt'));
 
                     return new PasswordResetMail($url, $minutes, $locale);
                 },
@@ -213,7 +213,7 @@ final class MailPreviewController
     {
         $user = new User;
         $user->name = 'Austėja Vaitkūnaitė';
-        $user->email = 'customer@example.test';
+        $user->email = 'info@egisstatyba.lt';
         $user->preferred_locale = 'lt';
 
         return $user;

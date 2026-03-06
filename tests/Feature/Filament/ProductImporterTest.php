@@ -195,6 +195,8 @@ it('creates missing suppliers and reuses existing suppliers during product impor
 
     expect(Supplier::query()->count())->toBe(2)
         ->and($newSupplier)->not->toBeNull()
+        ->and($newSupplier?->company_code)->not->toBeNull()
+        ->and($newSupplier?->code)->toBe('fresh-vendor')
         ->and($reuseProduct)->not->toBeNull()
         ->and($createProduct)->not->toBeNull()
         ->and($reuseProduct?->suppliers()->pluck('suppliers.id')->all())->toContain($existingSupplier->getKey())

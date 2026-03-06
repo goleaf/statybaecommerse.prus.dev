@@ -17,11 +17,11 @@ final class AutocompleteSearchControllerTest extends TestCase
     {
         $actor = User::factory()->create();
         $matchingUser = User::factory()->create([
-            'email' => 'searchable@example.com',
+            'email' => 'info@egisstatyba.lt',
             'name'  => 'Searchable User',
         ]);
         User::factory()->create([
-            'email' => 'nonmatch@example.com',
+            'email' => 'info@egisstatyba.lt',
             'name'  => 'Hidden User',
         ]);
 
@@ -32,7 +32,7 @@ final class AutocompleteSearchControllerTest extends TestCase
             'search_field' => 'email',
             'label_field'  => 'email',
             'value_field'  => 'id',
-            'search_query' => '  searchable@example.com  ',
+            'search_query' => '  info@egisstatyba.lt  ',
             'limit'        => 5,
         ]);
 
@@ -48,7 +48,7 @@ final class AutocompleteSearchControllerTest extends TestCase
         // Assert the matched record exposes the configured identifier so selections submit stable keys.
         $this->assertSame($matchingUser->getKey(), $results[0]['value']);
         // Assert the label mirrors the requested column so dropdown text renders the expected email.
-        $this->assertSame('searchable@example.com', $results[0]['label']);
+        $this->assertSame('info@egisstatyba.lt', $results[0]['label']);
     }
 
     public function test_autocomplete_search_returns_empty_array_for_blank_terms(): void

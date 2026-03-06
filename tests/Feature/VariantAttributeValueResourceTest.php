@@ -26,7 +26,7 @@ class VariantAttributeValueResourceTest extends TestCase
 
         // Create a test user
         $this->user = User::factory()->admin()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'password' => bcrypt('password'),
         ]);
 

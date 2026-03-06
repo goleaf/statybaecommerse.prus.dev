@@ -47,7 +47,7 @@ Every test method should be structured with Arrange-Act-Assert.
  
 In the Arrange phase, use Laravel factories but add meaningful column values and variable names if they help to understand failed tests better.
 Bad example: `$user1 = User::factory()->create();`
-Better example: `$adminUser = User::factory()->create(['email' => 'admin@admin.com'])`;
+Better example: `$adminUser = User::factory()->create(['email' => 'info@egisstatyba.lt'])`;
  
 In the Assert phase, perform these assertions when applicable:
 - HTTP status code returned from Act: `assertStatus()`

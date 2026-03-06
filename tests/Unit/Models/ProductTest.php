@@ -196,6 +196,37 @@ describe('Product model', function () {
         expect($product->translatable)->toBe($expectedTranslatable);
     });
 
+    it('normalizes rich editor document arrays for product descriptions', function () {
+        $product = Product::factory()->create();
+
+        $richDocument = [
+            'type'    => 'doc',
+            'content' => [
+                [
+                    'type'    => 'paragraph',
+                    'content' => [
+                        [
+                            'type' => 'text',
+                            'text' => 'Rich editor body',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $product->update([
+            'description'          => $richDocument,
+            'short_description'    => $richDocument,
+            'detailed_description' => $richDocument,
+        ]);
+
+        $product->refresh();
+
+        expect($product->description)->toBe('<p>Rich editor body</p>')
+            ->and($product->short_description)->toBe('<p>Rich editor body</p>')
+            ->and($product->detailed_description)->toBe('<p>Rich editor body</p>');
+    });
+
     it('calculates profit margin correctly', function () {
         $product = Product::factory()->create([
             'price'      => 100.00,

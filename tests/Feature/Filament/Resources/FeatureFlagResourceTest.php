@@ -30,7 +30,7 @@ final class FeatureFlagResourceTest extends TestCase
 
         // Authenticate as an administrator to bypass resource authorisation and expose the Feature Flag pages.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

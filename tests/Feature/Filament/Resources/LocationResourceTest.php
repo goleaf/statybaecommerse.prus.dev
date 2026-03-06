@@ -30,7 +30,7 @@ final class LocationResourceTest extends TestCase
 
         // Sign in as an administrator to satisfy any policy checks enforced by the resource.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

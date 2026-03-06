@@ -107,7 +107,7 @@ final class SystemSettingHistoryResourceTest extends TestCase
         // Create a deterministic administrator so every test reuses the same
         // authentication context without repeating attribute arrays.
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email' => 'info@egisstatyba.lt',
             'name'  => 'Admin User',
         ]);
 

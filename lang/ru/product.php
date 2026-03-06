@@ -76,6 +76,11 @@ return [
             'unavailable_variants'  => 'Недоступные варианты',
             'under_50_euros'        => 'До 50 €',
         ],
+        'badges' => [
+            'new'        => 'Новинка',
+            'featured'   => 'Рекомендуем',
+            'bestseller' => 'Хит продаж',
+        ],
         'messages' => [
             'added_to_cart'         => 'Вариант добавлен в корзину',
             'in_stock'              => 'В наличии',

@@ -54,7 +54,7 @@ it('strips null fields from initiate payload before sending request', function (
         ],
         'payer' => [
             'name'    => 'Buyer',
-            'email'   => 'buyer@example.test',
+            'email'   => 'info@egisstatyba.lt',
             'website' => null,
         ],
     ];
@@ -114,7 +114,7 @@ it('retries with fallback seller website when provider returns seller website va
         ],
         'payer' => [
             'name'  => 'Buyer',
-            'email' => 'buyer@example.test',
+            'email' => 'info@egisstatyba.lt',
         ],
         'seller' => [
             'website' => 'https://egistatyba.test',

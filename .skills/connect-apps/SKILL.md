@@ -31,7 +31,7 @@ This will:
 After setup, restart Claude Code and try:
 
 ```
-Send me a test email at YOUR_EMAIL@example.com
+Send me a test email at info@egisstatyba.lt
 ```
 
 If it works, you're connected!
@@ -40,7 +40,7 @@ If it works, you're connected!
 
 | Ask Claude to... | What happens |
 |------------------|--------------|
-| "Send email to sarah@acme.com about the launch" | Actually sends the email |
+| "Send email to info@egisstatyba.lt about the launch" | Actually sends the email |
 | "Create GitHub issue: fix login bug" | Creates the issue |
 | "Post to Slack #general: deploy complete" | Posts the message |
 | "Add meeting notes to Notion" | Adds to Notion |

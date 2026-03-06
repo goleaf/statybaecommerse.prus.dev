@@ -41,7 +41,7 @@ final class SuperAdminSeeder extends BaseSeeder
 
         // Use updateOrCreate instead of factory()->create()
         $admin = User::updateOrCreate(
-            ['email' => 'admin@example.com'],
+            ['email' => 'info@egisstatyba.lt'],
             [
                 'name'       => 'Super Administrator',
                 'first_name' => 'Super',
@@ -57,7 +57,7 @@ final class SuperAdminSeeder extends BaseSeeder
         $admin->syncRoles([$superAdminRole]);
 
         $this->command->info('✅ Super Admin created successfully!');
-        $this->command->info('📧 Email: admin@example.com');
+        $this->command->info('📧 Email: info@egisstatyba.lt');
         // Keep the printed credentials aligned with the seeded password.
         $this->command->info('🔑 Password: Admin123!');
         $this->command->info('🎭 Role: super-admin with ' . $permissions->count() . ' permissions');

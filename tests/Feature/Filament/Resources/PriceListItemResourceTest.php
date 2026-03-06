@@ -23,7 +23,7 @@ beforeEach(function (): void {
 
     // Authenticate a deterministic administrator so resource policies allow access in each scenario.
     $this->adminUser = User::factory()->create([
-        'email'    => 'admin@example.com',
+        'email'    => 'info@egisstatyba.lt',
         'is_admin' => true,
     ]);
 

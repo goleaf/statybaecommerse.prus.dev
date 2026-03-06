@@ -38,7 +38,7 @@ final class NewsImageResourceTest extends TestCase
 
         // Provision an administrator so authorization checks on the resource succeed.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

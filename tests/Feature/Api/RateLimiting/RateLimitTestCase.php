@@ -47,7 +47,7 @@ abstract class RateLimitTestCase extends TestCase
         $attributes = array_merge([
             'id'                => $id,
             'name'              => 'Rate Limit User ' . $id,
-            'email'             => sprintf('rate-limit-user-%d@example.com', $id),
+            'email'             => sprintf('info@egisstatyba.lt', $id),
             'is_admin'          => true,
             'email_verified_at' => now(),
             'preferred_locale'  => 'en',

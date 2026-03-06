@@ -30,7 +30,7 @@ final class EnumValueResourceTest extends TestCase
 
         // Authenticate a reusable administrator used by every scenario in this suite.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

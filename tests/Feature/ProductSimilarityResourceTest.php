@@ -20,7 +20,7 @@ class ProductSimilarityResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]));
     }

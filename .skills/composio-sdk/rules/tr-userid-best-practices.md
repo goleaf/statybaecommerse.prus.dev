@@ -313,7 +313,7 @@ const session = await composio.create('default', {
 const userId = user.id; // "550e8400-e29b-41d4-a716-446655440000"
 
 // ❌ Bad: Email (mutable)
-const userId = user.email; // "john@example.com" -> changes to "john@newdomain.com"
+const userId = user.email; // "info@egisstatyba.lt" -> changes to "info@egisstatyba.lt"
 
 // ❌ Bad: Username (mutable)
 const userId = user.username; // "john_doe" -> changes to "john_smith"
@@ -381,7 +381,7 @@ async function handleRequest(req: Request) {
   // Use same ID for direct tool execution
   await composio.tools.execute('GMAIL_SEND_EMAIL', {
     userId: userId,
-    arguments: { to: 'user@example.com', subject: 'Test' }
+    arguments: { to: 'info@egisstatyba.lt', subject: 'Test' }
   });
 
   // Use same ID for connected accounts

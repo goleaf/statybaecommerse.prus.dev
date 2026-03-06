@@ -57,7 +57,7 @@ return [
         'description' => 'Senden Sie eine Einladung und erhalten Sie gemeinsam Prämien.',
         'fields'      => [
             'referred_email'             => 'E-Mail-Adresse des Freundes',
-            'referred_email_placeholder' => 'freund@example.com',
+            'referred_email_placeholder' => 'info@egisstatyba.lt',
             'title'                      => 'Einladungsnotiz (optional)',
             'title_placeholder'          => 'Schau dir diesen tollen Shop an!',
             'description'                => 'Persönliche Nachricht (optional)',

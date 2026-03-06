@@ -57,7 +57,7 @@ return [
         'description' => 'Отправьте приглашение и получайте награды вместе.',
         'fields'      => [
             'referred_email'             => 'E-mail друга',
-            'referred_email_placeholder' => 'friend@example.com',
+            'referred_email_placeholder' => 'info@egisstatyba.lt',
             'title'                      => 'Заголовок приглашения (необязательно)',
             'title_placeholder'          => 'Посмотри этот отличный магазин!',
             'description'                => 'Личное сообщение (необязательно)',

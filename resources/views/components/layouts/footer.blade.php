@@ -94,127 +94,124 @@
     </div>
 
     <!-- Main Footer Content -->
-    <div class="container mx-auto w-full px-4 sm:px-6 lg:px-8 relative pt-16 pb-12">
-        <div class="grid w-full grid-cols-1 items-start gap-10 md:grid-cols-12 md:gap-10 lg:gap-14">
-            <div class="md:col-span-9 w-full min-w-0 rounded-[2rem] border border-ash/20 bg-white/[0.03] p-6 sm:p-8 lg:p-10">
-                <div class="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12">
-                    <div class="space-y-8 text-center lg:text-left lg:col-span-5 min-w-0">
-                        <div class="space-y-6">
-                            <a href="{{ $homeUrl }}" class="group inline-flex" aria-label="{{ __('messages.frontend') }}">
-                                <img src="{{ $footerLogoUrl }}" alt="{{ config('app.name') }}"
-                                    class="h-16 w-auto mx-auto lg:mx-0 object-contain">
-                            </a>
+    <div class="max-w-site mx-auto w-full px-4 sm:px-6 lg:px-8 relative pt-16 pb-12">
+        <div class="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-10">
+            <div class="space-y-10 text-center lg:col-span-4 lg:text-left">
+                <div class="space-y-6">
+                    <a href="{{ $homeUrl }}" class="group inline-flex" aria-label="{{ __('messages.frontend') }}">
+                        <img src="{{ $footerLogoUrl }}" alt="{{ config('app.name') }}"
+                            class="h-16 w-auto mx-auto lg:mx-0 object-contain">
+                    </a>
 
-                            <h3 class="text-2xl font-semibold text-sage">Statybos E-commerce</h3>
+                    <h3 class="text-2xl font-semibold text-sage">Statybos E-commerce</h3>
 
-                            <div class="max-w-md text-sm leading-7 text-ash/80 mx-auto lg:mx-0">
-                                {{ __('messages.footer_tagline') }}
-                            </div>
-                        </div>
+                    <div class="text-sm leading-7 text-ash/80">
+                        {{ __('messages.footer_tagline') }}
+                    </div>
+                </div>
 
-                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-                            <div class="rounded-2xl border border-ash/15 bg-black/10 px-5 py-4 text-left">
-                                <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
-                                    <span class="w-8 h-[2px] bg-brand-primary"></span>
-                                    <span>{{ __('messages.footer_contact') }}</span>
-                                </p>
-                                <ul class="flex flex-col space-y-3 text-sm text-ash">
-                                    @if ($companyPhone)
-                                        <li class="flex items-center gap-3">
-                                            <svg class="size-5 text-sage" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="1.5" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M2 5a2 2 0 012-2h2l2 5-2 1a14 14 0 006 6l1-2 5 2v2a2 2 0 01-2 2h-1C9.163 19 5 14.837 5 9V8a2 2 0 00-2-2z" />
-                                            </svg>
-                                            <a href="tel:{{ $companyPhone }}"
-                                                class="hover:text-sage transition-colors duration-200 font-medium">
-                                                {{ $companyPhone }}
-                                            </a>
-                                        </li>
-                                    @endif
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-1">
+                    <div class="text-left">
+                        <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
+                            <span class="w-8 h-[2px] bg-brand-primary"></span>
+                            <span>{{ __('messages.footer_contact') }}</span>
+                        </p>
+                        <ul class="flex flex-col space-y-3 text-sm text-ash">
+                            @if ($companyPhone)
+                                <li class="flex items-center gap-3">
+                                    <svg class="size-5 text-sage" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M2 5a2 2 0 012-2h2l2 5-2 1a14 14 0 006 6l1-2 5 2v2a2 2 0 01-2 2h-1C9.163 19 5 14.837 5 9V8a2 2 0 00-2-2z" />
+                                    </svg>
+                                    <a href="tel:{{ $companyPhone }}"
+                                        class="hover:text-sage transition-colors duration-200 font-medium">
+                                        {{ $companyPhone }}
+                                    </a>
+                                </li>
+                            @endif
 
-                                    @if ($companyEmail)
-                                        <li class="flex items-center gap-3">
-                                            <svg class="size-5 text-sage" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="1.5" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M3 8l9 6 9-6M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
-                                            </svg>
-                                            <a href="mailto:{{ $companyEmail }}"
-                                                class="hover:text-sage transition-colors duration-200 font-medium break-all">
-                                                {{ $companyEmail }}
-                                            </a>
-                                        </li>
-                                    @endif
+                            @if ($companyEmail)
+                                <li class="flex items-center gap-3">
+                                    <svg class="size-5 text-sage" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M3 8l9 6 9-6M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" />
+                                    </svg>
+                                    <a href="mailto:{{ $companyEmail }}"
+                                        class="hover:text-sage transition-colors duration-200 font-medium break-all">
+                                        {{ $companyEmail }}
+                                    </a>
+                                </li>
+                            @endif
 
-                                    @if ($companyAddress)
-                                        <li class="flex items-start gap-3">
-                                            <svg class="mt-0.5 size-5 text-sage" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="1.5" aria-hidden="true">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    d="M12 21s7-4.35 7-11a7 7 0 10-14 0c0 6.65 7 11 7 11z" />
-                                                <circle cx="12" cy="10" r="2.5" />
-                                            </svg>
-                                            <span class="leading-6">{{ $companyAddress }}</span>
-                                        </li>
-                                    @endif
-                                </ul>
-                            </div>
-
-                            <div class="rounded-2xl border border-ash/15 bg-black/10 px-5 py-4 text-left">
-                                <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
-                                    <span class="w-8 h-[2px] bg-brand-primary"></span>
-                                    <span>{{ __('messages.footer_hours') }}</span>
-                                </p>
-                                <p class="text-sm leading-7 text-ash">
-                                    {{ __('messages.footer_hours_desc') }}
-                                </p>
-                            </div>
-                        </div>
+                            @if ($companyAddress)
+                                <li class="flex items-start gap-3">
+                                    <svg class="mt-0.5 size-5 text-sage" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="1.5" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 21s7-4.35 7-11a7 7 0 10-14 0c0 6.65 7 11 7 11z" />
+                                        <circle cx="12" cy="10" r="2.5" />
+                                    </svg>
+                                    <span class="leading-6">{{ $companyAddress }}</span>
+                                </li>
+                            @endif
+                        </ul>
                     </div>
 
-                    <nav aria-label="{{ __('messages.footer_heading') }}" class="text-left lg:col-span-7 min-w-0">
-                        <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 xl:gap-10">
-                            @foreach ($footerNavigationSections as $section)
-                                <div>
-                                    <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
-                                        <span class="w-8 h-[2px] bg-brand-primary"></span>
-                                        // {{ $section['title'] }}
-                                    </p>
-                                    <div class="space-y-3 footer-nav">
-                                        @foreach ($section['links'] as $link)
-                                            <div>
-                                                @if ($link['url'])
-                                                    <x-footer-link href="{{ $link['url'] }}" class="{{ $footerLinkClass }}">
-                                                        <svg class="text-current" fill="currentColor" viewBox="0 0 24 24"
-                                                            aria-hidden="true">
-                                                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-                                                        </svg>
-                                                        <span>{{ $link['label'] }}</span>
-                                                    </x-footer-link>
-                                                @else
-                                                    <span class="{{ $footerUnavailableLinkClass }}" aria-disabled="true">
-                                                        <svg class="text-current" fill="currentColor" viewBox="0 0 24 24"
-                                                            aria-hidden="true">
-                                                            <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
-                                                        </svg>
-                                                        <span>{{ $link['label'] }}</span>
-                                                    </span>
-                                                @endif
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </nav>
+                    <div class="text-left">
+                        <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
+                            <span class="w-8 h-[2px] bg-brand-primary"></span>
+                            <span>{{ __('messages.footer_hours') }}</span>
+                        </p>
+                        <p class="text-sm leading-7 text-ash">
+                            {{ __('messages.footer_hours_desc') }}
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <div class="md:col-span-3 w-full min-w-0 rounded-[2rem] border border-ash/20 bg-white/[0.03] p-6 sm:p-8 text-left">
+            <nav aria-label="{{ __('messages.footer_heading') }}"
+                class="text-left lg:col-span-4 lg:border-l lg:border-ash/20 lg:pl-8">
+                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                    @foreach ($footerNavigationSections as $section)
+                        <div>
+                            <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
+                                <span class="w-8 h-[2px] bg-brand-primary"></span>
+                                {{ $section['title'] }}
+                            </p>
+                            <div class="space-y-3 footer-nav">
+                                @foreach ($section['links'] as $link)
+                                    <div>
+                                        @if ($link['url'])
+                                            <x-footer-link href="{{ $link['url'] }}" class="{{ $footerLinkClass }}">
+                                                <svg class="text-current" fill="currentColor" viewBox="0 0 24 24"
+                                                    aria-hidden="true">
+                                                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                                                </svg>
+                                                <span>{{ $link['label'] }}</span>
+                                            </x-footer-link>
+                                        @else
+                                            <span class="{{ $footerUnavailableLinkClass }}" aria-disabled="true">
+                                                <svg class="text-current" fill="currentColor" viewBox="0 0 24 24"
+                                                    aria-hidden="true">
+                                                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" />
+                                                </svg>
+                                                <span>{{ $link['label'] }}</span>
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </nav>
+
+            <div class="text-left lg:col-span-4 lg:border-l lg:border-ash/20 lg:pl-8">
                 <p class="text-xs uppercase tracking-wide text-ash/70 flex items-center gap-2 mb-4">
                     <span class="w-8 h-[2px] bg-brand-primary"></span>
-                    // {{ __('messages.footer_subscribe_title') }}
+                    {{ __('messages.footer_subscribe_title') }}
                 </p>
                 <div class="space-y-8">
                     <div>
@@ -244,7 +241,7 @@
 
     <!-- Bottom Footer -->
     <div class="border-t border-ash/30">
-        <div class="container mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-site mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col items-center border-t-0 sm:flex-row sm:justify-between">
                 <p class="text-sm text-ash"></p>
                 <div class="mt-8 flex items-center gap-6 divide-x divide-ash/30 sm:mt-0">

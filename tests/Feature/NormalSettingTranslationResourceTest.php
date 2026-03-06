@@ -23,7 +23,7 @@ final class NormalSettingTranslationResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
     }

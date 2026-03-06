@@ -12,7 +12,7 @@ uses(TestCase::class, RefreshDatabase::class);
 beforeEach(function (): void {
     // Create admin user for authentication
     $this->adminUser = User::factory()->create([
-        'email'    => 'admin@test.com',
+        'email'    => 'info@egisstatyba.lt',
         'is_admin' => true,
     ]);
 });

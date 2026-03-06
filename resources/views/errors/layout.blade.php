@@ -74,7 +74,7 @@
     $correlationId = $traceId;
 
     $localizedSupportEmail = __('messages.company_email');
-    $fallbackSupportEmail = config('mail.from.address', 'support@example.com');
+    $fallbackSupportEmail = config('mail.from.address', 'info@egisstatyba.lt');
     $resolvedSupportEmail = $localizedSupportEmail !== 'company_email'
         ? $localizedSupportEmail
         : $fallbackSupportEmail;

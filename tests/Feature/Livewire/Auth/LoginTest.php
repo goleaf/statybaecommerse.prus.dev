@@ -17,12 +17,12 @@ beforeEach(function (): void {
 
 it('logs in a user with valid credentials', function (): void {
     $user = User::factory()->create([
-        'email'    => 'logintest@example.com',
+        'email'    => 'info@egisstatyba.lt',
         'password' => 'Password123!',
     ]);
 
     Livewire::test(Login::class)
-        ->set('loginForm.email', 'logintest@example.com')
+        ->set('loginForm.email', 'info@egisstatyba.lt')
         ->set('loginForm.password', 'Password123!')
         ->call('login')
         ->assertHasNoErrors()
@@ -33,12 +33,12 @@ it('logs in a user with valid credentials', function (): void {
 
 it('rejects invalid credentials', function (): void {
     User::factory()->create([
-        'email'    => 'invalidlogin@example.com',
+        'email'    => 'info@egisstatyba.lt',
         'password' => 'Password123!',
     ]);
 
     Livewire::test(Login::class)
-        ->set('loginForm.email', 'invalidlogin@example.com')
+        ->set('loginForm.email', 'info@egisstatyba.lt')
         ->set('loginForm.password', 'WrongPassword!')
         ->call('login')
         ->assertHasErrors(['loginForm.email']);

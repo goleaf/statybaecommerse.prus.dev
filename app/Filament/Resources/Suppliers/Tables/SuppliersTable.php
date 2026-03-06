@@ -9,7 +9,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -20,20 +19,23 @@ final class SuppliersTable
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('logo')
-                    ->label(__('messages.logo'))
-                    ->collection('logo')
-                    ->conversion('logo-sm')
-                    ->visibility('private')
-                    ->circular(),
                 TextColumn::make('name')
                     ->label(__('messages.name'))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('code')
-                    ->label(__('messages.code'))
+                TextColumn::make('company_code')
+                    ->label(__('messages.company_code'))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('code')
+                    ->label(__('messages.system_code'))
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('contact_person')
+                    ->label(__('messages.contact_person'))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('contact_email')
                     ->label(__('messages.email'))
                     ->searchable()

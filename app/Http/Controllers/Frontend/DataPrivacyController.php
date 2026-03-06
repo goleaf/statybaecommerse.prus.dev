@@ -214,7 +214,7 @@ final class DataPrivacyController extends Controller
             }
 
             $emailKey = is_scalar($accountKey) ? (string) $accountKey : '';
-            $anonymisedEmail = sprintf('deleted-user-%s@deleted.example', $emailKey);
+            $anonymisedEmail = sprintf('info@egisstatyba.lt', $emailKey);
 
             $account->forceFill([
                 'name'                     => __('messages.deleted_user'),

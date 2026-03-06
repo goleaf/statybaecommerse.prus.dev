@@ -283,7 +283,7 @@ it('falls back to invoice listing by amount and payer email when note marker is 
                     'id'           => 'ext-older',
                     'notes'        => 'something else',
                     'total_amount' => 12.50,
-                    'payer_email'  => 'other@example.com',
+                    'payer_email'  => 'info@egisstatyba.lt',
                 ],
                 [
                     'id'           => 'ext-2002',

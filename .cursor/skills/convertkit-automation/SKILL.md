@@ -134,7 +134,7 @@ Automate ConvertKit (now known as Kit) email marketing operations through Compos
 ### Subscriber Lookup by Email
 
 ```
-1. Call KIT_LIST_SUBSCRIBERS with email_address='user@example.com'
+1. Call KIT_LIST_SUBSCRIBERS with email_address='info@egisstatyba.lt'
 2. Extract subscriber ID from the response
 3. Use ID for tagging, unsubscribing, or other operations
 ```

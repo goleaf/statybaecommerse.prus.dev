@@ -6,7 +6,7 @@ return [
     'company'                => 'Įmonė',
     'company_placeholder'    => 'Įmonė',
     'email_address'          => 'El. paštas',
-    'email_placeholder'      => 'el.pastas@imone.lt',
+    'email_placeholder'      => 'info@egisstatyba.lt',
     'first_name'             => 'Vardas',
     'first_name_placeholder' => 'Vardas',
     'interests'              => 'Dominančios temos',

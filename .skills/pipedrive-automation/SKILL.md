@@ -81,7 +81,7 @@ Automate Pipedrive CRM workflows including deal management, contact and organiza
 
 **Pitfalls**:
 - `PIPEDRIVE_ADD_AN_ORGANIZATION` may auto-merge with an existing org; check `response.additional_data.didMerge`
-- Email and phone fields are arrays of objects, not plain strings: `[{"value": "test@example.com", "label": "work", "primary": true}]`
+- Email and phone fields are arrays of objects, not plain strings: `[{"value": "info@egisstatyba.lt", "label": "work", "primary": true}]`
 - `PIPEDRIVE_SEARCH_PERSONS` wildcards like `*` or `@` are NOT supported; use `PIPEDRIVE_GET_ALL_PERSONS` to list all
 - Deletion via `PIPEDRIVE_DELETE_A_PERSON` or `PIPEDRIVE_DELETE_AN_ORGANIZATION` is soft-delete with 30-day retention, then permanent
 

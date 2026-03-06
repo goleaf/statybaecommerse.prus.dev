@@ -52,7 +52,7 @@ final class AdminLoginRefactorTest extends TestCase
     private function createAdminUser(): AdminUser
     {
         $admin = AdminUser::factory()->create([
-            'email'             => 'admin@example.com',
+            'email'             => 'info@egisstatyba.lt',
             'password'          => 'Admin123!',
             'email_verified_at' => now(),
         ]);

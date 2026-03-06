@@ -14,7 +14,7 @@ uses(RefreshDatabase::class);
 
 it('creates a fallback user for admin product imports', function () {
     $admin = AdminUser::factory()->create([
-        'email' => 'admin-import@example.test',
+        'email' => 'info@egisstatyba.lt',
         'name'  => 'Import Admin',
     ]);
 
@@ -26,5 +26,5 @@ it('creates a fallback user for admin product imports', function () {
     $resolved = $method->invoke($page, $admin);
 
     expect($resolved)->toBeInstanceOf(User::class)
-        ->and($resolved->email)->toBe('admin-import@example.test');
+        ->and($resolved->email)->toBe('info@egisstatyba.lt');
 });

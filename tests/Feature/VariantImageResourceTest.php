@@ -47,7 +47,7 @@ final class VariantImageResourceTest extends TestCase
 
         // Provision an administrator so every table/form assertion runs with the correct guard.
         $this->adminUser = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'name'     => 'Admin User',
             'is_admin' => true,
         ]);

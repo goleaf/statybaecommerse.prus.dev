@@ -15,7 +15,7 @@ beforeEach(function (): void {
     $this->resolveAdminPanel();
 
     $this->admin = AdminUser::factory()->create([
-        'email' => 'admin@example.com',
+        'email' => 'info@egisstatyba.lt',
     ]);
 
     $this->actingAs($this->admin, 'admin');

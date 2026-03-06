@@ -45,7 +45,7 @@ final class CheckoutControllerTest extends TestCase
 
         $response = $this->actingAs($user)->withSession(['cart' => $cartItem])->post(route('frontend.checkout.process'), [
             'full_name'      => 'Test User',
-            'email'          => 'test@example.com',
+            'email'          => 'info@egisstatyba.lt',
             'phone'          => '123456789',
             'address_line_1' => 'Main street 1',
             'address_line_2' => 'Apt 2',
@@ -85,7 +85,7 @@ final class CheckoutControllerTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('frontend.checkout.process'), [
             'full_name'      => 'Test User',
-            'email'          => 'test@example.com',
+            'email'          => 'info@egisstatyba.lt',
             'address_line_1' => 'Main street 1',
             'city'           => 'Vilnius',
             'postal_code'    => '12345',

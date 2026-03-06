@@ -31,7 +31,7 @@ final class PostResourceTest extends TestCase
 
         // Create and authenticate the canonical admin user for policy and activity logging checks.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

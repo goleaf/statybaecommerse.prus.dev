@@ -387,7 +387,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     {
         $dependsOnSetting = $this->createSystemSetting([
             'key'   => 'email_address',
-            'value' => 'admin@example.com',
+            'value' => 'info@egisstatyba.lt',
         ]);
 
         $dependency = $this->createDependency([

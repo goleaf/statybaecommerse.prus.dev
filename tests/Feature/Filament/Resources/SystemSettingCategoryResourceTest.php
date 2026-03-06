@@ -37,7 +37,7 @@ final class SystemSettingCategoryResourceTest extends TestCase
 
         // Create and authenticate the canonical administrator used throughout the assertions.
         $this->admin = AdminUser::factory()->create([
-            'email' => 'admin@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         $this->admin->assignRole('super_admin');

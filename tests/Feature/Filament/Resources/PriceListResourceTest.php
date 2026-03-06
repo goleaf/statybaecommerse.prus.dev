@@ -20,7 +20,7 @@ beforeEach(function (): void {
 
     // Authenticate a deterministic administrator for resource access checks.
     $this->adminUser = User::factory()->create([
-        'email'    => 'admin@example.com',
+        'email'    => 'info@egisstatyba.lt',
         'is_admin' => true,
     ]);
 
@@ -48,7 +48,7 @@ it('feature: lists price lists via the Filament table component', function (): v
 
     // Authenticate as an administrator so the resource policies grant table access.
     $admin = User::factory()->create([
-        'email'    => 'admin@example.com',
+        'email'    => 'info@egisstatyba.lt',
         'is_admin' => true,
     ]);
 

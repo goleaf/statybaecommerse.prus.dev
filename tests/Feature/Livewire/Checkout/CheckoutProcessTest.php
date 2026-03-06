@@ -92,7 +92,7 @@ it('allows guests to complete a multi-step checkout with dynamic shipping and pa
     $component
         ->set('billing.first_name', 'Jane')
         ->set('billing.last_name', 'Doe')
-        ->set('billing.email', 'jane@example.test')
+        ->set('billing.email', 'info@egisstatyba.lt')
         ->set('billing.phone', '+3706000000')
         ->set('billing.address', 'Gedimino pr. 1')
         ->set('billing.city', 'Vilnius')
@@ -196,7 +196,7 @@ it('captures translated country information when billing and shipping differ', f
     $component
         ->set('billing.first_name', 'Ieva')
         ->set('billing.last_name', 'Jonaitė')
-        ->set('billing.email', 'ieva@example.test')
+        ->set('billing.email', 'info@egisstatyba.lt')
         ->set('billing.phone', '+3706000001')
         ->set('billing.address', 'Laisvės al. 1')
         ->set('billing.city', 'Kaunas')
@@ -318,7 +318,7 @@ it('surfaces and clears shipping option validation when availability changes', f
     $component
         ->set('billing.first_name', 'Asta')
         ->set('billing.last_name', 'Petrauskienė')
-        ->set('billing.email', 'asta@example.test')
+        ->set('billing.email', 'info@egisstatyba.lt')
         ->set('billing.phone', '+3706000002')
         ->set('billing.address', 'Tilto g. 8')
         ->set('billing.city', 'Vilnius')

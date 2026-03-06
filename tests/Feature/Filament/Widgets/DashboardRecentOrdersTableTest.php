@@ -113,7 +113,7 @@ final class DashboardRecentOrdersTableTest extends TestCase
 
         Gate::define('dashboard.view_tables', fn () => true);
 
-        $customer = User::factory()->create(['name' => 'John Doe', 'email' => 'john@example.com']);
+        $customer = User::factory()->create(['name' => 'John Doe', 'email' => 'info@egisstatyba.lt']);
         $order = Order::factory()->create([
             'user_id' => $customer->id,
             'number'  => 'ORD-123',
@@ -126,7 +126,7 @@ final class DashboardRecentOrdersTableTest extends TestCase
         // Check that order data is displayed
         $component->assertSee('ORD-123');
         $component->assertSee('John Doe');
-        $component->assertSee('john@example.com');
+        $component->assertSee('info@egisstatyba.lt');
     }
 
     public function test_widget_table_has_view_action(): void

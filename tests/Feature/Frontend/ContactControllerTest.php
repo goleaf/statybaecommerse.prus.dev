@@ -30,7 +30,7 @@ final class ContactControllerTest extends TestCase
 
         $payload = [
             'name'         => 'Jonas Petrauskas',
-            'email'        => 'jonas@example.com',
+            'email'        => 'info@egisstatyba.lt',
             'phone'        => '+37061234567',
             'order_number' => 'ORD-2026-0001',
             'subject'      => 'Need project consultation',

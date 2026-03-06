@@ -63,7 +63,7 @@ Done. Claude can now connect to any app.
 
 ### Send Email
 ```
-Email sarah@acme.com - Subject: "Shipped!" Body: "v2.0 is live, let me know if issues"
+Email info@egisstatyba.lt - Subject: "Shipped!" Body: "v2.0 is live, let me know if issues"
 ```
 
 ### Create GitHub Issue

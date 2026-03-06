@@ -56,7 +56,7 @@ beforeEach(function (): void {
 it('unit: suggests formatted addresses', function (): void {
     $user = User::unguarded(fn () => User::create([
         'name'  => 'Jonas',
-        'email' => 'jonas@example.test',
+        'email' => 'info@egisstatyba.lt',
     ]));
 
     Address::unguarded(fn () => Address::create([

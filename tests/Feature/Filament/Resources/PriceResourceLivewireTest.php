@@ -30,7 +30,7 @@ final class PriceResourceLivewireTest extends TestCase
 
         // Create an administrator so the pricing resource is accessible during assertions.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

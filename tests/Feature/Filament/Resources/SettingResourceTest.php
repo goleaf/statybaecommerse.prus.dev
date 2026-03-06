@@ -32,7 +32,7 @@ final class SettingResourceTest extends TestCase
 
         // Provision an administrator account mirroring the default Filament guard configuration.
         $this->admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
 

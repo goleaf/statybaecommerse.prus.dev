@@ -51,7 +51,7 @@ final class ProfileTest extends TestCase
         $user = User::factory()->create([
             'first_name' => 'Jane',
             'last_name'  => 'Doe',
-            'email'      => 'jane@example.com',
+            'email'      => 'info@egisstatyba.lt',
         ]);
 
         if (Schema::hasTable('customers')) {
@@ -68,7 +68,7 @@ final class ProfileTest extends TestCase
         $response = $this->actingAs($user)->put(route('frontend.profile.update'), [
             'first_name'  => 'Alice',
             'last_name'   => 'Smith',
-            'email'       => 'alice@example.com',
+            'email'       => 'info@egisstatyba.lt',
             'phone'       => '+37060000001',
             'address'     => 'New Street 10',
             'postal_code' => '54321',
@@ -81,13 +81,13 @@ final class ProfileTest extends TestCase
         self::assertSame('Alice', $user->first_name);
         self::assertSame('Smith', $user->last_name);
         self::assertSame('Alice Smith', $user->name);
-        self::assertSame('alice@example.com', $user->email);
+        self::assertSame('info@egisstatyba.lt', $user->email);
         self::assertSame('+37060000001', $user->phone);
         self::assertSame('+37060000001', $user->phone_number);
 
         if (Schema::hasTable('customers')) {
             $this->assertDatabaseHas('customers', [
-                'email'       => 'alice@example.com',
+                'email'       => 'info@egisstatyba.lt',
                 'name'        => 'Alice Smith',
                 'postal_code' => '54321',
             ]);
@@ -131,7 +131,7 @@ final class ProfileTest extends TestCase
             'postal_code'    => '01103',
             'country_code'   => 'LT',
             'phone'          => '+37060000002',
-            'email'          => 'jonas@example.com',
+            'email'          => 'info@egisstatyba.lt',
             'is_default'     => true,
             'is_shipping'    => true,
         ];
@@ -201,7 +201,7 @@ final class ProfileTest extends TestCase
             'postal_code'    => '50290',
             'country_code'   => 'LT',
             'phone'          => '+37060000003',
-            'email'          => 'asta@example.com',
+            'email'          => 'info@egisstatyba.lt',
             'is_billing'     => true,
         ];
 

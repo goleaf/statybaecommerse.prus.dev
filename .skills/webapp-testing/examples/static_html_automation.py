@@ -19,7 +19,7 @@ with sync_playwright() as p:
     # Interact with elements
     page.click('text=Click Me')
     page.fill('#name', 'John Doe')
-    page.fill('#email', 'john@example.com')
+    page.fill('#email', 'info@egisstatyba.lt')
 
     # Submit form
     page.click('button[type="submit"]')

@@ -13,7 +13,7 @@ uses(RefreshDatabase::class);
 it('appends a numeric suffix to duplicate emails during import', function () {
     $user = User::factory()->admin()->create();
     User::factory()->create([
-        'email' => 'john@example.com',
+        'email' => 'info@egisstatyba.lt',
     ]);
 
     $import = new Import;
@@ -27,7 +27,7 @@ it('appends a numeric suffix to duplicate emails during import', function () {
     $columns = collect(UserImporter::getColumns())->map->getName()->values();
     $row = $columns->mapWithKeys(fn (string $name) => [$name => ''])->all();
     $row['name'] = 'John Doe';
-    $row['email'] = 'john@example.com';
+    $row['email'] = 'info@egisstatyba.lt';
     $row['password'] = 'Password1!';
     $row['is_active'] = '1';
 
@@ -35,5 +35,5 @@ it('appends a numeric suffix to duplicate emails during import', function () {
 
     (new ImportCsv($import, [$row], $columnMap, []))->handle();
 
-    expect(User::query()->where('email', 'like', 'john-%@example.com')->exists())->toBeTrue();
+    expect(User::query()->where('email', 'like', 'info@egisstatyba.lt')->exists())->toBeTrue();
 });

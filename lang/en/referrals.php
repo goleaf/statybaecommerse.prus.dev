@@ -57,7 +57,7 @@ return [
         'description' => 'Send an invitation and earn rewards together.',
         'fields'      => [
             'referred_email'             => 'Friend\'s email address',
-            'referred_email_placeholder' => 'friend@example.com',
+            'referred_email_placeholder' => 'info@egisstatyba.lt',
             'title'                      => 'Invitation note (optional)',
             'title_placeholder'          => 'Check out this great store!',
             'description'                => 'Personal message (optional)',

@@ -13,7 +13,7 @@ final class CompanySeeder extends BaseSeeder
         $companiesData = [
             [
                 'name'        => 'Statybos Centras UAB',
-                'email'       => 'info@statyboscentras.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 5 234 5678',
                 'address'     => 'Gedimino pr. 1, Vilnius',
                 'website'     => 'https://statyboscentras.lt',
@@ -24,7 +24,7 @@ final class CompanySeeder extends BaseSeeder
             ],
             [
                 'name'        => 'Lietuvos Statybos',
-                'email'       => 'contact@lietuvosstatybos.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 37 123 4567',
                 'address'     => 'Laisvės al. 15, Kaunas',
                 'website'     => 'https://lietuvosstatybos.lt',
@@ -35,7 +35,7 @@ final class CompanySeeder extends BaseSeeder
             ],
             [
                 'name'        => 'Vilniaus Statybos',
-                'email'       => 'info@vilniausstatybos.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 5 345 6789',
                 'address'     => 'Vilniaus g. 25, Vilnius',
                 'website'     => 'https://vilniausstatybos.lt',
@@ -46,7 +46,7 @@ final class CompanySeeder extends BaseSeeder
             ],
             [
                 'name'        => 'Kauno Statybos',
-                'email'       => 'info@kaunostatybos.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 37 234 5678',
                 'address'     => 'Kauno g. 10, Kaunas',
                 'website'     => 'https://kaunostatybos.lt',
@@ -57,7 +57,7 @@ final class CompanySeeder extends BaseSeeder
             ],
             [
                 'name'        => 'Klaipėdos Statybos',
-                'email'       => 'contact@klaipedostatybos.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 46 123 4567',
                 'address'     => 'Tiltų g. 5, Klaipėda',
                 'website'     => 'https://klaipedostatybos.lt',
@@ -68,7 +68,7 @@ final class CompanySeeder extends BaseSeeder
             ],
             [
                 'name'        => 'Panevėžio Statybos',
-                'email'       => 'info@paneveziostatybos.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 45 234 5678',
                 'address'     => 'Respublikos g. 20, Panevėžys',
                 'website'     => 'https://paneveziostatybos.lt',
@@ -79,7 +79,7 @@ final class CompanySeeder extends BaseSeeder
             ],
             [
                 'name'        => 'Šiaulių Statybos',
-                'email'       => 'contact@siauliustatybos.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 41 345 6789',
                 'address'     => 'Vilniaus g. 30, Šiauliai',
                 'website'     => 'https://siauliustatybos.lt',
@@ -90,7 +90,7 @@ final class CompanySeeder extends BaseSeeder
             ],
             [
                 'name'        => 'Alytaus Statybos',
-                'email'       => 'info@alytausstatybos.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 315 12345',
                 'address'     => 'Dainavos g. 12, Alytus',
                 'website'     => 'https://alytausstatybos.lt',
@@ -101,7 +101,7 @@ final class CompanySeeder extends BaseSeeder
             ],
             [
                 'name'        => 'Marijampolės Statybos',
-                'email'       => 'contact@marijampolestatybos.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 343 23456',
                 'address'     => 'Vilniaus g. 8, Marijampolė',
                 'website'     => 'https://marijampolestatybos.lt',
@@ -112,7 +112,7 @@ final class CompanySeeder extends BaseSeeder
             ],
             [
                 'name'        => 'Tauragės Statybos',
-                'email'       => 'info@tauragetatybos.lt',
+                'email'       => 'info@egisstatyba.lt',
                 'phone'       => '+370 446 34567',
                 'address'     => 'Vytauto g. 15, Tauragė',
                 'website'     => 'https://tauragetatybos.lt',

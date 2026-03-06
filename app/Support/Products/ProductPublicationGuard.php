@@ -36,6 +36,12 @@ final class ProductPublicationGuard
             return;
         }
 
+        // Only gate publication when transitioning into a publishable status.
+        // Existing published products must remain editable.
+        if (self::isPublishingStatus($product->status)) {
+            return;
+        }
+
         $selectedSupplierIds = self::normalizeSupplierIds($data['suppliers'] ?? null);
 
         if ($selectedSupplierIds !== []) {

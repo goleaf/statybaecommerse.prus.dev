@@ -34,7 +34,7 @@ final class FormSchemaCorrectnessPropertyTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email'    => 'admin@test.com',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
     }

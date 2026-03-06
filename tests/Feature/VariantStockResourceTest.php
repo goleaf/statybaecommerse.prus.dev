@@ -31,7 +31,7 @@ final class VariantStockResourceTest extends TestCase
 
         // Provision an administrator with super admin access for inventory maintenance flows.
         $this->adminUser = User::factory()->create([
-            'email'    => 'inventory-admin@example.test',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
         $this->adminUser->assignRole('super_admin');

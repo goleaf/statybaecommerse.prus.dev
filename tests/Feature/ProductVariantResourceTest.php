@@ -26,7 +26,7 @@ final class ProductVariantResourceTest extends TestCase
 
         // Create a deterministic administrator endowed with super admin privileges for variant operations.
         $this->adminUser = User::factory()->create([
-            'email'    => 'variant-admin@example.test',
+            'email'    => 'info@egisstatyba.lt',
             'is_admin' => true,
         ]);
     }

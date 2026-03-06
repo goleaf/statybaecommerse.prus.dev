@@ -89,7 +89,7 @@ class OrderFactory extends Factory
             'billing_address'   => [
                 'first_name' => 'Customer',
                 'last_name'  => (string) $sequence,
-                'email'      => sprintf('customer%02d@example.test', $sequence),
+                'email'      => sprintf('info@egisstatyba.lt', $sequence),
                 'phone'      => sprintf('+3706%07d', $sequence % 10000000),
                 'street'     => 'Example Street ' . $sequence,
                 'city'       => $billingCities[$sequence % count($billingCities)],
@@ -99,7 +99,7 @@ class OrderFactory extends Factory
             'shipping_address' => [
                 'first_name' => 'Recipient',
                 'last_name'  => (string) $sequence,
-                'email'      => sprintf('recipient%02d@example.test', $sequence),
+                'email'      => sprintf('info@egisstatyba.lt', $sequence),
                 'phone'      => sprintf('+3706%07d', ($sequence + 5000000) % 10000000),
                 'street'     => 'Warehouse Avenue ' . $sequence,
                 'city'       => $shippingCities[$sequence % count($shippingCities)],

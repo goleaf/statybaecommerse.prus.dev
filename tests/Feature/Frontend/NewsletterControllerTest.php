@@ -15,7 +15,7 @@ final class NewsletterControllerTest extends TestCase
     public function test_it_subscribes_new_email_via_json(): void
     {
         $response = $this->postJson(route('frontend.newsletter.subscribe'), [
-            'email' => 'jane.doe@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         $response->assertOk()->assertJson([
@@ -24,7 +24,7 @@ final class NewsletterControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email'  => 'jane.doe@example.com',
+            'email'  => 'info@egisstatyba.lt',
             'status' => 'active',
         ]);
     }
@@ -43,7 +43,7 @@ final class NewsletterControllerTest extends TestCase
     public function test_it_unsubscribes_existing_subscriber(): void
     {
         $subscriber = Subscriber::factory()->active()->create([
-            'email' => 'john.doe@example.com',
+            'email' => 'info@egisstatyba.lt',
         ]);
 
         $response = $this->postJson(route('frontend.newsletter.unsubscribe'), [

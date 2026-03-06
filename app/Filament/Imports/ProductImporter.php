@@ -1701,9 +1701,17 @@ class ProductImporter extends BaseImporter
             return $supplier;
         }
 
+        $companyCode = Str::upper(Str::slug($name, ''));
+
+        if ($companyCode === '') {
+            $companyCode = 'SUPPLIER';
+        }
+
         return Supplier::query()->create([
-            'name'       => $name,
-            'is_enabled' => true,
+            'name'         => $name,
+            'company_code' => $companyCode,
+            'code'         => Str::slug($name),
+            'is_enabled'   => true,
         ]);
     }
 

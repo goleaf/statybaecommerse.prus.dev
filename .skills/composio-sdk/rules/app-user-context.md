@@ -53,7 +53,7 @@ const userId = `user_${user.id}`; // "user_12345"
 ### Email (Not Recommended)
 
 ```typescript
-const userId = user.email; // "user@example.com"
+const userId = user.email; // "info@egisstatyba.lt"
 ```
 
 **Only use when:**

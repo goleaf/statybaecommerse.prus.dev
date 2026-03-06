@@ -28,7 +28,7 @@ final class ProductVariantStockFilterTest extends TestCase
         app()->setLocale('en');
 
         $this->admin = User::factory()->create([
-            'email'     => 'variant-admin@example.com',
+            'email'     => 'info@egisstatyba.lt',
             'is_admin'  => true,
             'is_active' => true,
         ]);

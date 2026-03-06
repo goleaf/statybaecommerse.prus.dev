@@ -83,7 +83,7 @@ beforeEach(function (): void {
 test('it queues export records and dispatches the processor job', function (): void {
     $userId = DB::table('users')->insertGetId([
         'name'       => 'Queue User',
-        'email'      => 'queue@example.com',
+        'email'      => 'info@egisstatyba.lt',
         'password'   => 'secret',
         'created_at' => now(),
         'updated_at' => now(),
@@ -128,7 +128,7 @@ test('it queues export records and dispatches the processor job', function (): v
 test('it processes queued exports and stores downloadable artifacts', function (): void {
     $userId = DB::table('users')->insertGetId([
         'name'       => 'Process User',
-        'email'      => 'process@example.com',
+        'email'      => 'info@egisstatyba.lt',
         'password'   => 'secret',
         'created_at' => now(),
         'updated_at' => now(),
@@ -177,7 +177,7 @@ test('it processes queued exports and stores downloadable artifacts', function (
 test('it marks exports as failed when processing throws an exception', function (): void {
     $userId = DB::table('users')->insertGetId([
         'name'       => 'Failing User',
-        'email'      => 'failure@example.com',
+        'email'      => 'info@egisstatyba.lt',
         'password'   => 'secret',
         'created_at' => now(),
         'updated_at' => now(),
