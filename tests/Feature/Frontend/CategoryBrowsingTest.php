@@ -75,6 +75,74 @@ final class CategoryBrowsingTest extends TestCase
             });
     }
 
+    public function test_category_show_includes_published_product_counts_for_related_categories(): void
+    {
+        $parent = Category::factory()->create(['name' => 'Drabužiai']);
+        $category = Category::factory()->create([
+            'name'      => 'Pirštinės',
+            'parent_id' => $parent->id,
+        ]);
+        $relatedA = Category::factory()->create([
+            'name'      => 'Marškinėliai',
+            'parent_id' => $parent->id,
+        ]);
+        $relatedB = Category::factory()->create([
+            'name'      => 'Kelnės',
+            'parent_id' => $parent->id,
+        ]);
+        $brand = Brand::factory()->create();
+
+        $firstProduct = $this->createPublishedProduct(['brand_id' => $brand->id]);
+        $firstProduct->categories()->attach($relatedA->id);
+
+        $secondProduct = $this->createPublishedProduct(['brand_id' => $brand->id]);
+        $secondProduct->categories()->attach($relatedB->id);
+
+        $response = $this->get(route('frontend.categories.show', $category));
+
+        $response->assertOk()
+            ->assertViewHas('relatedCategories', function ($relatedCategories) use ($relatedA, $relatedB) {
+                $relatedById = $relatedCategories->keyBy('id');
+
+                return (int) ($relatedById->get($relatedA->id)?->published_products_count ?? 0) > 0
+                    && (int) ($relatedById->get($relatedB->id)?->published_products_count ?? 0) > 0;
+            });
+    }
+
+    public function test_category_show_hides_and_ignores_featured_quick_filter(): void
+    {
+        $category = Category::factory()->create(['name' => 'Hermetikai']);
+        $brand = Brand::factory()->create();
+
+        $featuredProduct = $this->createPublishedProduct([
+            'name'        => 'Teminis hermetikas',
+            'brand_id'    => $brand->id,
+            'is_featured' => true,
+        ]);
+        $featuredProduct->categories()->attach($category->id);
+
+        $regularProduct = $this->createPublishedProduct([
+            'name'        => 'Standartinis hermetikas',
+            'brand_id'    => $brand->id,
+            'is_featured' => false,
+        ]);
+        $regularProduct->categories()->attach($category->id);
+
+        $response = $this->get(route('frontend.categories.show', [
+            'category' => $category,
+            'filter'   => 'featured',
+        ]));
+
+        $response->assertOk()
+            ->assertDontSeeText('Tik rekomenduojamos')
+            ->assertViewHas('availableFilters', fn (array $filters): bool => ! array_key_exists('featured', $filters))
+            ->assertViewHas('activeFilter', fn ($filter): bool => $filter === null)
+            ->assertViewHas('products', function ($paginator) use ($featuredProduct, $regularProduct): bool {
+                return $paginator->contains('id', $featuredProduct->id)
+                    && $paginator->contains('id', $regularProduct->id);
+            });
+    }
+
     private function createPublishedProduct(array $overrides = []): Product
     {
         return Product::factory()->create(array_merge([

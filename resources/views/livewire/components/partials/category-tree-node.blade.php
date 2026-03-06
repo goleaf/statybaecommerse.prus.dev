@@ -2,8 +2,7 @@
 
 @php
     $hasChildren = !empty($category['children']) && count($category['children']) > 0;
-    $categoryUrl = route('localized.categories.show', [
-        'locale' => app()->getLocale(),
+    $categoryUrl = route('frontend.categories.show', [
         'category' => $category['slug']
     ]);
 @endphp
@@ -45,7 +44,7 @@
                 @foreach($category['children'] as $child)
                     @php
                         $childHasChildren = !empty($child['children']) && count($child['children']) > 0;
-                        $childUrl = route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $child['slug']]);
+                        $childUrl = route('frontend.categories.show', ['category' => $child['slug']]);
                     @endphp
                     <div class="popup-item-wrapper level-2-wrapper">
                         <a 
@@ -82,7 +81,7 @@
                                 <div class="popup-list level-3-list">
                                     @foreach($child['children'] as $grandchild)
                                         @php
-                                            $grandchildUrl = route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $grandchild['slug']]);
+                                            $grandchildUrl = route('frontend.categories.show', ['category' => $grandchild['slug']]);
                                         @endphp
                                         <div class="popup-item-wrapper level-3-wrapper">
                                             <a 
@@ -108,3 +107,4 @@
         </div>
     @endif
 @endif
+

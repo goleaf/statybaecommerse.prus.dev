@@ -40,7 +40,7 @@
                     <p class="text-gray-500 mb-6">{{ __('ui.browse_our_product_catalog_to_find_your_perfect_match') }}</p>
                     
                     <a 
-                        href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
+                        href="{{ route('frontend.products.index', []) }}"
                         class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                     >
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,3 +85,5 @@
         </a>
     </div>
 </div>
+
+

@@ -42,7 +42,7 @@ it('unit: has correct model', function (): void {
 
 it('unit: has correct navigation group', function (): void {
     // The resource now lives under the Discounts cluster to mirror Filament navigation.
-    expect(DiscountRedemptionResource::getNavigationGroup())->toBe('Discounts');
+    expect(DiscountRedemptionResource::getNavigationGroup())->toBe(__('messages.discounts'));
 });
 
 it('unit: has correct navigation icon', function (): void {

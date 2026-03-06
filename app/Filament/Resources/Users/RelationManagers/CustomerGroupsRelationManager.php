@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\Users\RelationManagers;
 
 use App\Filament\Resources\CustomerGroups\CustomerGroupResource;
+use App\Filament\Resources\UserResource;
 use App\Models\CustomerGroup;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -160,7 +161,7 @@ class CustomerGroupsRelationManager extends RelationManager
                     ->icon('heroicon-m-plus')
                     ->url(fn (): string => CustomerGroupResource::getUrl('create', [
                         'attach_user_id' => $this->getOwnerRecord()->getKey(),
-                        'redirect'       => request()->fullUrl(),
+                        'redirect'       => $this->resolveOwnerPageRedirectUrl(),
                     ])),
             ])
             ->recordActions([
@@ -168,13 +169,13 @@ class CustomerGroupsRelationManager extends RelationManager
                     ->icon('heroicon-m-eye')
                     ->url(fn (CustomerGroup $record): string => CustomerGroupResource::getUrl('view', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(),
                     ])),
                 Action::make('edit')
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn (CustomerGroup $record): string => CustomerGroupResource::getUrl('edit', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(),
                     ])),
                 DetachAction::make(),
             ])
@@ -243,5 +244,63 @@ class CustomerGroupsRelationManager extends RelationManager
 
         return $normalized !== '' ? str_replace([' ', '-'], '_', $normalized) : $default;
     }
-}
 
+    private function resolveOwnerPageRedirectUrl(): string
+    {
+        foreach ([request()->fullUrl(), request()->headers->get('referer')] as $candidateUrl) {
+            if ($this->isSafeRedirectCandidate($candidateUrl)) {
+                return (string) $candidateUrl;
+            }
+        }
+
+        return $this->buildOwnerRelationUrl();
+    }
+
+    private function isSafeRedirectCandidate(mixed $candidateUrl): bool
+    {
+        if (! is_string($candidateUrl) || trim($candidateUrl) === '') {
+            return false;
+        }
+
+        $requestHost = request()->getHost();
+        $candidateHost = parse_url($candidateUrl, PHP_URL_HOST);
+
+        if (is_string($candidateHost) && $candidateHost !== '' && strcasecmp($candidateHost, $requestHost) !== 0) {
+            return false;
+        }
+
+        $path = parse_url($candidateUrl, PHP_URL_PATH);
+
+        if (! is_string($path) || $path === '') {
+            return false;
+        }
+
+        return ! str_ends_with($path, '/livewire/update');
+    }
+
+    private function buildOwnerRelationUrl(): string
+    {
+        $parameters = [
+            'record' => $this->getOwnerRecord(),
+        ];
+
+        $relationTabKey = self::resolveRelationTabKey();
+
+        if ($relationTabKey !== null) {
+            $parameters['relation'] = $relationTabKey;
+        }
+
+        return UserResource::getUrl('view', $parameters);
+    }
+
+    private static function resolveRelationTabKey(): ?string
+    {
+        $relationKey = array_search(self::class, UserResource::getRelations(), true);
+
+        if ($relationKey === false) {
+            return null;
+        }
+
+        return (string) $relationKey;
+    }
+}

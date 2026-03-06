@@ -1,3 +1,14 @@
+@php
+    $panelProductIds = collect($cartItems ?? [])
+        ->map(static fn ($item): int => (int) (is_array($item) ? ($item['product_id'] ?? $item['productId'] ?? 0) : data_get($item, 'product_id', data_get($item, 'productId', 0))))
+        ->filter(static fn (int $id): bool => $id > 0)
+        ->unique()
+        ->values();
+    $panelProductSlugById = $panelProductIds->isNotEmpty()
+        ? \App\Models\Product::query()->whereIn('id', $panelProductIds->all())->pluck('slug', 'id')
+        : collect();
+@endphp
+
 <div>
     <!-- Cart Toggle Button -->
     <button 
@@ -78,6 +89,15 @@
                                 $variantLabel = collect($variantAttributes)
                                     ->map(static fn ($value, $key) => sprintf('%s: %s', (string) $key, (string) $value))
                                     ->implode(', ');
+                                $productId = (int) ($item['product_id'] ?? $item['productId'] ?? 0);
+                                $productSlug = $productId > 0 ? $panelProductSlugById->get($productId) : null;
+                                $productUrl = is_string($productSlug) && $productSlug !== ''
+                                    ? (\Illuminate\Support\Facades\Route::has('products.show')
+                                        ? route('products.show', ['product' => $productSlug])
+                                        : (\Illuminate\Support\Facades\Route::has('frontend.products.show')
+                                            ? route('frontend.products.show', ['product' => $productSlug])
+                                            : '#'))
+                                    : '#';
                                 $imageUrl = $item['imageUrl'] ?? $item['image_url'] ?? $snapshot['image'] ?? null;
                                 $formattedUnitPrice = \Illuminate\Support\Number::currency($unitPrice, current_currency(), app()->getLocale());
                                 $formattedLineTotal = \Illuminate\Support\Number::currency($lineTotal, current_currency(), app()->getLocale());
@@ -85,17 +105,29 @@
                             <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" wire:key="cart-item-{{ $itemId }}">
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0">
+                                    @if ($productUrl !== '#')
+                                        <a href="{{ $productUrl }}" class="block">
+                                    @endif
                                     <img 
-                                        src="{{ $imageUrl ?: product_placeholder_url('thumb') }}"
+                                        src="{{ $imageUrl ?: asset('images/placeholder-product.jpg') }}"
                                         alt="{{ $itemName }}"
                                         class="w-12 h-12 object-cover rounded-md"
                                     >
+                                    @if ($productUrl !== '#')
+                                        </a>
+                                    @endif
                                 </div>
 
                                 <!-- Product Details -->
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                        {{ $itemName }}
+                                        @if ($productUrl !== '#')
+                                            <a href="{{ $productUrl }}" class="hover:text-blue-600 dark:hover:text-blue-300">
+                                                {{ $itemName }}
+                                            </a>
+                                        @else
+                                            {{ $itemName }}
+                                        @endif
                                     </h4>
                                     @if (! empty($variantLabel))
                                         <p class="text-xs text-gray-500 dark:text-gray-400">
@@ -247,7 +279,7 @@
                             <a
                                 {{-- Use Livewire navigation so the cart drawer preserves state between steps --}}
                                 wire:navigate
-                                href="{{ route('cart.index', app()->getLocale()) }}"
+                                href="{{ route('cart.index') }}"
                                 class="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200 text-center text-sm"
                             >
                                 {{ __('translations.view_cart') }}

@@ -2,6 +2,15 @@
     @php
         $itemsCollection = collect($items ?? [])->map(static fn ($item) => is_array($item) ? (object) $item : $item);
         $totalQuantity = (int) $itemsCollection->sum(static fn ($item) => (int) ($item->quantity ?? 0));
+        $productIds = $itemsCollection
+            ->pluck('product_id')
+            ->filter(static fn ($id): bool => is_numeric($id) && (int) $id > 0)
+            ->map(static fn ($id): int => (int) $id)
+            ->unique()
+            ->values();
+        $productSlugById = $productIds->isNotEmpty()
+            ? \App\Models\Product::query()->whereIn('id', $productIds->all())->pluck('slug', 'id')
+            : collect();
         $cartSubtotal = (float) ($subtotal ?? 0);
         $cartBreakdown = app(\App\Services\Pricing\PriceCalculator::class)->breakdown($cartSubtotal, 0.0, 0.0);
         $taxAmount = (float) ($cartBreakdown->tax ?? 0);
@@ -59,7 +68,7 @@
                         </div>
                         <h2 class="text-xl font-semibold text-gray-900">{{ __('messages.your_cart_is_empty') }}</h2>
                         <p class="mt-2 text-sm text-gray-600">{{ __('messages.start_adding_items_to_your_cart_to_see_them_here') }}</p>
-                        <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}"
+                        <a href="{{ route('home', []) }}"
                            class="mt-6 inline-flex items-center justify-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-semibold text-white transition">
                             {{ __('messages.continue_shopping') }}
                         </a>
@@ -77,12 +86,23 @@
                                     @php
                                         $cartItemId = (int) ($item->id ?? 0);
                                         $productId = (int) ($item->product_id ?? 0);
+                                        $productSlug = $productId > 0 ? $productSlugById->get($productId) : null;
+                                        $productUrl = is_string($productSlug) && $productSlug !== ''
+                                            ? (\Illuminate\Support\Facades\Route::has('products.show')
+                                                ? route('products.show', ['product' => $productSlug])
+                                                : (\Illuminate\Support\Facades\Route::has('frontend.products.show')
+                                                    ? route('frontend.products.show', ['product' => $productSlug])
+                                                    : '#'))
+                                            : '#';
                                         $itemQuantity = (int) ($item->quantity ?? 0);
                                     @endphp
                                     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                                         <div class="flex flex-wrap items-center justify-between gap-5 lg:flex-nowrap">
                                             <div class="flex min-w-0 flex-1 items-center gap-4">
                                                 <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                                                    @if ($productUrl !== '#')
+                                                        <a href="{{ $productUrl }}" class="block h-full w-full">
+                                                    @endif
                                                     @if ($thumb = $this->getItemThumbnail($item))
                                                         <img src="{{ $thumb }}" alt="{{ $item->name }}" class="h-full w-full object-cover" />
                                                     @else
@@ -92,10 +112,21 @@
                                                             </svg>
                                                         </div>
                                                     @endif
+                                                    @if ($productUrl !== '#')
+                                                        </a>
+                                                    @endif
                                                 </div>
 
                                                 <div class="min-w-0">
-                                                    <h3 class="whitespace-normal break-words text-base font-semibold leading-6 text-gray-900">{{ $item->name }}</h3>
+                                                    <h3 class="whitespace-normal break-words text-base font-semibold leading-6 text-gray-900">
+                                                        @if ($productUrl !== '#')
+                                                            <a href="{{ $productUrl }}" class="hover:text-brand-primary">
+                                                                {{ $item->name }}
+                                                            </a>
+                                                        @else
+                                                            {{ $item->name }}
+                                                        @endif
+                                                    </h3>
                                                     <p class="mt-2 text-sm text-gray-600">
                                                         {{ __('messages.unit_price') }}: {{ \Illuminate\Support\Number::currency((float) $item->price, current_currency(), app()->getLocale()) }}
                                                     </p>
@@ -158,7 +189,7 @@
                                     {{ __('translations.proceed_to_checkout') }}
                                 </a>
 
-                                <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}"
+                                <a href="{{ route('home', []) }}"
                                    class="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition">
                                     {{ __('messages.continue_shopping') }}
                                 </a>

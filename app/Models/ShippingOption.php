@@ -133,4 +133,67 @@ final class ShippingOption extends Model
     {
         return $query->orderBy('sort_order')->orderBy('id');
     }
+
+    /**
+     * Determine if the option can be used for the provided cart weight.
+     */
+    public function isEligibleForWeight(float $weight): bool
+    {
+        if ($this->min_weight !== null && $weight < (float) $this->min_weight) {
+            return false;
+        }
+
+        if ($this->max_weight !== null && $weight > (float) $this->max_weight) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if the option can be used for the provided order amount.
+     */
+    public function isEligibleForOrderAmount(float $amount): bool
+    {
+        if ($this->min_order_amount !== null && $amount < (float) $this->min_order_amount) {
+            return false;
+        }
+
+        if ($this->max_order_amount !== null && $amount > (float) $this->max_order_amount) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Resolve shipping price for the provided order context.
+     */
+    public function calculatePriceForOrder(float $weight, float $amount): float
+    {
+        return (float) $this->price;
+    }
+
+    /**
+     * Build a friendly estimated delivery label used by checkout resolvers.
+     */
+    public function getEstimatedDeliveryTextAttribute(): ?string
+    {
+        $min = $this->estimated_days_min;
+        $max = $this->estimated_days_max;
+
+        if ($min === null && $max === null) {
+            return null;
+        }
+
+        if ($min !== null && $max !== null) {
+            if ((int) $min === (int) $max) {
+                return (int) $min . ' day(s)';
+            }
+
+            return (int) $min . '-' . (int) $max . ' day(s)';
+        }
+
+        return (($min !== null ? (int) $min : (int) $max)) . ' day(s)';
+    }
 }

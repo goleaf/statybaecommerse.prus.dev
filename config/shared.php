@@ -34,19 +34,13 @@ return [
 
     'localization' => [
         'default_locale'          => 'lt',
-        'supported_locales'       => ['lt', 'en', 'ru', 'de'],
+        'supported_locales'       => ['lt'],
         'default_currency'        => 'EUR',
         'locale_currency_mapping' => [
             'lt' => 'EUR',
-            'en' => 'EUR',
-            'ru' => 'EUR',
-            'de' => 'EUR',
         ],
         'locale_timezone_mapping' => [
             'lt' => 'Europe/Vilnius',
-            'en' => 'UTC',
-            'ru' => 'Europe/Moscow',
-            'de' => 'Europe/Berlin',
         ],
     ],
 

@@ -54,15 +54,16 @@ final class LanguageSwitcher extends Component
 
             if ($route && ($name = $route->getName()) && str_starts_with($name, 'localized.')) {
                 $parameters = $route->parameters();
-                $parameters['locale'] = $locale;
+                unset($parameters['locale']);
                 $targetUrl = route($name, $parameters, false);
-            } elseif (Route::has('localized.home')) {
-                $targetUrl = route('localized.home', ['locale' => $locale], false);
+            } elseif (Route::has('home')) {
+                $targetUrl = route('home', [], false);
             }
 
-            $links[$locale] = $targetUrl ?? url('/' . ltrim($locale, '/'));
+            $links[$locale] = $targetUrl ?? url('/');
         }
 
         return $links;
     }
 }
+

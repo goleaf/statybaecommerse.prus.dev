@@ -7,6 +7,15 @@
     'layout' => 'grid', // grid, list
 ])
 
+@php
+    $productRouteKey = $product->slug ?? $product;
+    $productUrl = \Illuminate\Support\Facades\Route::has('product.show')
+        ? route('product.show', $productRouteKey)
+        : (\Illuminate\Support\Facades\Route::has('frontend.products.show')
+            ? route('frontend.products.show', ['product' => $productRouteKey])
+            : '#');
+@endphp
+
 <div @class([
     'group relative overflow-hidden bg-white shadow-md ring-1 ring-gray-200 transition-all duration-300 hover:shadow-lg hover:ring-gray-300 dark:bg-gray-800 dark:ring-gray-700 dark:hover:ring-gray-600',
     'rounded-xl' => $layout === 'grid',
@@ -17,29 +26,30 @@
         'aspect-w-1 aspect-h-1 overflow-hidden' => $layout === 'grid',
         'w-48 flex-shrink-0 overflow-hidden' => $layout === 'list',
     ])>
-        @if($product->hasImages())
-            @php $imageAttrs = $product->getResponsiveImageAttributes('md'); @endphp
-            <img 
-                src="{{ $imageAttrs['src'] }}" 
-                srcset="{{ $imageAttrs['srcset'] }}"
-                sizes="{{ $imageAttrs['sizes'] }}"
-                alt="{{ $imageAttrs['alt'] }}"
-                @class([
-                    'h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105' => $layout === 'grid',
-                    'h-full w-full object-cover' => $layout === 'list',
-                ])
-                loading="lazy"
-            />
-        @else
-            <div @class([
-                'flex h-64 items-center justify-center bg-gray-200 dark:bg-gray-700' => $layout === 'grid',
-                'flex h-full items-center justify-center bg-gray-200 dark:bg-gray-700' => $layout === 'list',
-            ])>
-                <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-            </div>
-        @endif
+        <a href="{{ $productUrl }}" class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
+            @if($product->hasImages())
+                @php $imageAttrs = $product->getResponsiveImageAttributes('md'); @endphp
+                <img 
+                    src="{{ $imageAttrs['src'] }}" 
+                    srcset="{{ $imageAttrs['srcset'] }}"
+                    sizes="{{ $imageAttrs['sizes'] }}"
+                    alt="{{ $imageAttrs['alt'] }}"
+                    @class([
+                        'h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105' => $layout === 'grid',
+                        'h-full w-full object-cover' => $layout === 'list',
+                    ])
+                    loading="lazy"
+                />
+            @else
+                <img src="{{ asset('images/placeholder-product.jpg') }}"
+                     alt="{{ $product->name }}"
+                     @class([
+                         'h-64 w-full object-cover transition-transform duration-300 group-hover:scale-105' => $layout === 'grid',
+                         'h-full w-full object-cover' => $layout === 'list',
+                     ])
+                     loading="lazy" />
+            @endif
+        </a>
 
         {{-- Action Buttons Overlay --}}
         @if($showCompare)
@@ -72,7 +82,7 @@
             'text-lg font-medium text-gray-900 dark:text-white line-clamp-2' => $layout === 'grid',
             'text-xl font-medium text-gray-900 dark:text-white' => $layout === 'list',
         ])>
-            <a href="{{ route('product.show', $product->slug ?? $product) }}" 
+            <a href="{{ $productUrl }}" 
                class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
                 {{ $product->name }}
             </a>

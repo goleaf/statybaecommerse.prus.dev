@@ -40,8 +40,7 @@ final class Show extends Component
         if ($canonicalSlug !== $slug) {
             $this->redirect(
                 route('localized.brands.show', [
-                    'locale' => app()->getLocale(),
-                    'slug'   => $canonicalSlug,
+                    'slug' => $canonicalSlug,
                 ]),
                 301
             );

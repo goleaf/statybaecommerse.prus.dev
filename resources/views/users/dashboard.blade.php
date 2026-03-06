@@ -131,7 +131,7 @@
                                 <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('users.no_orders') }}</h3>
                                 <p class="mt-1 text-sm text-gray-500">{{ __('users.no_orders_description') }}</p>
                                 <div class="mt-6">
-                                    <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                    <a href="{{ route('frontend.products.index', []) }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                                         {{ __('users.start_shopping') }}
                                     </a>
                                 </div>
@@ -237,3 +237,5 @@
         </div>
     </div>
 </div>
+
+

@@ -2,6 +2,15 @@
     @php
         $itemsCollection = collect($items ?? []);
         $itemCount = (int) data_get($summary ?? [], 'item_count', $itemsCollection->sum(fn (array $item): int => (int) data_get($item, 'quantity', 0)));
+        $productIds = $itemsCollection
+            ->pluck('product_id')
+            ->filter(static fn ($id): bool => is_numeric($id) && (int) $id > 0)
+            ->map(static fn ($id): int => (int) $id)
+            ->unique()
+            ->values();
+        $productSlugById = $productIds->isNotEmpty()
+            ? \App\Models\Product::query()->whereIn('id', $productIds->all())->pluck('slug', 'id')
+            : collect();
 
         $orderSummaryItems = $itemsCollection
             ->map(static function (array $item): array {
@@ -45,7 +54,7 @@
                             <h2 class="text-xl font-semibold text-gray-900">{{ __('messages.your_cart_is_empty') }}</h2>
                             <p class="mt-2 text-sm text-gray-600">{{ __('frontend.cart.empty_description') }}</p>
                             <a
-                                href="{{ \Illuminate\Support\Facades\Route::has('localized.products.index') ? route('localized.products.index', ['locale' => app()->getLocale()]) : route('frontend.products.index') }}"
+                                href="{{ \Illuminate\Support\Facades\Route::has('frontend.products.index') ? route('frontend.products.index', []) : route('frontend.products.index') }}"
                                 class="mt-6 inline-flex items-center justify-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary/90"
                             >
                                 {{ __('frontend.cart.continue_shopping') }}
@@ -56,6 +65,15 @@
                             @foreach ($itemsCollection as $item)
                                 @php
                                     $productName = (string) data_get($item, 'name', __('ui.unknown_product'));
+                                    $productId = (int) data_get($item, 'product_id', 0);
+                                    $productSlug = $productId > 0 ? $productSlugById->get($productId) : null;
+                                    $productUrl = is_string($productSlug) && $productSlug !== ''
+                                        ? (\Illuminate\Support\Facades\Route::has('products.show')
+                                            ? route('products.show', ['product' => $productSlug])
+                                            : (\Illuminate\Support\Facades\Route::has('frontend.products.show')
+                                                ? route('frontend.products.show', ['product' => $productSlug])
+                                                : '#'))
+                                        : '#';
                                     $unitPrice = (float) data_get($item, 'price', 0);
                                     $quantity = (int) data_get($item, 'quantity', 0);
                                     $lineTotal = (float) data_get($item, 'total', $unitPrice * $quantity);
@@ -66,6 +84,9 @@
                                     <div class="flex flex-wrap items-center gap-4 md:flex-nowrap md:justify-between">
                                         <div class="flex min-w-0 items-center gap-4">
                                             <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
+                                                @if ($productUrl !== '#')
+                                                    <a href="{{ $productUrl }}" class="block h-full w-full">
+                                                @endif
                                                 @if (is_string($imageUrl) && $imageUrl !== '')
                                                     <img src="{{ $imageUrl }}" alt="{{ $productName }}" class="h-full w-full object-cover" loading="lazy" />
                                                 @else
@@ -75,10 +96,21 @@
                                                         </svg>
                                                     </div>
                                                 @endif
+                                                @if ($productUrl !== '#')
+                                                    </a>
+                                                @endif
                                             </div>
 
                                             <div class="min-w-0">
-                                                <h3 class="whitespace-normal break-words text-base font-semibold text-gray-900">{{ $productName }}</h3>
+                                                <h3 class="whitespace-normal break-words text-base font-semibold text-gray-900">
+                                                    @if ($productUrl !== '#')
+                                                        <a href="{{ $productUrl }}" class="hover:text-brand-primary">
+                                                            {{ $productName }}
+                                                        </a>
+                                                    @else
+                                                        {{ $productName }}
+                                                    @endif
+                                                </h3>
                                                 <p class="mt-1 text-sm text-gray-600">
                                                     {{ __('frontend.cart.unit_price', ['price' => app_money_format($unitPrice)]) }}
                                                 </p>
@@ -116,7 +148,7 @@
                             </a>
 
                             <a
-                                href="{{ \Illuminate\Support\Facades\Route::has('localized.products.index') ? route('localized.products.index', ['locale' => app()->getLocale()]) : route('frontend.products.index') }}"
+                                href="{{ \Illuminate\Support\Facades\Route::has('frontend.products.index') ? route('frontend.products.index', []) : route('frontend.products.index') }}"
                                 class="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
                             >
                                 {{ __('frontend.cart.continue_shopping') }}

@@ -93,12 +93,13 @@ final class Locales
 
         if ($route && ($name = $route->getName()) && str_starts_with($name, 'localized.')) {
             $parameters = $route->parameters();
-            $parameters['locale'] = $locale;
+            unset($parameters['locale']);
             $targetUrl = route($name, $parameters, true);
-        } elseif (Route::has('localized.home')) {
-            $targetUrl = route('localized.home', ['locale' => $locale], true);
+        } elseif (Route::has('home')) {
+            $targetUrl = route('home', [], true);
         }
 
-        return $targetUrl ?? url('/' . ltrim($locale, '/'));
+        return $targetUrl ?? url('/');
     }
 }
+

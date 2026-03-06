@@ -45,7 +45,7 @@ return [
         'referred_user'                         => 'Приглашенный пользователь',
         'role'                                  => 'Роль',
         'similar_product'                       => 'Похожий товар',
-        'size_type'                             => 'Тип размера',
+        'size_type'                             => 'Вариант размера',
         'sku'                                   => 'SKU',
         'standard_invoice_template_for_billing' => 'Стандартный шаблон счета для оплаты',
         'stock_status'                          => 'Статус остатков',

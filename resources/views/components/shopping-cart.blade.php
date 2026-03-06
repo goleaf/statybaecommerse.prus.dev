@@ -32,9 +32,11 @@
                                 <div class="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden">
                                     {{-- Determine the most relevant media URL while supporting historic payloads. --}}
                                     @php($image = $item['main_image'] ?? $item['thumbnail'] ?? ($item['image'] ?? null))
-                                    <img src="{{ $image ?? product_placeholder_url('medium') }}"
-                                         alt="{{ $item['name'] }}"
-                                         class="w-full h-full object-cover">
+                                    <a href="{{ $item['url'] ?? '#' }}" class="block h-full w-full">
+                                        <img src="{{ $image ?? asset('images/placeholder-product.jpg') }}"
+                                             alt="{{ $item['name'] }}"
+                                             class="w-full h-full object-cover">
+                                    </a>
                                 </div>
                             </div>
                         @endif
@@ -196,7 +198,7 @@
                     {{ __('ui.proceed_to_checkout') }}
                 </a>
 
-                <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
+                <a href="{{ route('frontend.products.index', []) }}"
                    class="w-full border-2 border-gray-300 text-gray-700 py-3 rounded-xl font-semibold text-center block hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
                     {{ __('messages.continue_shopping') }}
                 </a>
@@ -217,12 +219,12 @@
             </p>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                <a href="{{ route('products.index', []) ?? '/products' }}"
                    class="btn-gradient px-8 py-3 rounded-xl font-semibold">
                     {{ __('messages.start_shopping') }}
                 </a>
 
-                <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                <a href="{{ route('frontend.categories.index', []) }}"
                    class="border-2 border-gray-300 text-gray-700 px-8 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
                     {{ __('ui.browse_categories') }}
                 </a>
@@ -329,3 +331,5 @@
         }
     }
 </script>
+
+

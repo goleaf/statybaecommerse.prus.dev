@@ -1,8 +1,12 @@
 @php
     $cookieName = config('privacy.consent.cookie_name', 'statybae_cookie_consent');
     $lifetimeDays = (int) config('privacy.consent.cookie_lifetime_days', 365);
-    $privacyRoute = \Illuminate\Support\Facades\Route::has('frontend.legal.privacy') ? route('frontend.legal.privacy') : url('/legal/privacy');
-    $cookieRoute = \Illuminate\Support\Facades\Route::has('frontend.legal.cookies') ? route('frontend.legal.cookies') : url('/legal/cookies');
+    $privacyRoute = \Illuminate\Support\Facades\Route::has('localized.legal.privacy')
+        ? route('localized.legal.privacy')
+        : url('/legal/privacy');
+    $cookieRoute = \Illuminate\Support\Facades\Route::has('localized.legal.cookies')
+        ? route('localized.legal.cookies')
+        : url('/legal/cookies');
 @endphp
 
 <div id="cookie-consent-banner"

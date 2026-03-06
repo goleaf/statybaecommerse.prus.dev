@@ -15,21 +15,21 @@
     {{-- Dark Banner Section --}}
     <div class="bg-dark text-sage">
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
-            <nav class="mb-8 text-sm text-sage/80" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
+            <nav class="mb-8 text-sm text-white" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                 <ol class="flex flex-wrap items-center gap-2">
                     <li>
-                        <a href="{{ route('home') }}" class="text-sage/80 hover:text-sage transition-colors">
+                        <a href="{{ route('home') }}" class="text-white hover:text-white transition-colors">
                             {{ __('nav.home') }}
                         </a>
                     </li>
-                    <li class="text-sage/80">/</li>
+                    <li class="text-white">/</li>
                     <li>
-                        <a href="{{ route('frontend.brands.index') }}" class="text-sage/80 hover:text-sage transition-colors">
+                        <a href="{{ route('frontend.brands.index') }}" class="text-white hover:text-white transition-colors">
                             {{ __('messages.brands') }}
                         </a>
                     </li>
-                    <li class="text-sage/80">/</li>
-                    <li class="text-sage/80">{{ $brandName }}</li>
+                    <li class="text-white">/</li>
+                    <li class="text-white">{{ $brandName }}</li>
                 </ol>
             </nav>
 
@@ -193,6 +193,12 @@
                     </div>
                 @endforeach
             </div>
+
+            @if ($products->hasPages())
+                <div class="mt-12 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                    {{ $products->onEachSide(1)->links('pagination::tailwind') }}
+                </div>
+            @endif
         @elseif($fallbackSections->isNotEmpty())
             <div class="space-y-10 mb-8">
                 @foreach ($fallbackSections as $section)

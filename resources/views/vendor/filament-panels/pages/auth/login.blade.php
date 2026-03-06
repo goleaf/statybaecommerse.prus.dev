@@ -1,4 +1,4 @@
-<x-filament-panels::page.simple>
+<x-filament-panels::page.simple heading="">
     @if (filament()->hasRegistration())
         <x-slot name="subheading">
             {{ __('ui.filament_panels_pages_auth_login_actions_register_before') }}

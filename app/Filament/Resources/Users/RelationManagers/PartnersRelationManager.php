@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\RelationManagers\Concerns\ResolvesOwnerPageRedirect;
 use App\Filament\Resources\Partners\PartnerResource;
-use App\Models\PartnerTier;
+use App\Filament\Resources\UserResource;
 use App\Models\Partner;
+use App\Models\PartnerTier;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DetachAction;
@@ -24,6 +26,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PartnersRelationManager extends RelationManager
 {
+    use ResolvesOwnerPageRedirect;
+
     protected static string $relationship = 'partners';
 
     public function form(Schema $schema): Schema
@@ -118,7 +122,7 @@ class PartnersRelationManager extends RelationManager
                     ->icon('heroicon-m-plus')
                     ->url(fn (): string => PartnerResource::getUrl('create', [
                         'attach_user_id' => $this->getOwnerRecord()->getKey(),
-                        'redirect'       => request()->fullUrl(),
+                        'redirect'       => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
             ])
             ->recordActions([
@@ -126,13 +130,13 @@ class PartnersRelationManager extends RelationManager
                     ->icon('heroicon-m-eye')
                     ->url(fn (Partner $record): string => PartnerResource::getUrl('view', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 Action::make('edit')
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn (Partner $record): string => PartnerResource::getUrl('edit', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 DetachAction::make(),
             ])
@@ -143,4 +147,3 @@ class PartnersRelationManager extends RelationManager
             ]);
     }
 }
-

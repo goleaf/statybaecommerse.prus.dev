@@ -1,17 +1,17 @@
 @php
     $locale = app()->getLocale();
-    $homeUrl = route('localized.home', ['locale' => $locale]) ?? url('/');
+    $homeUrl = route('home', []) ?? url('/');
     $cartUrl = \Illuminate\Support\Facades\Route::has('cart.index')
-        ? route('cart.index', ['locale' => $locale])
+        ? route('cart.index', [])
         : url('/cart');
     $ordersUrl = \Illuminate\Support\Facades\Route::has('orders.index')
-        ? route('orders.index', ['locale' => $locale])
+        ? route('orders.index', [])
         : url('/orders');
     $supportUrl = \Illuminate\Support\Facades\Route::has('localized.support.index')
-        ? route('localized.support.index', ['locale' => $locale])
+        ? route('localized.support.index', [])
         : url('/support');
     $productsUrl = \Illuminate\Support\Facades\Route::has('products.index')
-        ? route('products.index', ['locale' => $locale])
+        ? route('products.index', [])
         : url('/products');
 @endphp
 
@@ -50,3 +50,5 @@
         ],
     ],
 ])
+
+

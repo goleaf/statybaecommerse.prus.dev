@@ -11,7 +11,7 @@
             <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('messages.brands') }}">
                 <ol class="flex items-center gap-3">
                     <li>
-                        <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}"
+                        <a href="{{ route('home', []) }}"
                            class="inline-flex items-center gap-2 text-sage transition hover:text-white">
                             <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
@@ -172,7 +172,7 @@
                                         @endif
 
                                         <div class="flex items-center justify-center">
-                                            <a href="{{ route('localized.brands.show', ['locale' => app()->getLocale(), 'slug' => $brand->slug ?? '']) }}"
+                                            <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}"
                                                class="inline-flex items-center gap-2 rounded-full bg-sage px-4 py-2 text-sm font-semibold text-dark transition hover:bg-sage/90">
                                                 {{ __('messages.brands_index_visit_brand') }}
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -240,7 +240,7 @@
                             description="{{ __('messages.brands_index_empty_description') }}"
                             icon="heroicon-o-archive-box"
                             :action-text="__('messages.brands_index_reset_filters')"
-                            :action-url="route('localized.brands.index', ['locale' => app()->getLocale()])"
+                            :action-url="route('frontend.brands.index', [])"
                     />
                 @endif
             </div>
@@ -295,3 +295,5 @@
         </div>
     @endif
 </div>
+
+

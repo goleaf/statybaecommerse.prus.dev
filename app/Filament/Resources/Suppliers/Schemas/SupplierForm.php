@@ -31,17 +31,6 @@ final class SupplierForm
                             ->label(__('messages.name'))
                             ->required()
                             ->maxLength(255),
-                        TextInput::make('code')
-                            ->label(__('messages.code'))
-                            ->placeholder(__('admin.suppliers.code_placeholder'))
-                            ->helperText(__('admin.suppliers.code_help'))
-                            ->unique(ignoreRecord: true)
-                            ->maxLength(255)
-                            ->dehydrateStateUsing(static function (mixed $state): ?string {
-                                $value = is_string($state) ? trim($state) : '';
-
-                                return $value !== '' ? $value : null;
-                            }),
                     ])
                     ->columns(2)
                     ->columnSpanFull(),

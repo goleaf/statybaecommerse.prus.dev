@@ -42,8 +42,10 @@
                 emptyStateTitle="{{ __('messages.no_products_found') }}"
                 emptyStateDescription="{{ __('messages.try_adjusting_your_search_or_filter_criteria') }}"
                 emptyStateAction="{{ __('messages.browse_categories') }}"
-                emptyStateActionUrl="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                emptyStateActionUrl="{{ route('frontend.categories.index', []) }}"
             />
         </x-shared.sidebar-layout>
     </x-container>
 </div>
+
+

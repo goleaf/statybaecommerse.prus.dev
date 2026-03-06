@@ -84,7 +84,7 @@ class Show extends Component
         $canonical = $this->collection->translations()->where('locale', $locale)->value('slug') ?: $this->collection->slug;
 
         if ($canonical && $canonical !== $this->slug) {
-            redirect()->to(route('localized.collections.show', ['locale' => $locale, 'collection' => $canonical]), 301)->send();
+            redirect()->to(route('frontend.collections.show', ['collection' => $canonical]), 301)->send();
             exit;
         }
     }
@@ -351,8 +351,7 @@ class Show extends Component
                     'name' => (string) ($brand->trans('name', $locale) ?? $brand->name ?? ''),
                     'slug' => (string) $slug,
                     'url'  => route('localized.brands.show', [
-                        'locale' => $locale,
-                        'brand'  => $slug,
+                        'slug' => $slug,
                     ]),
                 ];
             })
@@ -704,3 +703,4 @@ class Show extends Component
         return in_array($operator, ['less_than', 'greater_than', 'equals_to', 'not_equals_to'], true);
     }
 }
+

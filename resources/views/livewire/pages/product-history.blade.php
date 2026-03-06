@@ -67,16 +67,16 @@
                 $perPageOptions = [10, 20, 50, 100];
                 $hasHistory = $history->count() > 0;
             @endphp
+            @php($productShowUrl = route('frontend.products.show', ['product' => $product->trans('slug') ?? $product->slug]))
 
             <x-breadcrumbs :items="[
                 [
                     'label' => __('messages.frontend'),
-                    'url' => route('localized.products.index', ['locale' => app()->getLocale()]),
+                    'url' => route('frontend.products.index', []),
                 ],
                 [
                     'label' => $product->trans('name') ?? $product->name,
-                    'url' => route('localized.products.show', [
-                        'locale' => app()->getLocale(),
+                    'url' => route('frontend.products.show', [
                         'product' => $product->trans('slug') ?? $product->slug,
                     ]),
                 ],
@@ -87,13 +87,15 @@
                 <div class="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
                     <div class="flex flex-1 items-start gap-4">
                         @if($product->getMainImage())
-                            <img src="{{ $product->getMainImage() }}"
-                                 alt="{{ $product->trans('name') ?? $product->name }}"
-                                 class="h-20 w-20 flex-none rounded-2xl object-cover shadow-sm" />
+                            <a href="{{ $productShowUrl }}" class="block">
+                                <img src="{{ $product->getMainImage() }}"
+                                     alt="{{ $product->trans('name') ?? $product->name }}"
+                                     class="h-20 w-20 flex-none rounded-2xl object-cover shadow-sm" />
+                            </a>
                         @else
-                            <span class="flex h-20 w-20 flex-none items-center justify-center rounded-2xl bg-slate-100 text-slate-400 shadow-inner">
+                            <a href="{{ $productShowUrl }}" class="flex h-20 w-20 flex-none items-center justify-center rounded-2xl bg-slate-100 text-slate-400 shadow-inner">
                                 <x-heroicon-o-cube class="h-8 w-8" />
-                            </span>
+                            </a>
                         @endif
 
                         <div class="space-y-4">
@@ -132,10 +134,7 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('localized.products.show', [
-                        'locale' => app()->getLocale(),
-                        'product' => $product->trans('slug') ?? $product->slug,
-                    ]) }}"
+                    <a href="{{ $productShowUrl }}"
                        class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         <x-heroicon-s-arrow-left class="h-4 w-4" />
                         {{ __('frontend.buttons.back_to_product') }}
@@ -356,10 +355,7 @@
                     <div class="mt-10 flex flex-col items-center gap-6">
                         {{ $history->links() }}
 
-                        <a href="{{ route('localized.products.show', [
-                            'locale' => app()->getLocale(),
-                            'product' => $product->trans('slug') ?? $product->slug,
-                        ]) }}"
+                        <a href="{{ $productShowUrl }}"
                            class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                             <x-heroicon-s-arrow-left class="h-4 w-4" />
                             {{ __('frontend.buttons.back_to_product') }}
@@ -375,10 +371,7 @@
                             {{ __('frontend.products.no_history_description') }}
                         </p>
                         <div class="mt-6">
-                            <a href="{{ route('localized.products.show', [
-                                'locale' => app()->getLocale(),
-                                'product' => $product->trans('slug') ?? $product->slug,
-                            ]) }}"
+                            <a href="{{ $productShowUrl }}"
                                class="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                 <x-heroicon-s-arrow-left class="h-4 w-4" />
                                 {{ __('frontend.buttons.back_to_product') }}
@@ -390,4 +383,3 @@
         </x-container>
     </div>
 </div>
-

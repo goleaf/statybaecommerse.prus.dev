@@ -29,12 +29,12 @@
             if ($route && ($name = $route->getName()) && str_starts_with($name, 'localized.')) {
                 foreach ((array) config('app.supported_locales') as $locale) {
                     $parameters = $route->parameters();
-                    $parameters['locale'] = $locale;
+                    unset($parameters['locale']);
                     $alternateUrls[$locale] = route($name, $parameters, true);
                 }
             } else {
                 foreach ((array) config('app.supported_locales') as $locale) {
-                    $alternateUrls[$locale] = url('/' . ltrim($locale, '/'));
+                    $alternateUrls[$locale] = url('/');
                 }
             }
         @endphp
@@ -44,7 +44,10 @@
     @endif
 
     {{-- Favicon --}}
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -78,10 +81,10 @@
     @stack('head')
 </head>
 
-<body class="h-full bg-gray-50 dark:bg-gray-900 font-sans antialiased">
+<body class="h-full bg-slate-50 font-sans antialiased">
     {{-- Skip to content link for accessibility --}}
     <a href="#main-content"
-       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50">
+       class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-cyan-600 text-white px-4 py-2 rounded-md z-50">
         {{ __('messages.skip_to_results') }}
     </a>
 

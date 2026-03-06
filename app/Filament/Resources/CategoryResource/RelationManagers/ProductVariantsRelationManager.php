@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
+use App\Filament\Concerns\ResolvesVariantImageUrl;
 use App\Filament\Resources\ProductVariantResource;
 use App\Models\ProductVariant;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductVariantsRelationManager extends RelationManager
 {
+    use ResolvesVariantImageUrl;
+
     protected static string $relationship = 'variants';
 
     protected static ?string $recordTitleAttribute = 'sku';
@@ -26,8 +31,15 @@ class ProductVariantsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query
+                ->with(['media', 'product.primaryImage']))
             ->recordUrl(fn (ProductVariant $record): string => ProductVariantResource::getUrl('edit', ['record' => $record]))
             ->columns([
+                ImageColumn::make('variant_image')
+                    ->label(__('messages.image'))
+                    ->disk('public')
+                    ->getStateUsing(static fn (ProductVariant $record): ?string => self::resolveVariantImageUrl($record))
+                    ->circular(),
                 TextColumn::make('sku')
                     ->label(__('messages.sku'))
                     ->searchable()

@@ -40,7 +40,7 @@ final class Canonical extends Component
         }
 
         $rest = trim(implode('/', $parts), '/');
-        $canonical = $rest === '' ? url('/' . app()->getLocale()) : url('/' . app()->getLocale() . '/' . $rest);
+        $canonical = $rest === '' ? url('/') : url('/' . $rest);
 
         return $canonical . $query;
     }

@@ -76,7 +76,10 @@
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600&display=swap" rel="stylesheet" />
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Scripts -->
     @php
@@ -143,7 +146,7 @@
     @stack('head')
 </head>
 
-<body class="font-sans antialiased h-full bg-gray-50">
+<body class="h-full bg-slate-50 font-sans antialiased">
     <div class="min-h-full">
         <!-- Header -->
         <x-layouts.header />

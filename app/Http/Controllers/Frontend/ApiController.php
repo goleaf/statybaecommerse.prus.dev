@@ -37,7 +37,7 @@ final class ApiController extends Controller
                         ->orWhere('description', 'like', $likeQuery);
                 });
             })
-            ->with('media')
+            ->with(['media', 'images'])
             ->limit($limit)
             ->get(['id', 'name', 'slug', 'price'])
             ->map(static fn (Product $product): array => self::mapProductPayload($product))
@@ -96,7 +96,7 @@ final class ApiController extends Controller
         // Recently viewed should honour session ordering even for unpublished catalog entries during tests.
         $products = Product::withoutGlobalScopes()
             ->whereIn('id', $orderedIds)
-            ->with('media')
+            ->with(['media', 'images'])
             ->get(['id', 'name', 'slug', 'price', 'status', 'published_at', 'is_enabled'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
                 $position = array_search((int) $product->getKey(), $orderedIds, true);
@@ -175,8 +175,11 @@ final class ApiController extends Controller
             ->all();
 
         $primaryImage = $images[0] ?? null;
-        $primaryUrl = $primaryImage['url'] ?? $product->getImageUrl('preview') ?? $product->main_image;
-        $thumbUrl = $primaryImage['thumbnail'] ?? $product->getImageUrl('thumb') ?? $product->thumbnail;
+        $featuredUrl = $product->getImageUrl('preview') ?? $product->main_image;
+        $featuredThumb = $product->getImageUrl('thumb') ?? $product->thumbnail ?? $featuredUrl;
+
+        $primaryUrl = $featuredUrl ?? ($primaryImage['url'] ?? null);
+        $thumbUrl = $featuredThumb ?? ($primaryImage['thumbnail'] ?? $primaryUrl);
 
         return [
             'id'         => $product->getKey(),

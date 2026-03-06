@@ -16,7 +16,7 @@ final class DashboardTest extends UnitTestCase
     public function test_dashboard_has_correct_title(): void
     {
         $dashboard = new Dashboard;
-        $this->assertEquals(__('messages.admin'), $dashboard->getTitle());
+        $this->assertEquals(__('admin.navigation.dashboard'), $dashboard->getTitle());
     }
 
     public function test_dashboard_has_widgets(): void

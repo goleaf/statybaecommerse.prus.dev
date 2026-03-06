@@ -53,8 +53,8 @@ final class SEOService
         // back to the legacy non-localised routes if the new ones are not
         // registered (e.g. during certain test scenarios).
         $canonical = self::resolveCanonicalUrl(
-            'localized.products.show',
-            ['locale' => $locale, 'product' => $slug],
+            'frontend.products.show',
+            ['product' => $slug],
             ['products.show', ['product' => $slug]],
             ['product.show', $slug]
         );
@@ -103,8 +103,8 @@ final class SEOService
             ? $category->slug
             : Str::slug((string) $category->name);
         $canonical = self::resolveCanonicalUrl(
-            'localized.categories.show',
-            ['locale' => $locale, 'category' => $slug],
+            'frontend.categories.show',
+            ['category' => $slug],
             ['categories.show', ['category' => $slug]]
         );
 
@@ -142,7 +142,7 @@ final class SEOService
             : Str::slug((string) $brand->name);
         $canonical = self::resolveCanonicalUrl(
             'localized.brands.show',
-            ['locale' => $locale, 'slug' => $slug],
+            ['slug' => $slug],
             ['brands.show', $slug]
         );
 
@@ -341,3 +341,4 @@ final class SEOService
         return is_string($value) ? $value : '';
     }
 }
+

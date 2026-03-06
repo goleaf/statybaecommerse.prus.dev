@@ -8,6 +8,9 @@ return [
         'published_at'   => 'Опубликовано',
         'stock_quantity' => 'Количество на складе',
     ],
+    'attributes' => [
+        'size_type' => 'Вариант размера',
+    ],
     'in_stock' => 'В наличии',
     'labels'   => [
         'unnamed_variant' => 'Вариант без названия',

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\ProductVariantResource\Pages;
 
 use App\Filament\Resources\ProductVariantResource;
+use App\Filament\Resources\ProductVariantResource\RelationManagers\AttributesRelationManager;
 use App\Models\ProductVariant;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,14 @@ class CreateProductVariants extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        if (! is_numeric($data['product_id'] ?? null)) {
+            $requestedProductId = request()->integer('product_id');
+
+            if ($requestedProductId > 0) {
+                $data['product_id'] = $requestedProductId;
+            }
+        }
+
         $table = (new ProductVariant)->getTable();
 
         if (! Schema::hasTable($table)) {
@@ -87,5 +96,37 @@ class CreateProductVariants extends CreateRecord
 
             throw $exception;
         }
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        $parameters = [
+            'record' => $this->getRecord(),
+        ];
+
+        $redirectUrl = request()->query('redirect');
+
+        if (is_string($redirectUrl) && $redirectUrl !== '') {
+            $parameters['redirect'] = $redirectUrl;
+        }
+
+        $relationTabKey = $this->resolveAttributesRelationTabKey();
+
+        if ($relationTabKey !== null) {
+            $parameters['relation'] = $relationTabKey;
+        }
+
+        return ProductVariantResource::getUrl('edit', $parameters);
+    }
+
+    private function resolveAttributesRelationTabKey(): ?string
+    {
+        $relationKey = array_search(AttributesRelationManager::class, ProductVariantResource::getRelations(), true);
+
+        if ($relationKey === false) {
+            return null;
+        }
+
+        return (string) $relationKey;
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Support\SearchQuerySanitizer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -18,14 +19,29 @@ final class SearchController extends Controller
     /**
      * Display search results.
      */
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
         // Normalise the raw query and category identifier before constructing
         // any database constraints so we never interpolate untrusted input into
         // LIKE clauses or relation filters.
         $query = SearchQuerySanitizer::sanitize($request->get('q', ''));
         $categoryInput = $request->get('category');
-        $selectedCategory = is_numeric($categoryInput) ? (int) $categoryInput : null;
+        $selectedCategoryModel = $this->resolveCategory($categoryInput);
+        $selectedCategory = $selectedCategoryModel?->getTranslatedSlug() ?: $selectedCategoryModel?->slug;
+
+        if (is_scalar($categoryInput)) {
+            $rawCategory = trim((string) $categoryInput);
+
+            if (
+                $rawCategory !== ''
+                && ctype_digit($rawCategory)
+                && is_string($selectedCategory)
+                && $selectedCategory !== ''
+                && $selectedCategory !== $rawCategory
+            ) {
+                return redirect()->to($request->fullUrlWithQuery(['category' => $selectedCategory]), 301);
+            }
+        }
 
         $products = collect();
 
@@ -35,12 +51,11 @@ final class SearchController extends Controller
             $products = Product::query()
                 ->enabled()
                 ->published()
-                ->when($selectedCategory !== null, function (Builder $builder) use ($selectedCategory): Builder {
-                    // Guard the category relationship filter by using the
-                    // already sanitised integer so the ORM never receives raw
-                    // request values.
-                    return $builder->whereHas('categories', static function (Builder $q) use ($selectedCategory): void {
-                        $q->where('categories.id', $selectedCategory);
+                ->when($selectedCategoryModel !== null, function (Builder $builder) use ($selectedCategoryModel): Builder {
+                    // Guard the category relationship filter by resolving the
+                    // category model before constraining the relationship.
+                    return $builder->whereHas('categories', static function (Builder $q) use ($selectedCategoryModel): void {
+                        $q->where('categories.id', $selectedCategoryModel->getKey());
                     });
                 })
                 ->where(static function (Builder $q) use ($likePattern): void {
@@ -54,7 +69,7 @@ final class SearchController extends Controller
                 ->paginate(20)
                 ->appends(array_filter([
                     'q'        => $query !== '' ? $query : null,
-                    'category' => $selectedCategory,
+                    'category' => is_string($selectedCategory) && $selectedCategory !== '' ? $selectedCategory : null,
                 ], static fn ($value) => $value !== null && $value !== ''))
                 ->withPath(route('frontend.search.index'));
         }
@@ -67,6 +82,29 @@ final class SearchController extends Controller
             'categories'       => $categories,
             'selectedCategory' => $selectedCategory,
         ]);
+    }
+
+    private function resolveCategory(mixed $categoryInput): ?Category
+    {
+        if (! is_scalar($categoryInput)) {
+            return null;
+        }
+
+        $categoryValue = trim((string) $categoryInput);
+        if ($categoryValue === '') {
+            return null;
+        }
+
+        if (ctype_digit($categoryValue)) {
+            return Category::query()->find((int) $categoryValue);
+        }
+
+        return Category::query()
+            ->where('slug', $categoryValue)
+            ->orWhereHas('translations', static function (Builder $query) use ($categoryValue): void {
+                $query->where('slug', $categoryValue);
+            })
+            ->first();
     }
 
     /**

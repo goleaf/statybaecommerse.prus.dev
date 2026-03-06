@@ -223,7 +223,7 @@
                    class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200">
                     {{ __('translations.computed_properties') }}
                 </a>
-                <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}" 
+                <a href="{{ route('frontend.products.index', []) }}" 
                    class="bg-white/10 backdrop-blur-sm text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/20 transition-colors duration-200">
                     {{ __('translations.real_time_updates') }}
                 </a>
@@ -231,3 +231,5 @@
         </div>
     </section>
 </div>
+
+

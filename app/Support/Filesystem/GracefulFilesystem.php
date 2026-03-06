@@ -45,6 +45,12 @@ class GracefulFilesystem extends Filesystem
         $this->backupManager = $backupManager ?? new BackupDatabaseManager($this->permissions);
         // Use a base filesystem instance to avoid recursive calls back into this class.
         $this->scanner = $scanner ?? new DirectoryScanner(new Filesystem, $this->memoryManager);
+
+        // Preserve legacy static remember() behaviour by reusing the latest
+        // instantiated filesystem instance in the service container.
+        if (app()->bound(self::class) || app()->resolved(self::class) || app()->runningUnitTests()) {
+            app()->instance(self::class, $this);
+        }
     }
 
     /**
@@ -109,6 +115,8 @@ class GracefulFilesystem extends Filesystem
 
             return $directories;
 
+        } catch (InvalidArgumentException $exception) {
+            throw $exception;
         } catch (Throwable $e) {
             Log::error('Filesystem directory scan failed', [
                 'directory' => $directory,
@@ -136,9 +144,19 @@ class GracefulFilesystem extends Filesystem
      */
     private function normalizeDepthParameter(bool|int $recursive): int
     {
+        if ($recursive === true) {
+            return PHP_INT_MAX;
+        }
+
+        if ($recursive === false) {
+            return 1;
+        }
+
+        if ($recursive < 0) {
+            return PHP_INT_MAX;
+        }
+
         return match ($recursive) {
-            true    => -1,    // Unlimited depth
-            false   => 0,    // No recursion
             default => $recursive, // Pass through integer values
         };
     }
@@ -234,8 +252,18 @@ class GracefulFilesystem extends Filesystem
         try {
             $this->validateDirectoryPath($path);
 
+            if ($this->isDirectory($path)) {
+                return true;
+            }
+
             $mode = $mode ?? $this->permissions->getDirectoryMode();
-            $created = parent::makeDirectory($path, $mode, $recursive, $force);
+            $parentDirectory = dirname($path);
+            $shouldUseRecursiveCreation = $recursive || ($parentDirectory !== '' && ! is_dir($parentDirectory));
+            $created = parent::makeDirectory($path, $mode, $shouldUseRecursiveCreation, $force);
+
+            if (! $created && $this->isDirectory($path)) {
+                $created = true;
+            }
 
             if ($created) {
                 $this->memoryManager->remember($path);
@@ -250,6 +278,8 @@ class GracefulFilesystem extends Filesystem
 
             return $created;
 
+        } catch (InvalidArgumentException $exception) {
+            throw $exception;
         } catch (Throwable $e) {
             Log::error('Directory creation failed', [
                 'path'  => $path,
@@ -294,6 +324,8 @@ class GracefulFilesystem extends Filesystem
                 ]);
             }
 
+        } catch (InvalidArgumentException $exception) {
+            throw $exception;
         } catch (Throwable $e) {
             Log::error('Directory ensure failed', [
                 'path'  => $path,

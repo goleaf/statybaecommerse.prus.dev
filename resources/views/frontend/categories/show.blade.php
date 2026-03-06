@@ -10,35 +10,11 @@
         ?? (is_string($category->description) ? $category->description : (string) data_get($category->description, app()->getLocale(), ''));
 @endphp
 <div class="min-h-screen bg-sage brand-products-page">
-    <div class="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
-        <nav class="text-sm text-dark/70" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
-            <ol class="flex flex-wrap items-center gap-2">
-                <li>
-                    <a href="{{ route('home') }}" class="hover:text-dark transition-colors">
-                        {{ __('nav.home') }}
-                    </a>
-                </li>
-                <li>/</li>
-                <li>
-                    <a href="{{ route('frontend.categories.index') }}" class="hover:text-dark transition-colors">
-                        {{ __('messages.categories') }}
-                    </a>
-                </li>
-                <li>/</li>
-                <li class="text-dark">{{ $categoryName }}</li>
-            </ol>
-        </nav>
-    </div>
-
     <div class="bg-dark text-sage">
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-16 sm:px-6 lg:px-8">
             <div class="space-y-6">
                 <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                     <div class="max-w-2xl space-y-4">
-                        <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
-                            {{ __('ui.category_spotlight') }}
-                        </span>
-
                         <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
                             {{ $categoryName }}
                         </h1>
@@ -62,9 +38,6 @@
                         </div>
                         <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm text-white/80 shadow-sm">
                             {{ number_format($relatedCategories->count()) }} {{ __('messages.subcategories') }}
-                        </div>
-                        <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm text-white/80 shadow-sm">
-                            {{ number_format($highlightedBrands->count()) }} {{ __('ui.featured_brands') }}
                         </div>
                     </div>
                 </div>
@@ -102,7 +75,7 @@
     <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="mb-8 rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
             <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                <form method="get" class="flex flex-wrap items-center gap-3 text-sm font-medium">
+                <form method="get" class="flex flex-wrap items-center gap-3 text-sm font-medium" data-disable-submit-spinner="true">
                     <span class="text-white/80 font-semibold">{{ __('ui.quick_filters') }}</span>
                     @foreach ($availableFilters as $key => $label)
                         <label class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-dark transition hover:border-sage hover:bg-sage/20 cursor-pointer">
@@ -177,42 +150,21 @@
                 @endforeach
             </div>
         @else
-            <div class="rounded-3xl border border-dashed border-sage/30 bg-dark/50 p-12 text-center mb-8">
-                <p class="text-white/60">{{ __('ui.no_products_available_for_this_category_yet') }}</p>
+            <div class="mb-8 rounded-3xl border border-dark/10 bg-gradient-to-br from-white via-sage/25 to-stone-100 p-12 text-center shadow-sm">
+                <div class="mx-auto flex max-w-md flex-col items-center gap-4">
+                    <div class="flex h-14 w-14 items-center justify-center rounded-full border border-dark/10 bg-dark/5 text-dark">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 6.75A1.75 1.75 0 014.75 5h14.5A1.75 1.75 0 0121 6.75v10.5A1.75 1.75 0 0119.25 19H4.75A1.75 1.75 0 013 17.25V6.75z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 9.5h9M7.5 13.5h4.5" />
+                        </svg>
+                    </div>
+                    <p class="text-lg font-semibold text-dark sm:text-xl">
+                        {{ __('ui.no_products_available_for_this_category_yet') }}
+                    </p>
+                </div>
             </div>
         @endif
 
-        <section class="mt-12 grid gap-8 lg:grid-cols-2">
-            <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-sm">
-                <h2 class="text-xl font-semibold text-white">{{ __('ui.explore_related_categories') }}</h2>
-                <ul class="mt-4 grid gap-3 text-sm text-white/80 sm:grid-cols-2">
-                    @forelse ($relatedCategories as $related)
-                        <li class="rounded-2xl border border-sage/30 bg-sage/10 p-4 transition hover:border-sage hover:bg-sage/20">
-                            <a href="{{ route('frontend.categories.show', $related) }}" class="font-semibold text-white hover:text-sage">{{ $related->name }}</a>
-                            @if ($related->description)
-                                <p class="mt-2 text-xs text-white/70">{!! str($related->description)->stripTags()->limit(100) !!}</p>
-                            @endif
-                        </li>
-                    @empty
-                        <li class="rounded-2xl border border-dashed border-sage/30 bg-sage/10 p-6 text-center text-sm text-white/70">{{ __('ui.additional_categories_will_appear_here_as_soon_as_they_are_available') }}</li>
-                    @endforelse
-                </ul>
-            </div>
-
-            <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-sm">
-                <h2 class="text-xl font-semibold text-white">{{ __('ui.featured_brands_in_this_category') }}</h2>
-                <ul class="mt-4 space-y-3 text-sm text-white/80">
-                    @forelse ($highlightedBrands as $brand)
-                        <li class="flex items-center justify-between rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3">
-                            <a href="{{ route('frontend.brands.show', $brand) }}" class="font-semibold text-white hover:text-sage">{{ $brand->name }}</a>
-                            <span class="rounded-full bg-sage px-2 py-0.5 text-xs font-semibold text-dark">{{ number_format($brand->published_products_count ?? $brand->products_count ?? 0) }}</span>
-                        </li>
-                    @empty
-                        <li class="rounded-2xl border border-dashed border-sage/30 bg-sage/10 p-6 text-center text-sm text-white/70">{{ __('ui.brand_highlights_will_appear_as_soon_as_products_are_published') }}</li>
-                    @endforelse
-                </ul>
-            </div>
-        </section>
     </div>
 </div>
 

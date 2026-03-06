@@ -135,13 +135,29 @@
                         <div class="px-6 py-4">
                             <div class="space-y-4">
                                 @foreach ($order->items as $item)
+                                    @php
+                                        $product = $item->productVariant?->product;
+                                        $productUrl = $product
+                                            ? (\Illuminate\Support\Facades\Route::has('products.show')
+                                                ? route('products.show', $product)
+                                                : (\Illuminate\Support\Facades\Route::has('frontend.products.show')
+                                                    ? route('frontend.products.show', $product)
+                                                    : null))
+                                            : null;
+                                    @endphp
                                     <div class="flex items-center space-x-4">
                                         <div class="flex-shrink-0">
                                             @if ($item->productVariant && $item->productVariant->product && $item->productVariant->product->featured_image)
+                                                @if ($productUrl)
+                                                    <a href="{{ $productUrl }}" class="block">
+                                                @endif
                                                 <img
                                                      src="{{ $item->productVariant->product->featured_image ? \App\Support\Storage\SecureStorage::temporarySignedUrl($item->productVariant->product->featured_image) : '' }}"
                                                      alt="{{ $item->productVariant->product->name }}"
                                                      class="h-16 w-16 rounded-md object-cover">
+                                                @if ($productUrl)
+                                                    </a>
+                                                @endif
                                             @else
                                                 <div
                                                      class="h-16 w-16 rounded-md bg-gray-200 flex items-center justify-center">
@@ -157,7 +173,13 @@
                                         </div>
                                         <div class="flex-1 min-w-0">
                                             <h4 class="text-sm font-medium text-gray-900">
-                                                {{ $item->productVariant ? $item->productVariant->product->name : $item->product_name }}
+                                                @if ($productUrl)
+                                                    <a href="{{ $productUrl }}" class="hover:text-blue-600">
+                                                        {{ $item->productVariant ? $item->productVariant->product->name : $item->product_name }}
+                                                    </a>
+                                                @else
+                                                    {{ $item->productVariant ? $item->productVariant->product->name : $item->product_name }}
+                                                @endif
                                             </h4>
                                             @if ($item->productVariant && $item->productVariant->name)
                                                 <p class="text-sm text-gray-500">{{ $item->productVariant->name }}</p>
@@ -259,7 +281,7 @@
                 <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('users.no_orders') }}</h3>
                 <p class="mt-1 text-sm text-gray-500">{{ __('users.no_orders_description') }}</p>
                 <div class="mt-6">
-                    <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
+                    <a href="{{ route('frontend.products.index', []) }}"
                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                         {{ __('users.start_shopping') }}
                     </a>

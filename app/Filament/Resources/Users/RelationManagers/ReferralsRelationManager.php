@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\RelationManagers\Concerns\ResolvesOwnerPageRedirect;
 use App\Filament\Resources\Referrals\ReferralResource;
+use App\Filament\Resources\UserResource;
 use App\Models\Referral;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -21,6 +23,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ReferralsRelationManager extends RelationManager
 {
+    use ResolvesOwnerPageRedirect;
+
     protected static string $relationship = 'referrals';
 
     public function form(Schema $schema): Schema
@@ -89,7 +93,7 @@ class ReferralsRelationManager extends RelationManager
                     ->icon('heroicon-m-plus')
                     ->url(fn (): string => ReferralResource::getUrl('create', [
                         'user_id'  => $this->getOwnerRecord()->getKey(),
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
             ])
             ->recordActions([
@@ -97,13 +101,13 @@ class ReferralsRelationManager extends RelationManager
                     ->icon('heroicon-m-eye')
                     ->url(fn (Referral $record): string => ReferralResource::getUrl('view', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 Action::make('edit')
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn (Referral $record): string => ReferralResource::getUrl('edit', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 DeleteAction::make(),
             ])
@@ -114,4 +118,3 @@ class ReferralsRelationManager extends RelationManager
             ]);
     }
 }
-

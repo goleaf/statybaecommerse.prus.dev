@@ -64,12 +64,19 @@
             <h2 class="text-lg font-semibold text-gray-900 mb-4">{{ __('ui.filtered_products') }}</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @forelse($filteredProducts as $product)
+                    @php($productUrl = route('product.show', $product->trans('slug') ?? $product->slug ?? $product))
                     <div class="bg-white border rounded-lg p-4 hover:shadow-md transition-shadow">
                         @if($product->getFirstMediaUrl('images'))
-                            <img src="{{ $product->getFirstMediaUrl('images') }}" alt="{{ $product->name }}" 
-                                 class="w-full h-32 object-cover rounded mb-3">
+                            <a href="{{ $productUrl }}" class="block">
+                                <img src="{{ $product->getFirstMediaUrl('images') }}" alt="{{ $product->name }}" 
+                                     class="w-full h-32 object-cover rounded mb-3">
+                            </a>
                         @endif
-                        <h3 class="font-medium text-gray-900 mb-2">{{ $product->name }}</h3>
+                        <h3 class="font-medium text-gray-900 mb-2">
+                            <a href="{{ $productUrl }}" class="hover:text-blue-600">
+                                {{ $product->name }}
+                            </a>
+                        </h3>
                         <p class="text-sm text-gray-600 mb-2">{{ $product->brand?->name }}</p>
                         <p class="text-lg font-bold text-green-600">€{{ number_format($product->price, 2) }}</p>
                         <p class="text-xs text-gray-500 mt-2">{{ $product->created_at->format('M d, Y') }}</p>

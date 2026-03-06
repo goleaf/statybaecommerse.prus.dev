@@ -29,10 +29,11 @@ class ProductsTable
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['brand', 'suppliers', 'media']))
             ->columns([
-                SpatieMediaLibraryImageColumn::make('thumbnail')
+                SpatieMediaLibraryImageColumn::make('main_image')
                     ->label(__('messages.image'))
                     ->collection('thumbnail')
                     ->conversion('thumb')
+                    ->defaultImageUrl(static fn (Product $record): ?string => $record->getMainImage('thumb') ?? $record->getMainImage())
                     ->width(60)
                     ->height(60)
                     ->square(),

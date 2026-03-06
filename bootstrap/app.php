@@ -57,6 +57,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $middleware->append(App\Http\Middleware\AddSecurityHeaders::class);
         $middleware->append(App\Http\Middleware\SetLocale::class);
         $middleware->append(App\Http\Middleware\SetFilamentLocale::class);
+        $middleware->append(App\Http\Middleware\PruneDebugbarJsonStorage::class);
         // Handle user impersonation for admin support
         $middleware->append(App\Http\Middleware\HandleImpersonation::class);
         $middleware->throttleApi('api.default');

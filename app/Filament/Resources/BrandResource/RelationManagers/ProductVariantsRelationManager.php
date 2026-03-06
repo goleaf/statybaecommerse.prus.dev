@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
+use App\Filament\Concerns\ResolvesVariantImageUrl;
+use App\Models\ProductVariant;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -12,13 +14,17 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class ProductVariantsRelationManager extends RelationManager
 {
+    use ResolvesVariantImageUrl;
+
     protected static string $relationship = 'variants';
 
     protected static ?string $recordTitleAttribute = 'sku';
@@ -51,7 +57,14 @@ class ProductVariantsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query
+                ->with(['media', 'product.primaryImage']))
             ->columns([
+                ImageColumn::make('variant_image')
+                    ->label(__('messages.image'))
+                    ->disk('public')
+                    ->getStateUsing(static fn (ProductVariant $record): ?string => self::resolveVariantImageUrl($record))
+                    ->circular(),
                 TextColumn::make('sku')
                     ->label(__('messages.sku'))
                     ->sortable()

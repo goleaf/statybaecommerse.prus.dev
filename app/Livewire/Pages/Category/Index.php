@@ -18,24 +18,22 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Schema as SchemaFacade;
+use Illuminate\Support\Collection as SupportCollection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
-use Livewire\WithPagination;
 
 /**
  * Category listing page with reactive filters, caching and schema-driven filters.
  *
  * @property string          $search
+ * @property string          $brandSearch
  * @property array<int, int> $selectedBrandIds
  * @property array<int, int> $selectedCollectionIds
  * @property array<int, int> $selectedCategoryIds
- * @property float|null      $priceMin
- * @property float|null      $priceMax
  * @property bool            $inStock
  * @property bool            $onSale
  * @property bool            $hasProducts
@@ -47,9 +45,10 @@ use Livewire\WithPagination;
 final class Index extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
-    use WithPagination;
 
     public string $search = '';
+
+    public string $brandSearch = '';
 
     /**
      * @var array<int, int>
@@ -65,10 +64,6 @@ final class Index extends Component implements HasSchemas
      * @var array<int, int>
      */
     public array $selectedCategoryIds = [];
-
-    public ?float $priceMin = null;
-
-    public ?float $priceMax = null;
 
     public bool $inStock = false;
 
@@ -102,24 +97,6 @@ final class Index extends Component implements HasSchemas
         }
     }
 
-    public function updated(string $name): void
-    {
-        if (in_array($name, [
-            'search',
-            'selectedBrandIds',
-            'selectedCollectionIds',
-            'selectedCategoryIds',
-            'priceMin',
-            'priceMax',
-            'inStock',
-            'onSale',
-            'hasProducts',
-            'sort',
-        ], true)) {
-            $this->resetPage();
-        }
-    }
-
     public function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -132,18 +109,6 @@ final class Index extends Component implements HasSchemas
                 ->placeholder(__('messages.all_brands'))
                 ->options($this->getBrandOptions())
                 ->live(),
-            TextInput::make('priceMin')
-                ->label(__('messages.min_price'))
-                ->numeric()
-                ->step(0.01)
-                ->minValue(0)
-                ->live(debounce: 500),
-            TextInput::make('priceMax')
-                ->label(__('messages.max_price'))
-                ->numeric()
-                ->step(0.01)
-                ->minValue(0)
-                ->live(debounce: 500),
             Checkbox::make('hasProducts')
                 ->label(__('messages.only_categories_with_products'))
                 ->live(),
@@ -249,6 +214,27 @@ final class Index extends Component implements HasSchemas
      * @return array<int, array{id: int, name: string, count: int}>
      */
     #[Computed]
+    public function filteredFacetBrands(): array
+    {
+        $needle = mb_strtolower(trim($this->brandSearch));
+
+        if ($needle === '') {
+            return $this->facetBrands;
+        }
+
+        return array_values(array_filter(
+            $this->facetBrands,
+            static fn (array $brand): bool => str_contains(
+                mb_strtolower((string) ($brand['name'] ?? '')),
+                $needle
+            )
+        ));
+    }
+
+    /**
+     * @return array<int, array{id: int, name: string, count: int}>
+     */
+    #[Computed]
     public function facetCollections(): array
     {
         $locale = app()->getLocale();
@@ -312,8 +298,6 @@ final class Index extends Component implements HasSchemas
                     fn (Builder $inner): Builder => $inner->whereIn('collections.id', $this->selectedCollectionIds)
                 )
             )
-            ->when($this->priceMin !== null, fn (Builder $q): Builder => $q->where('price', '>=', (float) $this->priceMin))
-            ->when($this->priceMax !== null, fn (Builder $q): Builder => $q->where('price', '<=', (float) $this->priceMax))
             ->when($this->inStock, fn (Builder $q): Builder => $q->where('stock_quantity', '>', 0))
             ->when(
                 $this->onSale && SchemaFacade::hasTable('discount_products') && SchemaFacade::hasTable('discounts'),
@@ -328,35 +312,16 @@ final class Index extends Component implements HasSchemas
                 });
             });
     }
-
     /**
-     * @return LengthAwarePaginator<int, Category>
+     * @return SupportCollection<int, array{category: Category, depth: int}>
      */
     #[Computed]
-    public function categories(): LengthAwarePaginator
+    public function categories(): SupportCollection
     {
         $query = Category::query()
             ->with(['media'])
             ->withCount(['products' => function (Builder $q): void {
-                $q->published()
-                    ->when(
-                        ! empty($this->selectedBrandIds),
-                        fn (Builder $qq): Builder => $qq->whereIn('brand_id', $this->selectedBrandIds)
-                    )
-                    ->when(
-                        ! empty($this->selectedCollectionIds),
-                        fn (Builder $qq): Builder => $qq->whereHas(
-                            'collections',
-                            fn (Builder $c): Builder => $c->whereIn('collections.id', $this->selectedCollectionIds)
-                        )
-                    )
-                    ->when($this->priceMin !== null, fn (Builder $qq): Builder => $qq->where('price', '>=', (float) $this->priceMin))
-                    ->when($this->priceMax !== null, fn (Builder $qq): Builder => $qq->where('price', '<=', (float) $this->priceMax))
-                    ->when($this->inStock, fn (Builder $qq): Builder => $qq->where('stock_quantity', '>', 0))
-                    ->when(
-                        $this->onSale && SchemaFacade::hasTable('discount_products') && SchemaFacade::hasTable('discounts'),
-                        fn (Builder $qq): Builder => $qq->whereHas('discounts', static fn (Builder $discountQuery): Builder => $discountQuery->active())
-                    );
+                $this->applyActiveProductFilters($q);
             }])
             ->where('is_visible', true);
 
@@ -369,6 +334,12 @@ final class Index extends Component implements HasSchemas
 
         if ($this->hasProducts) {
             $query->has('products');
+        }
+
+        if (! empty($this->selectedBrandIds)) {
+            $query->whereHas('products', function (Builder $q): void {
+                $this->applyActiveProductFilters($q);
+            });
         }
 
         if (! empty($this->selectedCategoryIds)) {
@@ -388,7 +359,106 @@ final class Index extends Component implements HasSchemas
                 fn (Builder $q): Builder => $q->orderBy('name')
             );
 
-        return $query->paginate(24);
+        /** @var EloquentCollection<int, Category> $categories */
+        $categories = $query->get();
+
+        /** @var array<int, bool> $visibleIds */
+        $visibleIds = array_fill_keys(
+            $categories->pluck('id')->map(static fn ($id): int => (int) $id)->all(),
+            true
+        );
+
+        /** @var array<int, EloquentCollection<int, Category>> $categoriesByParent */
+        $categoriesByParent = [];
+
+        foreach ($categories as $category) {
+            $parentId = (int) ($category->parent_id ?? 0);
+
+            // When a filtered result contains children without their parents, render them at root level.
+            if ($parentId !== 0 && ! isset($visibleIds[$parentId])) {
+                $parentId = 0;
+            }
+
+            if (! isset($categoriesByParent[$parentId])) {
+                $categoriesByParent[$parentId] = new EloquentCollection;
+            }
+
+            $categoriesByParent[$parentId]->push($category);
+        }
+
+        return $this->flattenCategoryRows($categoriesByParent, 0, 0);
+    }
+
+    /**
+     * @param  array<int, EloquentCollection<int, Category>>  $categoriesByParent
+     * @return SupportCollection<int, array{category: Category, depth: int}>
+     */
+    private function flattenCategoryRows(array $categoriesByParent, int $parentId, int $depth): SupportCollection
+    {
+        $rows = new SupportCollection;
+        $siblings = $categoriesByParent[$parentId] ?? new EloquentCollection;
+
+        foreach ($this->sortCategorySiblings($siblings) as $category) {
+            $rows->push([
+                'category' => $category,
+                'depth'    => $depth,
+            ]);
+
+            $rows = $rows->merge(
+                $this->flattenCategoryRows($categoriesByParent, (int) $category->getKey(), $depth + 1)
+            );
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param  EloquentCollection<int, Category>  $siblings
+     * @return EloquentCollection<int, Category>
+     */
+    private function sortCategorySiblings(EloquentCollection $siblings): EloquentCollection
+    {
+        return $siblings
+            ->sort(function (Category $left, Category $right): int {
+                $leftName = mb_strtolower((string) $left->name);
+                $rightName = mb_strtolower((string) $right->name);
+
+                return match ($this->sort) {
+                    'name_desc' => strcmp($rightName, $leftName),
+                    'products_desc' => ((int) ($right->products_count ?? 0) <=> (int) ($left->products_count ?? 0))
+                        ?: strcmp($leftName, $rightName),
+                    'products_asc' => ((int) ($left->products_count ?? 0) <=> (int) ($right->products_count ?? 0))
+                        ?: strcmp($leftName, $rightName),
+                    default => strcmp($leftName, $rightName),
+                };
+            })
+            ->values();
+    }
+
+    /**
+     * @param  Builder<Product>  $query
+     * @return Builder<Product>
+     */
+    private function applyActiveProductFilters(Builder $query): Builder
+    {
+        return $query
+            ->published()
+            ->when(
+                ! empty($this->selectedBrandIds),
+                fn (Builder $qq): Builder => $qq->whereIn('brand_id', $this->selectedBrandIds)
+            )
+            ->when(
+                ! empty($this->selectedCollectionIds),
+                fn (Builder $qq): Builder => $qq->whereHas(
+                    'collections',
+                    fn (Builder $c): Builder => $c->whereIn('collections.id', $this->selectedCollectionIds)
+                )
+            )
+            ->when($this->inStock, fn (Builder $qq): Builder => $qq->where('stock_quantity', '>', 0))
+            ->when(
+                $this->onSale && SchemaFacade::hasTable('discount_products') && SchemaFacade::hasTable('discounts'),
+                fn (Builder $qq): Builder => $qq->whereHas('discounts', static fn (Builder $discountQuery): Builder => $discountQuery->active())
+            );
     }
 
     public function render(): View
@@ -417,8 +487,6 @@ final class Index extends Component implements HasSchemas
             'selectedBrandIds'      => $this->normalizeIds($this->selectedBrandIds),
             'selectedCollectionIds' => $this->normalizeIds($this->selectedCollectionIds),
             'selectedCategoryIds'   => $this->normalizeIds($this->selectedCategoryIds),
-            'priceMin'              => $this->priceMin,
-            'priceMax'              => $this->priceMax,
             'inStock'               => $this->inStock,
             'onSale'                => $this->onSale,
             'hasProducts'           => $this->hasProducts,

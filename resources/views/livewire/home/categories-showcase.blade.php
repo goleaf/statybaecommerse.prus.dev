@@ -18,7 +18,7 @@
                     {{ __('messages.all_categories') }}
                 </p>
             </div>
-            <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+            <a href="{{ route('frontend.categories.index', []) }}"
                class="inline-flex items-center gap-2 self-start rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50">
                 {{ __('messages.all_categories') }}
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -32,3 +32,5 @@
         </div>
     </div>
 </section>
+
+

@@ -83,4 +83,27 @@ final class ProductBrowsingTest extends TestCase
             ->assertSeeText($productA->name)
             ->assertDontSeeText($productB->name);
     }
+
+    public function test_product_listing_redirects_numeric_category_query_to_slug(): void
+    {
+        $category = Category::factory()->create([
+            'name' => 'Saugos priemonės',
+            'slug' => 'saugos-priemones',
+        ]);
+
+        $response = $this->get(route('frontend.products.index', [
+            'category' => (string) $category->getKey(),
+            'sort'     => 'latest',
+        ]));
+
+        $response->assertStatus(301);
+
+        $location = (string) $response->headers->get('Location');
+
+        $this->assertSame('/products', parse_url($location, PHP_URL_PATH));
+
+        parse_str((string) parse_url($location, PHP_URL_QUERY), $query);
+        $this->assertSame($category->slug, $query['category'] ?? null);
+        $this->assertSame('latest', $query['sort'] ?? null);
+    }
 }

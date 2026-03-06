@@ -76,9 +76,7 @@ final class BrochuresTable
                 Action::make('open_frontend')
                     ->label(__('admin.brochures.open_frontend'))
                     ->icon('heroicon-m-arrow-top-right-on-square')
-                    ->url(static fn (mixed $record): string => route('localized.brochures.index', [
-                        'locale' => app()->getLocale(),
-                    ]))
+                    ->url(static fn (mixed $record): string => route('localized.brochures.index'))
                     ->openUrlInNewTab(),
                 EditAction::make(),
                 DeleteAction::make()

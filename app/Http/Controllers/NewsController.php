@@ -9,6 +9,7 @@ use App\Services\PaginationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
 /**
@@ -112,9 +113,13 @@ final class NewsController extends Controller
     private function redirectToIndex(): RedirectResponse
     {
         if (request()->routeIs('localized.news.*')) {
-            return redirect()->route('localized.news.index', [
-                'locale' => app()->getLocale(),
-            ]);
+            if (Route::has('localized.news.index.lt')) {
+                return redirect()->route('localized.news.index.lt');
+            }
+
+            if (Route::has('localized.news.index')) {
+                return redirect()->route('localized.news.index');
+            }
         }
 
         return redirect()->route('frontend.news.index');

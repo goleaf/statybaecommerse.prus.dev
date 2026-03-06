@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Services\LocaleService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,44 +14,20 @@ use Illuminate\Support\Str;
 
 final class LocaleController
 {
-    public function __construct(
-        private readonly LocaleService $localeService
-    ) {}
-
     public function __invoke(Request $request, ?string $locale = null): RedirectResponse
     {
-        // Collect the requested locale from either the route wildcard or the submitted payload.
-        $requestedRaw = $locale ?? $request->input('locale');
-        $requested = is_string($requestedRaw) ? $requestedRaw : null;
+        $resolved = 'lt';
 
-        $requestedContext = strtolower(trim((string) $request->input('context', '')));
+        app()->setLocale($resolved);
+        config()->set('app.locale', $resolved);
+        config()->set('app.fallback_locale', $resolved);
+        config()->set('app.supported_locales', [$resolved]);
 
-        // Check if this is an admin panel request
-        $isAdminPanel = $requestedContext === 'admin'
-            || $request->is('admin')
-            || $request->is('admin/*')
-            || str_contains($request->header('referer', ''), '/admin');
+        Session::put('locale', $resolved);
+        Session::put('admin_locale', $resolved);
+        Session::put('app.locale', $resolved);
+        cookie()->queue(cookie('app_locale', $resolved, 60 * 24 * 30));
 
-        // Create a temporary request with the locale parameter for resolution
-        $tempRequest = $request->duplicate();
-        if ($requested !== null) {
-            $tempRequest->route()->setParameter('locale', $requested);
-        }
-
-        // Use centralized locale service for resolution and persistence
-        $resolved = $this->localeService->resolveAndSetLocale($tempRequest);
-
-        // Store locale in appropriate session key
-        if ($isAdminPanel) {
-            Session::put('admin_locale', $resolved);
-            Session::put('app.locale', $resolved);
-        } else {
-            $this->localeService->persistLocale($resolved, $tempRequest);
-        }
-
-        $this->localeService->applyLocaleConfiguration($resolved);
-
-        // Update user preference if authenticated
         $user = Auth::user();
         if ($user instanceof User && $user->preferred_locale !== $resolved) {
             $user->forceFill(['preferred_locale' => $resolved])->save();
@@ -63,19 +38,11 @@ final class LocaleController
             return redirect()->to($redirectTo);
         }
 
-        return redirect()->back(fallback: $this->fallbackRedirect($resolved, $isAdminPanel));
+        return redirect()->back(fallback: $this->fallbackRedirect());
     }
 
-    private function fallbackRedirect(string $locale, bool $isAdminPanel = false): string
+    private function fallbackRedirect(): string
     {
-        if ($isAdminPanel) {
-            return url('/admin');
-        }
-
-        if (Route::has('localized.home')) {
-            return route('localized.home', ['locale' => $locale]);
-        }
-
         if (Route::has('home')) {
             return route('home');
         }
@@ -99,7 +66,6 @@ final class LocaleController
                 return false;
             }
 
-            // Explicitly match the current host, scheme, and port to avoid open redirect exploits.
             if ($targetHost !== $request->getHost()) {
                 return false;
             }
@@ -118,7 +84,6 @@ final class LocaleController
             return false;
         }
 
-        // Relative paths that begin with a forward slash stay within the application scope and are therefore safe.
         return Str::startsWith($target, '/');
     }
 }

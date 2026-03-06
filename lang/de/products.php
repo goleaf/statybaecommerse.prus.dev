@@ -8,6 +8,9 @@ return [
         'published_at'   => 'Veröffentlicht am',
         'stock_quantity' => 'Lagerbestand',
     ],
+    'attributes' => [
+        'size_type' => 'Größenvariante',
+    ],
     'in_stock' => 'Auf Lager',
     'labels'   => [
         'unnamed_variant' => 'Unbenannte Variante',

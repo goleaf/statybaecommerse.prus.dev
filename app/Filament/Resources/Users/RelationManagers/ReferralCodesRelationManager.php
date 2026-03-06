@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\RelationManagers\Concerns\ResolvesOwnerPageRedirect;
 use App\Filament\Resources\ReferralCodes\ReferralCodeResource;
+use App\Filament\Resources\UserResource;
 use App\Models\ReferralCode;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -22,6 +24,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ReferralCodesRelationManager extends RelationManager
 {
+    use ResolvesOwnerPageRedirect;
+
     protected static string $relationship = 'referralCodes';
 
     public function form(Schema $schema): Schema
@@ -77,7 +81,7 @@ class ReferralCodesRelationManager extends RelationManager
                     ->icon('heroicon-m-plus')
                     ->url(fn (): string => ReferralCodeResource::getUrl('create', [
                         'user_id'  => $this->getOwnerRecord()->getKey(),
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
             ])
             ->recordActions([
@@ -85,13 +89,13 @@ class ReferralCodesRelationManager extends RelationManager
                     ->icon('heroicon-m-eye')
                     ->url(fn (ReferralCode $record): string => ReferralCodeResource::getUrl('view', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 Action::make('edit')
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn (ReferralCode $record): string => ReferralCodeResource::getUrl('edit', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 DeleteAction::make(),
             ])
@@ -123,4 +127,3 @@ class ReferralCodesRelationManager extends RelationManager
         return $data;
     }
 }
-

@@ -13,6 +13,7 @@ use App\Support\Cache\TagAwareCache;
 use Carbon\CarbonImmutable;
 use Closure;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Schema;
 
 final class DashboardMetricsRepository
 {
@@ -56,18 +57,27 @@ final class DashboardMetricsRepository
             $startOfDay = CarbonImmutable::now()->startOfDay();
             $endOfDay = CarbonImmutable::now()->endOfDay();
 
-            return User::query()
+            $table = (new User)->getTable();
+
+            $query = User::query()
                 ->withoutGlobalScopes([ActiveScope::class])
-                // Focus on customer signups and exclude internal administrator accounts
-                // so dashboard widgets reflect end-user growth instead of seeded staff.
-                ->where('is_admin', false)
                 // Ignore users already linked to historical orders so factory-generated
                 // fixtures and transactional customer associations do not inflate the
                 // registration count for dashboard KPIs.
                 ->whereDoesntHave('orders')
-                ->whereBetween('created_at', [$startOfDay, $endOfDay])
-                ->whereNull('deleted_at')
-                ->count();
+                ->whereBetween('created_at', [$startOfDay, $endOfDay]);
+
+            // Focus on customer signups and exclude internal administrator accounts
+            // when the legacy schema exposes the admin flag.
+            if (Schema::hasTable($table) && Schema::hasColumn($table, 'is_admin')) {
+                $query->where('is_admin', false);
+            }
+
+            if (Schema::hasTable($table) && Schema::hasColumn($table, 'deleted_at')) {
+                $query->whereNull('deleted_at');
+            }
+
+            return $query->count();
         }, [CacheKeys::userAggregateTag()]);
     }
 

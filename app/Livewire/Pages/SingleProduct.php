@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\Livewire\Pages;
 
 use App\Livewire\Concerns\WithCart;
+use App\Models\Attribute;
+use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\VariantAttributeValue;
 use App\Services\Pricing\VariantPriceService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
@@ -51,6 +54,21 @@ final class SingleProduct extends Component
 
     public ?string $ogImage = null;
 
+    /**
+     * @var array<int, array<string, mixed>>
+     */
+    public array $variantMatrixSnapshot = [];
+
+    /**
+     * @var array<string, string>
+     */
+    public array $selectedVariantAttributes = [];
+
+    /**
+     * @var array<int, array{current: float|null, compare: float|null, discount: float|null, currency: string|null}>
+     */
+    private array $variantCardPricingCache = [];
+
     #[Computed]
     public function specifications(): \Illuminate\Support\Collection
     {
@@ -61,7 +79,7 @@ final class SingleProduct extends Component
                 $valueModel = $attribute->values->firstWhere('id', $valueId);
 
                 return [
-                    'label' => $attribute->trans('name') ?? $attribute->name,
+                    'label' => $this->resolveAttributeLabel($attribute, null, $attribute->slug),
                     'value' => $valueModel ? ($valueModel->trans('value') ?? $valueModel->value) : null,
                     'icon'  => $attribute->icon,
                 ];
@@ -210,7 +228,9 @@ final class SingleProduct extends Component
                         ]),
                         'variants' => fn ($variantQuery) => $variantQuery->with([
                             'media',
+                            'inventories',
                             'prices.currency',
+                            'variantAttributeValues.attribute.values',
                             'variantAttributeValues.attribute.translations',
                         ]),
                     ])
@@ -224,6 +244,8 @@ final class SingleProduct extends Component
 
         $this->activeVariantId = $this->determineDefaultVariantId();
         $this->refreshVariantState($this->activeVariantId);
+        $this->rebuildVariantMatrixSnapshot();
+        $this->selectedVariantAttributes = [];
 
         $this->ogImage = $this->product->getImageUrl('preview')
             ?: $this->product->getImageUrl();
@@ -408,11 +430,10 @@ final class SingleProduct extends Component
     {
         $resolvedUrl = null;
 
-        if ($routeKey !== '' && Route::has('localized.products.show')) {
+        if ($routeKey !== '' && Route::has('frontend.products.show')) {
             try {
-                // Attempt to honour the active locale when a localized route exists.
-                $resolvedUrl = route('localized.products.show', [
-                    'locale'  => app()->getLocale(),
+                // Attempt to use the canonical localized route first.
+                $resolvedUrl = route('frontend.products.show', [
                     'product' => $routeKey,
                 ]);
             } catch (UrlGenerationException) {
@@ -466,11 +487,11 @@ final class SingleProduct extends Component
     public function attributeFeatures(): \Illuminate\Support\Collection
     {
         if (! $this->product->relationLoaded('attributes')) {
-            $this->product->loadMissing(['attributes.values']);
+            $this->product->loadMissing(['attributes.translations', 'attributes.values']);
         }
 
         if (! $this->product->relationLoaded('variants')) {
-            $this->product->loadMissing(['variants.variantAttributeValues.attribute']);
+            $this->product->loadMissing(['variants.variantAttributeValues.attribute.translations']);
         }
 
         $variantFeatures = collect();
@@ -480,18 +501,20 @@ final class SingleProduct extends Component
             ->variants
             ->flatMap(function (ProductVariant $variant) {
                 if (! $variant->relationLoaded('variantAttributeValues')) {
-                    $variant->loadMissing(['variantAttributeValues.attribute']);
+                    $variant->loadMissing(['variantAttributeValues.attribute.translations']);
                 }
 
                 return $variant
                     ->variantAttributeValues
-                    ->map(function ($value): array {
+                    ->map(function (VariantAttributeValue $value): array {
                         $attribute = $value->attribute;
+                        $attributeSlug = $attribute?->slug ?? Str::slug((string) ($value->attribute_name ?? 'attribute'));
+                        $valueSlug = $value->attribute_value_slug ?? Str::slug((string) ($value->getLocalizedValue() ?? $value->attribute_value ?? 'value'));
 
                         return [
                             'id'    => $attribute?->id,
-                            'label' => $attribute?->trans('name') ?? $attribute?->name ?? $value->attribute_name,
-                            'value' => $value->getLocalizedValue(),
+                            'label' => $this->resolveVariantAttributeLabel($attribute, $value, $attributeSlug),
+                            'value' => $this->resolveVariantAttributeValue(null, $value, $attributeSlug, $valueSlug),
                             'icon'  => $attribute?->icon,
                             'color' => $attribute?->color,
                         ];
@@ -540,7 +563,7 @@ final class SingleProduct extends Component
 
                 return [
                     'id'    => $attribute->id,
-                    'label' => $attribute->trans('name') ?? $attribute->name,
+                    'label' => $this->resolveAttributeLabel($attribute, null, $attribute->slug),
                     'value' => $value,
                     'icon'  => $icon,
                     'color' => $color,
@@ -560,41 +583,98 @@ final class SingleProduct extends Component
     #[Computed]
     public function variantMatrix(): \Illuminate\Support\Collection
     {
-        if (! $this->product->relationLoaded('variants')) {
-            $this->product->loadMissing(['variants.media', 'variants.variantAttributeValues.attribute', 'variants.prices.currency']);
+        if ($this->variantMatrixSnapshot === []) {
+            $this->rebuildVariantMatrixSnapshot();
         }
 
-        return $this
+        return collect($this->variantMatrixSnapshot)
+            ->map(fn (array $variant): array => [
+                ...$variant,
+                'is_active' => (int) ($variant['id'] ?? 0) === (int) ($this->activeVariantId ?? 0),
+            ])
+            ->values();
+    }
+
+    private function rebuildVariantMatrixSnapshot(): void
+    {
+        if (! $this->product->relationLoaded('variants')) {
+            $this->product->loadMissing([
+                'variants.media',
+                'variants.inventories',
+                'variants.prices.currency',
+                'variants.variantAttributeValues.attribute.translations',
+                'variants.variantAttributeValues.attribute.values.translations',
+            ]);
+        } else {
+            $this->product->variants->loadMissing([
+                'media',
+                'inventories',
+                'prices.currency',
+                'variantAttributeValues.attribute.translations',
+                'variantAttributeValues.attribute.values.translations',
+            ]);
+        }
+
+        $this->variantCardPricingCache = [];
+
+        $this->variantMatrixSnapshot = $this
             ->product
             ->variants
             ->map(fn (ProductVariant $variant): array => $this->formatVariantForDisplay($variant))
-            ->values();
+            ->values()
+            ->all();
+    }
+
+    #[Computed]
+    public function activeVariantData(): ?array
+    {
+        $activeVariantId = $this->activeVariantId;
+        $activeVariant = $this->variantMatrix->first(
+            static fn (array $variant): bool => (int) ($variant['id'] ?? 0) === (int) ($activeVariantId ?? 0)
+        );
+
+        if (! is_array($activeVariant)) {
+            $activeVariant = $this->variantMatrix->first();
+        }
+
+        return is_array($activeVariant) ? $activeVariant : null;
     }
 
     #[Computed]
     public function variantOptionGroups(): SupportCollection
     {
-        if (! $this->product->relationLoaded('variants')) {
-            $this->product->loadMissing(['variants.media', 'variants.variantAttributeValues.attribute']);
+        $variants = $this->variantMatrix;
+
+        if ($variants->isEmpty()) {
+            return collect();
         }
 
         $groups = [];
 
-        foreach ($this->variantMatrix as $variantData) {
+        foreach ($variants as $variantData) {
             foreach ($variantData['attributes'] as $attribute) {
-                $groupKey = (string) ($attribute['attribute_id'] ?? $attribute['attribute_slug']);
+                $groupSlug = $this->normalizeAttributeTranslationKey((string) ($attribute['attribute_slug'] ?? ''));
+                $groupKey = (string) ($attribute['attribute_id'] ?? $groupSlug);
+
+                if ($groupKey === '' || $groupSlug === '') {
+                    continue;
+                }
 
                 if (! isset($groups[$groupKey])) {
                     $groups[$groupKey] = [
                         'id'         => $attribute['attribute_id'],
                         'name'       => $attribute['attribute'],
-                        'slug'       => $attribute['attribute_slug'],
+                        'slug'       => $groupSlug,
                         'sort_order' => $attribute['attribute_sort_order'],
                         'values'     => [],
                     ];
                 }
 
-                $valueKey = $attribute['value_slug'] ?: Str::slug((string) ($attribute['value'] ?? 'value'));
+                $valueKey = $this->normalizeVariantOptionKey($attribute['value_slug'] ?? null, $attribute['value'] ?? null);
+
+                if ($valueKey === '') {
+                    continue;
+                }
 
                 if (! isset($groups[$groupKey]['values'][$valueKey])) {
                     $groups[$groupKey]['values'][$valueKey] = [
@@ -615,30 +695,116 @@ final class SingleProduct extends Component
 
                 $valueEntry = &$groups[$groupKey]['values'][$valueKey];
                 $valueEntry['variant_ids'][] = $variantData['id'];
-                $valueEntry['available_quantity'] += (int) ($variantData['available_quantity'] ?? 0);
                 $valueEntry['price_samples'][] = $variantData['pricing']['current'];
-
-                if ($valueEntry['primary_variant_id'] === null) {
-                    $valueEntry['primary_variant_id'] = $variantData['id'];
-                }
-
-                $valueEntry['is_active'] = $valueEntry['is_active'] || ($variantData['is_active'] ?? false);
-                $valueEntry['is_available'] = $valueEntry['is_available'] || ($variantData['is_available'] ?? false);
 
                 unset($valueEntry);
             }
         }
 
+        $variantCount = max(1, $variants->count());
+        $groupMetaByKey = [];
+
+        foreach ($groups as $groupKey => $groupData) {
+            $isHighCardinality = $this->isHighCardinalityVariantGroup($groupData, $variantCount);
+            $groupMetaByKey[$groupKey] = [
+                'is_high_cardinality' => $isHighCardinality,
+                'is_constraint'       => ! $isHighCardinality,
+                'presentation'        => $isHighCardinality ? 'compact_list' : 'chips',
+            ];
+        }
+
+        $groupMetaBySlug = collect($groups)
+            ->mapWithKeys(static function (array $groupData, string $groupKey) use ($groupMetaByKey): array {
+                return [(string) ($groupData['slug'] ?? $groupKey) => $groupMetaByKey[$groupKey] ?? []];
+            })
+            ->all();
+
+        $activeSelectionMap = $this->normalizeSelectedVariantAttributeMap($this->selectedVariantAttributes);
+        $selectedConstraintAttributes = $this->resolveSelectedConstraintAttributes(
+            $activeSelectionMap,
+            $groupMetaBySlug
+        );
+
+        $variantsById = $variants
+            ->filter(static fn (array $variant): bool => isset($variant['id']) && is_numeric($variant['id']))
+            ->mapWithKeys(static fn (array $variant): array => [(int) $variant['id'] => $variant])
+            ->all();
+
+        $groupEligibleVariantIds = [];
+
+        foreach ($groups as $groupKey => $groupData) {
+            $groupSlug = (string) ($groupData['slug'] ?? '');
+            $isHighCardinality = (bool) ($groupMetaByKey[$groupKey]['is_high_cardinality'] ?? false);
+
+            if ($groupSlug === '' || $isHighCardinality) {
+                continue;
+            }
+
+            $groupEligibleVariantIds[$groupSlug] = $variants
+                ->filter(
+                    fn (array $variantData): bool => $this->variantMatchesSelectedAttributes(
+                        $variantData,
+                        $selectedConstraintAttributes,
+                        $groupSlug
+                    )
+                )
+                ->pluck('id')
+                ->filter(static fn ($id): bool => is_numeric($id))
+                ->map(static fn ($id): int => (int) $id)
+                ->unique()
+                ->values()
+                ->all();
+        }
+
         return collect($groups)
-            ->map(static function (array $group): array {
+            ->map(function (array $group, string $groupKey) use ($activeSelectionMap, $groupEligibleVariantIds, $groupMetaByKey, $variantsById): array {
+                $groupMeta = $groupMetaByKey[$groupKey] ?? [
+                    'is_high_cardinality' => false,
+                    'is_constraint'       => true,
+                    'presentation'        => 'chips',
+                ];
+                $groupSlug = (string) ($group['slug'] ?? '');
+                $eligibleVariantLookup = array_flip($groupEligibleVariantIds[$groupSlug] ?? []);
+
                 $values = collect($group['values'])
-                    ->map(static function (array $value): array {
-                        $prices = array_filter($value['price_samples'], static fn ($price): bool => $price !== null);
+                    ->map(function (array $value) use ($activeSelectionMap, $eligibleVariantLookup, $groupMeta, $groupSlug, $variantsById): array {
+                        $candidateVariantIds = collect($value['variant_ids'] ?? [])
+                            ->filter(static fn ($id): bool => is_numeric($id))
+                            ->map(static fn ($id): int => (int) $id)
+                            ->unique()
+                            ->values()
+                            ->all();
+
+                        if (! (bool) ($groupMeta['is_high_cardinality'] ?? false)) {
+                            $candidateVariantIds = array_values(
+                                array_filter(
+                                    $candidateVariantIds,
+                                    static fn (int $id): bool => isset($eligibleVariantLookup[$id])
+                                )
+                            );
+                        }
+
+                        $candidateVariants = collect($candidateVariantIds)
+                            ->map(static fn (int $variantId): ?array => $variantsById[$variantId] ?? null)
+                            ->filter(static fn (?array $variant): bool => is_array($variant))
+                            ->values();
+
+                        $prices = $candidateVariants
+                            ->pluck('pricing.current')
+                            ->filter(static fn ($price): bool => is_numeric($price))
+                            ->map(static fn ($price): float => (float) $price)
+                            ->values()
+                            ->all();
+
                         $priceHint = null;
 
                         if ($prices !== []) {
                             $minPrice = min($prices);
-                            $currency = $value['price_currency_hint'];
+                            $currency = $candidateVariants
+                                ->pluck('pricing.currency')
+                                ->filter()
+                                ->first()
+                                ?? ($value['price_currency_hint'] ?? null);
 
                             if ($currency) {
                                 $priceHint = __('products.page.variant_option_from_price', [
@@ -647,39 +813,289 @@ final class SingleProduct extends Component
                             }
                         }
 
+                        $primaryVariantId = $this->resolvePreferredVariantIdForSelection($candidateVariants);
+
                         return [
                             'key'                => $value['key'],
                             'label'              => $value['label'],
                             'hex_color'          => $value['hex_color'],
                             'swatch_image'       => $value['swatch_image'],
-                            'variant_ids'        => array_values(array_unique($value['variant_ids'])),
-                            'primary_variant_id' => $value['primary_variant_id'],
-                            'is_active'          => $value['is_active'],
-                            'is_available'       => $value['is_available'],
-                            'available_quantity' => (int) $value['available_quantity'],
-                            'price_hint'         => $priceHint,
-                            'value_sort_order'   => $value['value_sort_order'],
+                            'variant_ids'        => $candidateVariantIds,
+                            'primary_variant_id' => $primaryVariantId,
+                            'is_active'          => ($activeSelectionMap[$groupSlug] ?? null) === $value['key'],
+                            'is_available'       => $candidateVariants->contains(
+                                static fn (array $variant): bool => (bool) ($variant['is_available'] ?? false)
+                            ),
+                            'available_quantity' => (int) $candidateVariants->sum(
+                                static fn (array $variant): int => (int) ($variant['available_quantity'] ?? 0)
+                            ),
+                            'price_hint'       => $priceHint,
+                            'value_sort_order' => $value['value_sort_order'],
                         ];
                     })
                     ->sortBy(static fn (array $value): array => [$value['value_sort_order'] ?? 0, $value['label'] ?? ''])
                     ->values();
 
+                if ($groupMeta['is_high_cardinality']) {
+                    $values = $values
+                        ->filter(static fn (array $value): bool => ($value['primary_variant_id'] ?? null) !== null)
+                        ->values();
+                }
+
+                $selectedValueKey = $activeSelectionMap[$groupSlug] ?? null;
+                $selectedValue = is_string($selectedValueKey)
+                    ? $values->firstWhere('key', $selectedValueKey)
+                    : null;
+
                 return [
-                    'id'         => $group['id'],
-                    'name'       => $group['name'],
-                    'slug'       => $group['slug'],
-                    'sort_order' => $group['sort_order'],
-                    'values'     => $values,
+                    'id'                   => $group['id'],
+                    'name'                 => $group['name'],
+                    'slug'                 => $group['slug'],
+                    'sort_order'           => $group['sort_order'],
+                    'presentation'         => $groupMeta['presentation'],
+                    'is_high_cardinality'  => $groupMeta['is_high_cardinality'],
+                    'is_constraint'        => $groupMeta['is_constraint'],
+                    'selected_value_key'   => $selectedValueKey,
+                    'selected_value_label' => is_array($selectedValue)
+                        ? ($selectedValue['label'] ?? null)
+                        : null,
+                    'values' => $values,
                 ];
             })
             ->sortBy(static fn (array $group): array => [$group['sort_order'] ?? 0, $group['name'] ?? ''])
             ->values();
     }
 
+    #[Computed]
+    public function filteredVariantData(): SupportCollection
+    {
+        $variants = $this->variantMatrix;
+
+        if ($variants->isEmpty()) {
+            return collect();
+        }
+
+        $selectedAttributes = $this->normalizeSelectedVariantAttributeMap($this->selectedVariantAttributes);
+
+        if ($selectedAttributes === []) {
+            return $variants->values();
+        }
+
+        return $variants
+            ->filter(fn (array $variantData): bool => $this->variantMatchesSelectedAttributes($variantData, $selectedAttributes, ''))
+            ->values();
+    }
+
+    /**
+     * @param  array<string, mixed>  $variantData
+     * @return array<string, string>
+     */
+    private function extractVariantAttributeSelectionMap(array $variantData): array
+    {
+        $selection = [];
+
+        foreach (($variantData['attributes'] ?? []) as $attribute) {
+            if (! is_array($attribute)) {
+                continue;
+            }
+
+            $attributeSlug = $this->normalizeAttributeTranslationKey((string) ($attribute['attribute_slug'] ?? ''));
+            $valueKey = $this->normalizeVariantOptionKey($attribute['value_slug'] ?? null, $attribute['value'] ?? null);
+
+            if ($attributeSlug === '' || $valueKey === '') {
+                continue;
+            }
+
+            $selection[$attributeSlug] = $valueKey;
+        }
+
+        return $selection;
+    }
+
+    /**
+     * @param  array<string, mixed>  $selection
+     * @return array<string, string>
+     */
+    private function normalizeSelectedVariantAttributeMap(array $selection): array
+    {
+        $normalizedSelection = [];
+
+        foreach ($selection as $attributeSlug => $value) {
+            if (! is_string($attributeSlug)) {
+                continue;
+            }
+
+            $normalizedAttributeSlug = $this->normalizeAttributeTranslationKey($attributeSlug);
+            $normalizedValue = $this->normalizeVariantOptionKey($value, $value);
+
+            if ($normalizedAttributeSlug === '' || $normalizedValue === '') {
+                continue;
+            }
+
+            $normalizedSelection[$normalizedAttributeSlug] = $normalizedValue;
+        }
+
+        return $normalizedSelection;
+    }
+
+    /**
+     * @param  array<string, string>               $selection
+     * @param  array<string, array<string, mixed>> $groupMetaBySlug
+     * @return array<string, string>
+     */
+    private function resolveSelectedConstraintAttributes(array $selection, array $groupMetaBySlug): array
+    {
+        $selectedConstraintAttributes = collect($selection)
+            ->filter(static function (string $selectedValue, string $attributeSlug) use ($groupMetaBySlug): bool {
+                if ($selectedValue === '') {
+                    return false;
+                }
+
+                return (bool) ($groupMetaBySlug[$attributeSlug]['is_constraint'] ?? true);
+            })
+            ->all();
+
+        if ($selectedConstraintAttributes === []) {
+            return [];
+        }
+
+        $requiredPrimarySlugs = collect(['color', 'size'])
+            ->filter(static fn (string $slug): bool => (bool) ($groupMetaBySlug[$slug]['is_constraint'] ?? false))
+            ->values();
+
+        if ($requiredPrimarySlugs->count() >= 2) {
+            foreach ($requiredPrimarySlugs as $requiredSlug) {
+                if (! isset($selectedConstraintAttributes[$requiredSlug])) {
+                    return [];
+                }
+            }
+        }
+
+        return $selectedConstraintAttributes;
+    }
+
+    /**
+     * @param array<string, mixed>  $variantData
+     * @param array<string, string> $selectedAttributes
+     */
+    private function variantMatchesSelectedAttributes(array $variantData, array $selectedAttributes, string $ignoredAttributeSlug): bool
+    {
+        if ($selectedAttributes === []) {
+            return true;
+        }
+
+        $variantSelection = $this->extractVariantAttributeSelectionMap($variantData);
+
+        foreach ($selectedAttributes as $attributeSlug => $selectedValue) {
+            if ($attributeSlug === $ignoredAttributeSlug) {
+                continue;
+            }
+
+            if (($variantSelection[$attributeSlug] ?? null) !== $selectedValue) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+    /**
+     * @param SupportCollection<int, array<string, mixed>> $candidateVariants
+     */
+    private function resolvePreferredVariantIdForSelection(SupportCollection $candidateVariants): ?int
+    {
+        if ($candidateVariants->isEmpty()) {
+            return null;
+        }
+
+        $activeVariantId = $this->activeVariantId;
+
+        if ($activeVariantId !== null) {
+            $activeCandidate = $candidateVariants->first(
+                static fn (array $variant): bool => (int) ($variant['id'] ?? 0) === (int) $activeVariantId
+            );
+
+            if (is_array($activeCandidate)) {
+                return (int) $activeVariantId;
+            }
+        }
+
+        $availableCandidate = $candidateVariants->first(
+            static fn (array $variant): bool => (bool) ($variant['is_available'] ?? false)
+        );
+
+        if (is_array($availableCandidate) && isset($availableCandidate['id']) && is_numeric($availableCandidate['id'])) {
+            return (int) $availableCandidate['id'];
+        }
+
+        $fallback = $candidateVariants->first();
+
+        return is_array($fallback) && isset($fallback['id']) && is_numeric($fallback['id'])
+            ? (int) $fallback['id']
+            : null;
+    }
+
+    private function normalizeVariantOptionKey(mixed $valueSlug, mixed $value): string
+    {
+        if (is_string($valueSlug)) {
+            $trimmed = trim($valueSlug);
+
+            if ($trimmed !== '') {
+                return $trimmed;
+            }
+        }
+
+        if (is_numeric($value)) {
+            return (string) $value;
+        }
+
+        if (is_string($value)) {
+            $trimmed = trim($value);
+
+            if ($trimmed !== '') {
+                return Str::slug($trimmed);
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * @param array<string, mixed> $group
+     */
+    private function isHighCardinalityVariantGroup(array $group, int $variantCount): bool
+    {
+        $slug = $this->normalizeAttributeTranslationKey((string) ($group['slug'] ?? ''));
+
+        if (in_array($slug, ['size_type'], true)) {
+            return true;
+        }
+
+        $values = collect($group['values'] ?? []);
+        $valueCount = $values->count();
+
+        if ($valueCount < 2) {
+            return false;
+        }
+
+        $numericLikeCount = $values->filter(function (array $value): bool {
+            $candidate = $this->firstFilledString([$value['key'] ?? null, $value['label'] ?? null]);
+
+            return $this->isNumericString($candidate);
+        })->count();
+
+        $numericRatio = $numericLikeCount / max(1, $valueCount);
+        $uniqueRatio = $valueCount / max(1, $variantCount);
+
+        return $valueCount >= 12 || ($numericRatio >= 0.7 && $uniqueRatio >= 0.45);
+    }
+
     #[On('variant.selected')]
     public function handleVariantSelected(?int $variantId): void
     {
         $this->refreshVariantState($variantId);
+        $this->syncSelectionFromActiveVariant();
     }
 
     /**
@@ -689,9 +1105,89 @@ final class SingleProduct extends Component
     {
         // Update the current pricing and inventory snapshot for the chosen variant.
         $this->refreshVariantState($variantId);
+        $this->syncSelectionFromActiveVariant();
 
         // Propagate the selection to child Livewire components listening for the shared event channel.
         $this->dispatch('variantSelected', $variantId);
+    }
+
+    public function selectVariantOption(string $attributeSlug, string $valueKey, ?int $preferredVariantId = null): void
+    {
+        $normalizedAttributeSlug = $this->normalizeAttributeTranslationKey($attributeSlug);
+        $normalizedValueKey = $this->normalizeVariantOptionKey($valueKey, $valueKey);
+
+        if ($normalizedAttributeSlug === '' || $normalizedValueKey === '') {
+            return;
+        }
+
+        $currentValue = $this->selectedVariantAttributes[$normalizedAttributeSlug] ?? null;
+
+        if ($currentValue === $normalizedValueKey) {
+            unset($this->selectedVariantAttributes[$normalizedAttributeSlug]);
+        } else {
+            $this->selectedVariantAttributes[$normalizedAttributeSlug] = $normalizedValueKey;
+        }
+
+        $this->selectedVariantAttributes = $this->normalizeSelectedVariantAttributeMap($this->selectedVariantAttributes);
+
+        $groupMetaBySlug = collect($this->variantOptionGroups)
+            ->mapWithKeys(static fn (array $group): array => [
+                (string) ($group['slug'] ?? '') => [
+                    'is_constraint' => (bool) ($group['is_constraint'] ?? true),
+                ],
+            ])
+            ->all();
+
+        $selectedConstraintAttributes = $this->resolveSelectedConstraintAttributes(
+            $this->selectedVariantAttributes,
+            $groupMetaBySlug
+        );
+
+        if ($selectedConstraintAttributes === []) {
+            return;
+        }
+
+        $candidateVariants = $this->variantMatrix
+            ->filter(fn (array $variantData): bool => $this->variantMatchesSelectedAttributes($variantData, $selectedConstraintAttributes, ''))
+            ->values();
+
+        if ($candidateVariants->isEmpty()) {
+            return;
+        }
+
+        $targetVariantId = null;
+
+        if ($preferredVariantId !== null) {
+            $preferredMatch = $candidateVariants->first(
+                static fn (array $variantData): bool => (int) ($variantData['id'] ?? 0) === $preferredVariantId
+            );
+
+            if (is_array($preferredMatch)) {
+                $targetVariantId = $preferredVariantId;
+            }
+        }
+
+        $targetVariantId ??= $this->resolvePreferredVariantIdForSelection($candidateVariants);
+
+        if ($targetVariantId === null) {
+            return;
+        }
+
+        $this->refreshVariantState($targetVariantId);
+        $this->syncSelectionFromActiveVariant();
+        $this->dispatch('variantSelected', $targetVariantId);
+    }
+
+    public function clearVariantSelection(?string $attributeSlug = null): void
+    {
+        if ($attributeSlug === null || trim($attributeSlug) === '') {
+            $this->selectedVariantAttributes = [];
+
+            return;
+        }
+
+        $normalizedAttributeSlug = $this->normalizeAttributeTranslationKey($attributeSlug);
+        unset($this->selectedVariantAttributes[$normalizedAttributeSlug]);
     }
 
     protected function determineDefaultVariantId(): ?int
@@ -723,6 +1219,33 @@ final class SingleProduct extends Component
         $this->updateStockState($variant);
     }
 
+    private function syncSelectionFromActiveVariant(): void
+    {
+        $activeVariant = $this->activeVariantData;
+
+        if (! is_array($activeVariant)) {
+            return;
+        }
+
+        $activeVariantSelection = $this->extractVariantAttributeSelectionMap($activeVariant);
+        $manuallyManagedSelection = collect($this->selectedVariantAttributes)
+            ->filter(fn (string $value, string $attributeSlug): bool => ! $this->shouldAutoSyncSelectedAttribute($attributeSlug))
+            ->all();
+        $autoSyncedSelection = collect($activeVariantSelection)
+            ->filter(fn (string $value, string $attributeSlug): bool => $this->shouldAutoSyncSelectedAttribute($attributeSlug))
+            ->all();
+
+        $this->selectedVariantAttributes = [
+            ...$manuallyManagedSelection,
+            ...$autoSyncedSelection,
+        ];
+    }
+
+    private function shouldAutoSyncSelectedAttribute(string $attributeSlug): bool
+    {
+        return ! in_array($this->normalizeAttributeTranslationKey($attributeSlug), ['size_type'], true);
+    }
+
     protected function resolveVariantById(?int $variantId): ?ProductVariant
     {
         if (! $variantId) {
@@ -741,7 +1264,7 @@ final class SingleProduct extends Component
 
         $variant = $this->product
             ->variants()
-            ->with(['variantAttributeValues.attribute', 'prices.currency', 'images'])
+            ->with(['inventories', 'variantAttributeValues.attribute.values', 'prices.currency', 'images'])
             ->find($variantId);
 
         if ($variant && $this->product->relationLoaded('variants')) {
@@ -754,6 +1277,34 @@ final class SingleProduct extends Component
         return $variant;
     }
 
+    /**
+     * Build lightweight pricing for variant cards without running the full pricing engine per variant.
+     *
+     * @return array{current: float|null, compare: float|null, discount: float|null, currency: string|null}
+     */
+    private function buildVariantCardPricingSummary(ProductVariant $variant): array
+    {
+        $variantId = (int) $variant->getKey();
+
+        if (isset($this->variantCardPricingCache[$variantId])) {
+            return $this->variantCardPricingCache[$variantId];
+        }
+
+        $current = $variant->getCurrentPrice();
+        $compare = $variant->compare_price !== null ? (float) $variant->compare_price : null;
+        $discount = null;
+
+        if ($compare !== null && $compare > ($current + 0.0001)) {
+            $discount = round((($compare - $current) / $compare) * 100, 0);
+        }
+
+        return $this->variantCardPricingCache[$variantId] = [
+            'current'  => $current,
+            'compare'  => $compare,
+            'discount' => $discount,
+            'currency' => function_exists('current_currency') ? current_currency() : null,
+        ];
+    }
     protected function buildPricingSummary(?ProductVariant $variant = null): array
     {
         $currency = function_exists('current_currency') ? current_currency() : null;
@@ -915,7 +1466,6 @@ final class SingleProduct extends Component
             ['label' => __('translations.availability'), 'value' => $this->product->isInStock() ? __('translations.in_stock') : __('translations.out_of_stock')],
             ['label' => __('translations.weight'), 'value' => $this->formatMeasurement($this->product->weight, $this->product->weight_unit?->value ?? null)],
             ['label' => __('translations.dimensions'), 'value' => $this->product->getDimensions()],
-            ['label' => __('translations.last_updated'), 'value' => $this->product->updated_at?->diffForHumans()],
         ];
 
         return array_values(array_filter($facts, fn (array $fact) => filled($fact['value'])));
@@ -939,12 +1489,16 @@ final class SingleProduct extends Component
     private function formatVariantForDisplay(ProductVariant $variant): array
     {
         if (! $variant->relationLoaded('variantAttributeValues')) {
-            $variant->loadMissing(['variantAttributeValues.attribute']);
+            $variant->loadMissing(['variantAttributeValues.attribute.translations', 'variantAttributeValues.attribute.values.translations']);
         }
 
-        $pricing = $this->buildPricingSummary($variant);
+        $pricing = $this->buildVariantCardPricingSummary($variant);
         $currency = $pricing['currency'] ?? (function_exists('current_currency') ? current_currency() : null);
         $currentPrice = $pricing['current'];
+        $availableQuantity = $variant->availableQuantity();
+        $isOutOfStock = $availableQuantity < 1;
+        $isAvailableForPurchase = (bool) $variant->is_enabled
+            && (! (bool) $variant->track_inventory || (bool) $variant->allow_backorder || $availableQuantity > 0);
 
         $priceFormatted = $currentPrice !== null ? app_money_format((float) $currentPrice, $currency) : null;
 
@@ -954,22 +1508,30 @@ final class SingleProduct extends Component
 
         $attributeValues = $variant
             ->variantAttributeValues
-            ->map(function ($value): array {
+            ->map(function (VariantAttributeValue $value): array {
                 $attribute = $value->attribute;
 
                 if ($attribute && ! $attribute->relationLoaded('values')) {
-                    $attribute->loadMissing('values');
+                    $attribute->loadMissing('values.translations');
                 }
 
                 $attributeSlug = $attribute?->slug ?? Str::slug((string) ($value->attribute_name ?? 'attribute'));
                 $valueSlug = $value->attribute_value_slug ?? Str::slug((string) ($value->getLocalizedValue() ?? $value->attribute_value ?? 'value'));
 
-                $attributeValueModel = $attribute?->values?->firstWhere('slug', $valueSlug)
-                    ?? $attribute?->values?->firstWhere('value', $value->attribute_value)
+                $attributeValues = ($attribute && $attribute->relationLoaded('values'))
+                    ? $attribute->getRelation('values')
+                    : collect();
+
+                $attributeValueModel = $attributeValues->firstWhere('slug', $valueSlug)
+                    ?? $attributeValues->firstWhere('value', $value->attribute_value)
                     ?? null;
 
-                $label = $attribute?->trans('name') ?? $attribute?->name ?? $value->attribute_name;
-                $displayValue = $value->getLocalizedValue();
+                if (! $attributeValueModel instanceof AttributeValue) {
+                    $attributeValueModel = null;
+                }
+
+                $label = $this->resolveVariantAttributeLabel($attribute, $value, $attributeSlug);
+                $displayValue = $this->resolveVariantAttributeValue($attributeValueModel, $value, $attributeSlug, $valueSlug);
 
                 return [
                     'attribute_id'         => $attribute?->getKey(),
@@ -990,15 +1552,241 @@ final class SingleProduct extends Component
             'name'               => $variant->getLocalizedName(),
             'sku'                => $variant->sku,
             'price'              => $priceFormatted,
-            'is_out_of_stock'    => $variant->isOutOfStock(),
-            'is_available'       => $variant->isAvailableForPurchase(),
-            'available_quantity' => $variant->availableQuantity(),
+            'is_out_of_stock'    => $isOutOfStock,
+            'is_available'       => $isAvailableForPurchase,
+            'available_quantity' => $availableQuantity,
             'thumbnail'          => $thumbnail,
             'attributes'         => $attributeValues,
             'attribute_summary'  => $attributeValues->pluck('value')->filter()->implode(' • '),
             'pricing'            => $pricing,
             'is_active'          => $variant->getKey() === $this->activeVariantId,
         ];
+    }
+
+    private function resolveVariantAttributeLabel(?Attribute $attribute, VariantAttributeValue $value, string $attributeSlug): string
+    {
+        return $this->resolveAttributeLabel($attribute, $value->attribute_name, $attributeSlug);
+    }
+
+    private function resolveVariantAttributeValue(
+        ?AttributeValue $attributeValueModel,
+        VariantAttributeValue $value,
+        string $attributeSlug,
+        string $valueSlug
+    ): string {
+        $normalizedAttributeKey = $this->normalizeAttributeTranslationKey($attributeSlug);
+        $normalizedValueKey = $this->normalizeAttributeValueTranslationKey($valueSlug !== '' ? $valueSlug : (string) ($value->attribute_value ?? ''));
+        $rawVariantValue = $this->firstFilledString([
+            $value->getLocalizedValue(),
+            $value->attribute_value_display,
+            $value->attribute_value,
+        ]);
+
+        if ($this->isNumericLiteralAttributeKey($normalizedAttributeKey) && $this->isNumericString($rawVariantValue)) {
+            return $rawVariantValue;
+        }
+
+        foreach ($this->attributeValueTranslationKeys($normalizedAttributeKey, $normalizedValueKey) as $translationKey) {
+            $translated = $this->translatedLineOrNull($translationKey);
+
+            if ($translated !== null) {
+                return $translated;
+            }
+        }
+
+        $candidateValues = [
+            $value->getLocalizedValue(),
+            $value->attribute_value_display,
+            $value->attribute_value,
+            $attributeValueModel?->trans('value'),
+            $attributeValueModel?->display_value,
+            $attributeValueModel?->value,
+        ];
+
+        foreach ($candidateValues as $candidate) {
+            if (! is_string($candidate)) {
+                continue;
+            }
+
+            $candidate = trim($candidate);
+
+            if ($candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        return '';
+    }
+
+    /**
+     * @param array<int, mixed> $candidates
+     */
+    private function firstFilledString(array $candidates): ?string
+    {
+        foreach ($candidates as $candidate) {
+            if (is_numeric($candidate)) {
+                return (string) $candidate;
+            }
+
+            if (! is_string($candidate)) {
+                continue;
+            }
+
+            $trimmed = trim($candidate);
+
+            if ($trimmed !== '') {
+                return $trimmed;
+            }
+        }
+
+        return null;
+    }
+
+    private function resolveAttributeLabel(?Attribute $attribute, ?string $fallbackName = null, ?string $attributeSlug = null): string
+    {
+        $normalizedAttributeKey = $this->normalizeAttributeTranslationKey(
+            $attribute?->slug
+                ?? $attributeSlug
+                ?? $fallbackName
+                ?? 'attribute'
+        );
+
+        foreach ($this->attributeLabelTranslationKeys($normalizedAttributeKey) as $translationKey) {
+            $translated = $this->translatedLineOrNull($translationKey);
+
+            if ($translated !== null) {
+                return $translated;
+            }
+        }
+
+        $candidateValues = [
+            $attribute?->trans('name'),
+            $attribute?->name,
+            $fallbackName,
+        ];
+
+        foreach ($candidateValues as $candidate) {
+            if (! is_string($candidate)) {
+                continue;
+            }
+
+            $candidate = trim($candidate);
+
+            if ($candidate !== '') {
+                return $candidate;
+            }
+        }
+
+        return Str::headline(str_replace('_', ' ', $normalizedAttributeKey));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function attributeLabelTranslationKeys(string $attributeKey): array
+    {
+        return [
+            "products.attributes.{$attributeKey}",
+            "admin.labels.{$attributeKey}",
+            "attribute.{$attributeKey}",
+            "products.{$attributeKey}",
+            "translations.{$attributeKey}",
+            "messages.{$attributeKey}",
+        ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function attributeValueTranslationKeys(string $attributeKey, string $valueKey): array
+    {
+        $keys = ["products.attribute_values.{$attributeKey}.{$valueKey}"];
+
+        if ($this->isBooleanLikeAttributeKey($attributeKey)) {
+            $keys[] = "products.attribute_values.common.{$valueKey}";
+        }
+
+        return $keys;
+    }
+
+    private function isBooleanLikeAttributeKey(string $attributeKey): bool
+    {
+        return in_array($attributeKey, [
+            'allow_backorder',
+            'hide_add_to_cart',
+            'is_active',
+            'is_enabled',
+            'is_featured',
+            'is_requestable',
+            'manage_stock',
+            'track_inventory',
+        ], true);
+    }
+
+    private function isNumericLiteralAttributeKey(string $attributeKey): bool
+    {
+        return in_array($attributeKey, [
+            'pack_size',
+            'size',
+            'height',
+            'length',
+            'width',
+            'weight',
+            'volume',
+            'minimum_quantity',
+            'stock_quantity',
+            'warehouse_quantity',
+        ], true);
+    }
+
+    private function isNumericString(?string $value): bool
+    {
+        if ($value === null) {
+            return false;
+        }
+
+        $normalized = str_replace(',', '.', trim($value));
+
+        return $normalized !== '' && is_numeric($normalized);
+    }
+
+    private function translatedLineOrNull(string $key): ?string
+    {
+        $translated = __($key);
+
+        if (! is_string($translated) || $translated === $key) {
+            return null;
+        }
+
+        $translated = trim($translated);
+
+        return $translated !== '' ? $translated : null;
+    }
+
+    private function normalizeAttributeTranslationKey(string $key): string
+    {
+        $normalized = Str::of(Str::snake($key))
+            ->ascii()
+            ->replaceMatches('/[^a-z0-9_]/', '_')
+            ->replaceMatches('/_+/', '_')
+            ->trim('_')
+            ->value();
+
+        return $normalized !== '' ? $normalized : 'attribute';
+    }
+
+    private function normalizeAttributeValueTranslationKey(string $key): string
+    {
+        $normalized = Str::of($key)
+            ->ascii()
+            ->lower()
+            ->replace(['-', ' '], '_')
+            ->replaceMatches('/[^a-z0-9_]/', '_')
+            ->replaceMatches('/_+/', '_')
+            ->trim('_')
+            ->value();
+
+        return $normalized !== '' ? $normalized : 'value';
     }
 
     private function formatMeasurement(null|int|float|string $value, ?string $unit): ?string

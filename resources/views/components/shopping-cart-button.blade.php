@@ -46,7 +46,7 @@
                 <div class="space-y-3 mb-4 max-h-64 overflow-y-auto">
                     {{-- Sample cart item - replace with actual cart items --}}
                     <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <img src="{{ product_placeholder_url('thumb') }}"
+                        <img src="{{ asset('images/placeholder-product.jpg') }}"
                              alt="{{ __('frontend.cart.sample_product_alt') }}"
                              class="w-12 h-12 object-cover rounded-lg">
                         <div class="flex-1">
@@ -72,7 +72,7 @@
                     <div class="flex gap-2">
                         <a wire:navigate
                            {{-- Navigate via Livewire so drawer metrics remain hydrated --}}
-                            href="{{ route('cart.index', ['locale' => app()->getLocale()]) ?? '/cart' }}"
+                            href="{{ route('cart.index', []) ?? '/cart' }}"
                            class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-center font-medium hover:bg-gray-200 transition-colors duration-200">
                             {{ __('frontend.cart.view_cart') }}
                         </a>
@@ -97,7 +97,7 @@
                     </svg>
                     <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('messages.frontend') }}</h4>
                     <p class="text-gray-600 mb-4">{{ __('frontend.cart.empty_description') }}</p>
-                    <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                    <a href="{{ route('products.index', []) ?? '/products' }}"
                        class="btn-gradient px-6 py-2 rounded-lg font-medium">
                         {{ __('frontend.cart.start_shopping') }}
                     </a>
@@ -106,3 +106,4 @@
         </div>
     </div>
 </div>
+

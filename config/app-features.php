@@ -21,7 +21,7 @@ return [
         'review'           => true,
         'inventory'        => true,
         'multi_currency'   => false,
-        'multi_language'   => true,
+        'multi_language'   => false,
         'seo'              => true,
         'advanced_pricing' => true,
         'customer_groups'  => true,
@@ -47,7 +47,7 @@ return [
      * | The locales supported by the application
      * |
      */
-    'supported_locales' => ['lt', 'en', 'ru', 'de'],
+    'supported_locales' => ['lt'],
 
     /*
      * |--------------------------------------------------------------------------
@@ -67,5 +67,5 @@ return [
      * | The fallback locale for the application
      * |
      */
-    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'lt'),
 ];

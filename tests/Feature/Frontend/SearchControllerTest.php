@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Frontend;
 
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
@@ -34,7 +36,9 @@ final class SearchControllerTest extends TestCase
 
         $product = Product::factory()->state($state)->create();
 
-        $response = $this->get('/lt/search?q=' . urlencode('Kniedė Bralo aliuminis/ plienas standartinė'));
+        $response = $this->get(route('frontend.search.index', [
+            'q' => 'Kniedė Bralo aliuminis/ plienas standartinė',
+        ]));
 
         $response->assertOk()
             ->assertSee($product->name);
@@ -68,5 +72,75 @@ final class SearchControllerTest extends TestCase
                 'id'   => $product->id,
                 'name' => $product->name,
             ]);
+    }
+
+    public function test_search_filters_by_category_slug(): void
+    {
+        app()->setLocale('lt');
+
+        $matchingCategory = Category::factory()->create([
+            'name' => 'Elektriniai įrankiai',
+            'slug' => 'elektriniai-irankiai',
+        ]);
+        $otherCategory = Category::factory()->create([
+            'name' => 'Saugos priemonės',
+            'slug' => 'saugos-priemones',
+        ]);
+
+        $matchingProduct = Product::factory()->create([
+            'name'         => 'Slug Filter Hammer A',
+            'slug'         => 'slug-filter-hammer-a',
+            'status'       => 'published',
+            'is_enabled'   => true,
+            'published_at' => now()->subDay(),
+        ]);
+        $matchingProduct->categories()->attach($matchingCategory);
+
+        $otherProduct = Product::factory()->create([
+            'name'         => 'Slug Filter Hammer B',
+            'slug'         => 'slug-filter-hammer-b',
+            'status'       => 'published',
+            'is_enabled'   => true,
+            'published_at' => now()->subDay(),
+        ]);
+        $otherProduct->categories()->attach($otherCategory);
+
+        $response = $this->get(route('frontend.search.index', [
+            'q'        => 'Slug Filter Hammer',
+            'category' => $matchingCategory->slug,
+        ]));
+
+        $response->assertOk();
+
+        /** @var LengthAwarePaginator<int, Product> $products */
+        $products = $response->viewData('products');
+        $visibleProductIds = collect($products->items())->pluck('id')->all();
+
+        $this->assertContains($matchingProduct->getKey(), $visibleProductIds);
+        $this->assertNotContains($otherProduct->getKey(), $visibleProductIds);
+    }
+
+    public function test_search_redirects_numeric_category_query_to_slug(): void
+    {
+        app()->setLocale('lt');
+
+        $category = Category::factory()->create([
+            'name' => 'Matavimo įranga',
+            'slug' => 'matavimo-iranga',
+        ]);
+
+        $response = $this->get(route('frontend.search.index', [
+            'q'        => 'mat',
+            'category' => (string) $category->getKey(),
+        ]));
+
+        $response->assertStatus(301);
+
+        $location = (string) $response->headers->get('Location');
+        $this->assertSame('/search', parse_url($location, PHP_URL_PATH));
+
+        parse_str((string) parse_url($location, PHP_URL_QUERY), $query);
+        $this->assertSame('mat', $query['q'] ?? null);
+        $this->assertSame($category->slug, $query['category'] ?? null);
     }
 }

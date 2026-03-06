@@ -16,7 +16,7 @@
                                     {{ $this->isValueSelected($attribute->slug, $value->value) 
                                         ? 'bg-blue-600 text-white border-blue-600' 
                                         : 'bg-white text-gray-700 border-gray-300 hover:border-blue-500 hover:text-blue-600' }}
-                                    {{ !$this->isValueAvailable($attribute->slug, $value->value) ? 'opacity-50 cursor-not-allowed' : '' }}"
+                                    {{ !$this->isValueAvailable($attribute->slug, $value->value) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}"
                                 {{ !$this->isValueAvailable($attribute->slug, $value->value) ? 'disabled' : '' }}
                             >
                                 {{ $value->display_value ?? $value->value }}
@@ -157,7 +157,7 @@
                 type="button"
                 wire:click="addToCart"
                 class="w-full cursor-pointer bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200
-                    {{ !$selectedVariant->isAvailableForPurchase() ? 'opacity-50 cursor-not-allowed' : '' }}"
+                    {{ !$selectedVariant->isAvailableForPurchase() ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}"
                 {{ !$selectedVariant->isAvailableForPurchase() ? 'disabled' : '' }}
             >
                 @if($selectedVariant->isAvailableForPurchase())
@@ -183,11 +183,11 @@
             <h4 class="text-sm font-medium text-gray-700 mb-3">{{ __('product.variants.fields.images') }}</h4>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                 @foreach($selectedVariant->images->take(4) as $image)
-                    <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                    <div class="aspect-square flex items-center justify-center bg-gray-100 rounded-lg overflow-hidden">
                         <img
                             src="{{ $image->image_url }}"
                             alt="{{ $image->formatted_alt_text }}"
-                            class="w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                            class="h-auto w-auto max-h-full max-w-full object-contain"
                         >
                     </div>
                 @endforeach

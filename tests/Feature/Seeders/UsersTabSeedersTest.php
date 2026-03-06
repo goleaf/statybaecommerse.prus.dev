@@ -14,7 +14,7 @@ uses(RefreshDatabase::class);
 it('registers users tab seeders in the standard seeder profile', function (): void {
     $standardSeeders = config('seeds.standard_seeders', []);
 
-    expect($standardSeeders)->toContain(UsersCompanyTabSeeder::class);
+    expect($standardSeeders)->not->toContain(UsersCompanyTabSeeder::class);
     expect($standardSeeders)->toContain(UsersCustomerGroupsTabSeeder::class);
     expect($standardSeeders)->toContain(UsersPartnersTabSeeder::class);
 });

@@ -17,26 +17,12 @@ class SetLocale
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $supportedLocales = explode(',', config('app.supported_locales', 'lt,en'));
-
-        // Check if this is an admin panel request
-        $isAdminPanel = $request->is('admin') || $request->is('admin/*');
-
-        if ($isAdminPanel) {
-            // For admin panel, use English as default but allow switching
-            $locale = Session::get('admin_locale', 'en');
-            if (! in_array($locale, $supportedLocales)) {
-                $locale = 'en';
-            }
-        } else {
-            // For frontend, use Lithuanian as default
-            $locale = Session::get('locale', config('app.locale', 'lt'));
-            if (! in_array($locale, $supportedLocales)) {
-                $locale = config('app.locale', 'lt');
-            }
-        }
+        $locale = 'lt';
 
         App::setLocale($locale);
+        Session::put('locale', $locale);
+        Session::put('admin_locale', $locale);
+        Session::put('app.locale', $locale);
 
         return $next($request);
     }

@@ -27,7 +27,8 @@ class SlidersTable
             ->columns([
                 SpatieMediaLibraryImageColumn::make('image')
                     ->label(__('translations.slide_image'))
-                    ->collection('slider_images'),
+                    ->collection('slider_images')
+                    ->defaultImageUrl(static fn (Slider $record): ?string => $record->getFirstMediaUrl('mobile_images', 'thumb') ?: $record->getFirstMediaUrl('mobile_images')),
                 TextColumn::make('title')
                     ->label(__('messages.title'))
                     ->searchable()

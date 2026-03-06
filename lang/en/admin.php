@@ -45,7 +45,7 @@ return [
         'referred_user'                         => 'Referred User',
         'role'                                  => 'Role',
         'similar_product'                       => 'Similar Product',
-        'size_type'                             => 'Size Type',
+        'size_type'                             => 'Size variant',
         'sku'                                   => 'SKU',
         'stock_status'                          => 'Stock Status',
         'standard_invoice_template_for_billing' => 'Standard invoice template for billing',

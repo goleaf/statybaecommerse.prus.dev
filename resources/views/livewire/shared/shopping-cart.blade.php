@@ -1,3 +1,14 @@
+@php
+    $dropdownProductIds = collect($this->cartItems ?? [])
+        ->map(static fn (array $item): int => (int) ($item['product_id'] ?? $item['productId'] ?? 0))
+        ->filter(static fn (int $id): bool => $id > 0)
+        ->unique()
+        ->values();
+    $dropdownProductSlugById = $dropdownProductIds->isNotEmpty()
+        ? \App\Models\Product::query()->whereIn('id', $dropdownProductIds->all())->pluck('slug', 'id')
+        : collect();
+@endphp
+
 <div class="relative">
     {{-- Cart Icon Button --}}
     <button wire:click="toggleCart" 
@@ -22,15 +33,40 @@
                 @if ($this->cartItems->count() > 0)
                     <div class="space-y-3 max-h-64 overflow-y-auto">
                         @foreach ($this->cartItems as $item)
+                            @php
+                                $productId = (int) ($item['product_id'] ?? $item['productId'] ?? 0);
+                                $productSlug = $productId > 0 ? $dropdownProductSlugById->get($productId) : null;
+                                $productUrl = is_string($productSlug) && $productSlug !== ''
+                                    ? (\Illuminate\Support\Facades\Route::has('products.show')
+                                        ? route('products.show', ['product' => $productSlug])
+                                        : (\Illuminate\Support\Facades\Route::has('frontend.products.show')
+                                            ? route('frontend.products.show', ['product' => $productSlug])
+                                            : '#'))
+                                    : '#';
+                            @endphp
                             <div wire:key="cart-item-{{ $item['id'] }}" class="flex items-center space-x-3 border-b border-gray-100 pb-3">
                                 @if (! empty($item['image_url']))
+                                    @if ($productUrl !== '#')
+                                        <a href="{{ $productUrl }}" class="block">
+                                    @endif
                                     <img src="{{ $item['image_url'] }}"
                                          alt="{{ $item['name'] }}"
                                          class="w-12 h-12 object-cover rounded">
+                                    @if ($productUrl !== '#')
+                                        </a>
+                                    @endif
                                 @endif
 
                                 <div class="flex-1">
-                                    <h4 class="text-sm font-medium">{{ $item['name'] }}</h4>
+                                    <h4 class="text-sm font-medium">
+                                        @if ($productUrl !== '#')
+                                            <a href="{{ $productUrl }}" class="hover:text-blue-600">
+                                                {{ $item['name'] }}
+                                            </a>
+                                        @else
+                                            {{ $item['name'] }}
+                                        @endif
+                                    </h4>
                                     <p class="text-xs text-gray-500">{{ format_currency($item['unit_price']) }}</p>
 
                                     <div class="flex items-center space-x-2 mt-1">

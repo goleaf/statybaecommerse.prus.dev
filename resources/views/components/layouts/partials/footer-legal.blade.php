@@ -10,7 +10,7 @@
                     $slug = $legal->translations()->where('locale', $locale)->value('slug') ?: $legal->slug;
                     $title = $legal->translations()->where('locale', $locale)->value('title') ?: $legal->title;
                 @endphp
-                <a href="{{ route('legal.show', ['locale' => $locale, 'slug' => $slug]) }}" class="hover:underline">
+                <a href="{{ route('legal.show', ['slug' => $slug]) }}" class="hover:underline">
                     {{ $title }}
                 </a>
             @endforeach
@@ -18,3 +18,4 @@
     </div>
     @yield('footer-extra')
 </footer>
+

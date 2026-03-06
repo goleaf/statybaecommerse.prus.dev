@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
-use App\Filament\Resources\OrderResource;
 use App\Enums\OrderPaymentState;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentStatus;
+use App\Filament\RelationManagers\Concerns\ResolvesOwnerPageRedirect;
+use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\UserResource;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -24,6 +26,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class OrdersRelationManager extends RelationManager
 {
+    use ResolvesOwnerPageRedirect;
+
     protected static string $relationship = 'orders';
 
     public function form(Schema $schema): Schema
@@ -89,7 +93,7 @@ class OrdersRelationManager extends RelationManager
                     ->icon('heroicon-m-plus')
                     ->url(fn (): string => OrderResource::getUrl('create', [
                         'user_id'  => $this->getOwnerRecord()->getKey(),
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
             ])
             ->recordActions([
@@ -97,13 +101,13 @@ class OrdersRelationManager extends RelationManager
                     ->icon('heroicon-m-eye')
                     ->url(fn ($record): string => OrderResource::getUrl('view', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 Action::make('edit')
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn ($record): string => OrderResource::getUrl('edit', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 DeleteAction::make(),
             ])
@@ -202,4 +206,3 @@ class OrdersRelationManager extends RelationManager
         return round((float) $value, 2);
     }
 }
-

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Statyba favicon">
+  <rect x="24" y="24" width="464" height="464" rx="88" fill="#fff" />
+  <g fill="#0a0a0a" stroke="#0a0a0a" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M88 250L256 176L424 250" fill="none" stroke-width="24" />
+    <path d="M104 282L256 214L408 282" fill="none" stroke-width="18" />
+    <rect x="234" y="116" width="44" height="220" />
+    <rect x="118" y="250" width="28" height="110" />
+    <rect x="146" y="250" width="54" height="28" />
+    <rect x="266" y="252" width="80" height="28" />
+    <rect x="318" y="252" width="28" height="108" />
+    <rect x="104" y="360" width="112" height="18" />
+    <rect x="296" y="360" width="116" height="18" />
+  </g>
+</svg>

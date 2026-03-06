@@ -522,9 +522,8 @@ final class Category extends Model implements HasMedia
             return route('frontend.categories.show', ['category' => $parameter]);
         }
 
-        if (Route::has('localized.categories.show')) {
-            return route('localized.categories.show', [
-                'locale'   => app()->getLocale(),
+        if (Route::has('frontend.categories.show')) {
+            return route('frontend.categories.show', [
                 'category' => $parameter,
             ]);
         }
@@ -1143,3 +1142,4 @@ final class Category extends Model implements HasMedia
         return '(?i)^(?!(?:' . implode('|', $escaped) . ')$)[a-z0-9\\-]+$';
     }
 }
+

@@ -44,7 +44,7 @@ use Illuminate\Support\Str;
  *
  * @mixin \Eloquent
  */
-final class Notification extends DatabaseNotification
+class Notification extends DatabaseNotification
 {
     /**
      * @use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\NotificationFactory>

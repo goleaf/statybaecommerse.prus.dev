@@ -218,7 +218,7 @@
                         <h4 class="font-semibold text-gray-900 mb-3">{{ __('frontend.search_results.suggestions.browse_categories') }}</h4>
                         <div class="space-y-2">
                             @foreach ($suggestions[__('frontend.search_results.suggestions.categories_title')] as $category)
-                                <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                                <a href="{{ route('frontend.categories.index', []) }}"
                                    class="block px-3 py-2 text-sm text-gray-600 hover:bg-white hover:text-blue-600 rounded-lg transition-colors duration-200">
                                     {{ $category }}
                                 </a>
@@ -348,3 +348,5 @@
         }
     }
 </script>
+
+

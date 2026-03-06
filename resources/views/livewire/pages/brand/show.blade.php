@@ -21,7 +21,7 @@
             <nav class="flex mb-8" aria-label="{{ __('frontend.navigation.breadcrumbs') }}">
                 <ol class="inline-flex items-center space-x-1 md:space-x-3">
                     <li class="inline-flex items-center">
-                        <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}" class="inline-flex items-center text-blue-100 hover:text-white">
+                        <a href="{{ route('home', []) }}" class="inline-flex items-center text-blue-100 hover:text-white">
                             <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" />
                             </svg>
@@ -33,7 +33,7 @@
                             <svg class="w-4 h-4 text-blue-200" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
                             </svg>
-                            <a href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}" class="ml-1 text-blue-100 hover:text-white md:ml-2">
+                            <a href="{{ route('frontend.brands.index', []) }}" class="ml-1 text-blue-100 hover:text-white md:ml-2">
                                 {{ __('messages.shared') }}
                             </a>
                         </div>
@@ -178,7 +178,7 @@
                         <x-slot name="footer">
                             @if($brand->products()->where('is_visible', true)->whereNotNull('published_at')->count() > 12)
                                 <x-shared.button
-                                    href="{{ route('localized.products.index', ['locale' => app()->getLocale(), 'brand' => $brand->getTranslatedSlug()]) }}"
+                                    href="{{ route('frontend.products.index', ['brand' => $brand->getTranslatedSlug()]) }}"
                                     variant="primary"
                                     size="sm"
                                     class="w-full"
@@ -325,7 +325,7 @@
                             
                             <div class="p-4">
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 mb-2">
-                                    <a href="{{ route('localized.brands.show', ['locale' => app()->getLocale(), 'slug' => $relatedBrand->getTranslatedSlug()]) }}" class="stretched-link">
+                                    <a href="{{ route('localized.brands.show', ['slug' => $relatedBrand->getTranslatedSlug()]) }}" class="stretched-link">
                                         {{ $relatedBrand->getTranslatedName() }}
                                     </a>
                                 </h3>
@@ -347,3 +347,5 @@
         </div>
     @endif
 </div>
+
+

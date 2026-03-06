@@ -1,20 +1,26 @@
+@php
+    $productUrl = route('product.show', $product->slug ?? $product);
+@endphp
+
 <div class="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow duration-200">
     <!-- Product Image -->
     <div class="aspect-square bg-gray-100 relative overflow-hidden">
-        @if ($product->hasImages())
-            @php $imageAttrs = $product->getResponsiveImageAttributes('md'); @endphp
-            <img src="{{ $imageAttrs['src'] }}"
-                 srcset="{{ $imageAttrs['srcset'] }}"
-                 sizes="{{ $imageAttrs['sizes'] }}"
-                 alt="{{ $imageAttrs['alt'] }}"
-                 loading="lazy"
-                 class="w-full h-full object-cover">
-        @else
-            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                <span
-                      class="text-lg text-gray-500 font-medium">{{ strtoupper(substr($product->trans('name') ?? $product->name, 0, 3)) }}</span>
-            </div>
-        @endif
+        <a href="{{ $productUrl }}" class="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
+            @if ($product->hasImages())
+                @php $imageAttrs = $product->getResponsiveImageAttributes('md'); @endphp
+                <img src="{{ $imageAttrs['src'] }}"
+                     srcset="{{ $imageAttrs['srcset'] }}"
+                     sizes="{{ $imageAttrs['sizes'] }}"
+                     alt="{{ $imageAttrs['alt'] }}"
+                     loading="lazy"
+                     class="w-full h-full object-cover">
+            @else
+                <img src="{{ asset('images/placeholder-product.jpg') }}"
+                     alt="{{ $product->trans('name') ?? $product->name }}"
+                     loading="lazy"
+                     class="w-full h-full object-cover">
+            @endif
+        </a>
 
         <!-- Discount Badge -->
         @if ($this->discountPercentage)
@@ -43,7 +49,7 @@
 
         <!-- Product Name -->
         <h3 class="text-sm font-medium text-gray-900 mb-2 line-clamp-2">
-            <a href="{{ route('product.show', $product->slug) }}" class="hover:text-blue-600">
+            <a href="{{ $productUrl }}" class="hover:text-blue-600">
                 {{ $product->name }}
             </a>
         </h3>

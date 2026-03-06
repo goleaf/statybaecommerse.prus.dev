@@ -21,13 +21,18 @@
                 @foreach ($products as $product)
                     <div
                          class="rounded-xl border border-gray-200 bg-white p-3 shadow-sm dark:border-white/10 dark:bg-gray-900">
+                        @php
+                            $productUrl = \Illuminate\Support\Facades\Route::has('frontend.products.show')
+                                ? route('frontend.products.show', $product)
+                                : (\Illuminate\Support\Facades\Route::has('products.show')
+                                    ? route('products.show', $product)
+                                    : '#');
+                        @endphp
                         @php($media = $product->getFirstMedia(config('media.storage.collection_name')))
-                        @if ($media)
-                            <img src="{{ $media->getFullUrl() }}" alt="{{ $product->trans('name') ?? $product->name }}"
+                        <a href="{{ $productUrl }}" class="block">
+                            <img src="{{ $media ? $media->getFullUrl() : asset('images/placeholder-product.jpg') }}" alt="{{ $product->trans('name') ?? $product->name }}"
                                  class="w-full h-40 object-cover rounded-lg">
-                        @else
-                            <div class="w-full h-40 bg-gray-100 rounded-lg dark:bg-white/5"></div>
-                        @endif
+                        </a>
                         <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">
                             {{ $product->trans('name') ?? $product->name }}</h3>
                         @php($price = $product->prices->first())

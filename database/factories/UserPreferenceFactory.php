@@ -7,6 +7,7 @@ namespace Database\Factories;
 use App\Models\User;
 use App\Models\UserPreference;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\UserPreference>
@@ -47,7 +48,7 @@ final class UserPreferenceFactory extends Factory
         return [
             'user_id'          => User::factory(),
             'preference_type'  => fake()->randomElement($preferenceTypes),
-            'preference_key'   => fake()->randomElement($preferenceKeys),
+            'preference_key'   => $this->buildUniqueKey(fake()->randomElement($preferenceKeys)),
             'preference_score' => fake()->randomFloat(6, 0, 1),
             'last_updated'     => fake()->dateTimeBetween('-30 days', 'now'),
             'metadata'         => [
@@ -75,7 +76,7 @@ final class UserPreferenceFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'preference_type' => 'category',
-            'preference_key'  => fake()->randomElement(['electronics', 'clothing', 'books', 'home', 'sports']),
+            'preference_key'  => $this->buildUniqueKey(fake()->randomElement(['electronics', 'clothing', 'books', 'home', 'sports'])),
         ]);
     }
 
@@ -86,7 +87,7 @@ final class UserPreferenceFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'preference_type' => 'brand',
-            'preference_key'  => fake()->randomElement(['apple', 'samsung', 'nike', 'adidas', 'sony']),
+            'preference_key'  => $this->buildUniqueKey(fake()->randomElement(['apple', 'samsung', 'nike', 'adidas', 'sony'])),
         ]);
     }
 
@@ -97,7 +98,7 @@ final class UserPreferenceFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'preference_type' => 'price_range',
-            'preference_key'  => fake()->randomElement(['0-50', '50-100', '100-500', '500-1000', '1000+']),
+            'preference_key'  => $this->buildUniqueKey(fake()->randomElement(['0-50', '50-100', '100-500', '500-1000', '1000+'])),
         ]);
     }
 
@@ -149,5 +150,10 @@ final class UserPreferenceFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'metadata' => $metadata,
         ]);
+    }
+
+    private function buildUniqueKey(string $base): string
+    {
+        return $base . '-' . Str::lower(Str::random(6));
     }
 }

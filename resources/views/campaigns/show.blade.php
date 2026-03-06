@@ -202,11 +202,9 @@
                                 <a href="{{ route('frontend.products.show', $product) }}"
                                    class="block p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                                     <div class="flex items-center space-x-3">
-                                        @if ($product->featured_image)
-                                            <img src="{{ $product->getFeaturedImageUrl() }}"
-                                                 alt="{{ $product->trans('name') }}"
-                                                 class="w-10 h-10 object-cover rounded">
-                                        @endif
+                                        <img src="{{ $product->featured_image ? $product->getFeaturedImageUrl() : asset('images/placeholder-product.jpg') }}"
+                                             alt="{{ $product->trans('name') }}"
+                                             class="w-10 h-10 object-cover rounded">
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
                                                 {{ $product->trans('name') }}

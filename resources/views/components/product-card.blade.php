@@ -11,8 +11,9 @@
 
 @php
     $product = $product ?? new \App\Models\Product();
-    $imageUrl = $product->getImageUrl('preview') ?? $product->main_image ?? $product->thumbnail;
+    $imageUrl = $product->getImageUrl('preview') ?? $product->main_image ?? $product->thumbnail ?? asset('images/placeholder-product.jpg');
     $isNew = $product->created_at && $product->created_at->diffInDays() < 30;
+    $productUrl = route('product.show', $product->slug ?? $product);
 @endphp
 
 <div
@@ -29,7 +30,7 @@
     {{-- Enhanced Product Image with modern effects --}}
     <div
          class="aspect-w-1 aspect-h-1 bg-gradient-to-br from-gray-100 dark:from-gray-700 to-gray-200 dark:to-gray-600 relative overflow-hidden rounded-t-2xl">
-        @if ($imageUrl)
+        <a href="{{ $productUrl }}" class="block focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
             <img src="{{ $imageUrl }}"
                  alt="{{ $product->name }}"
                  class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
@@ -42,15 +43,7 @@
             <div
                  class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out">
             </div>
-        @else
-            <div class="w-full h-64 bg-gradient-to-br from-gray-100 dark:from-gray-700 to-gray-200 dark:to-gray-600 flex items-center justify-center">
-                <svg class="w-16 h-16 text-gray-400 dark:text-gray-500 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors duration-300"
-                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-            </div>
-        @endif
+        </a>
 
         {{-- Enhanced Badges with modern design --}}
         @if ($showBadge)
@@ -74,8 +67,8 @@
 
         {{-- Enhanced Quick Actions with modern design --}}
         <div
-             class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center z-20">
-            <div class="flex gap-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+             class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center z-20 pointer-events-none">
+            <div class="flex gap-3 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 pointer-events-auto">
                 @if ($showQuickView)
                     <button class="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md text-gray-700 dark:text-gray-200 p-3 rounded-full shadow-lg hover:bg-white dark:hover:bg-gray-700 hover:scale-110 transition-all duration-200 border border-white/20 dark:border-gray-600/20"
                             title="{{ __('messages.quick_view') }}">
@@ -107,7 +100,7 @@
         {{-- Product Name with enhanced styling --}}
         <h3
             class="font-bold text-gray-900 dark:text-white text-lg mb-3 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-            <a href="{{ route('product.show', $product->slug ?? $product) }}" class="hover:text-blue-600 dark:hover:text-blue-400">
+            <a href="{{ $productUrl }}" class="hover:text-blue-600 dark:hover:text-blue-400">
                 {{ $product->name }}
             </a>
         </h3>

@@ -30,6 +30,9 @@ final class DashboardMetricsRepositoryTest extends TestCase
         // Clear cache before each test
         Cache::flush();
 
+        // Remove seeded orders so each assertion only evaluates records created in this test.
+        Order::query()->withoutGlobalScopes()->delete();
+
         // Set test time
         CarbonImmutable::setTestNow(CarbonImmutable::create(2024, 6, 15, 12));
     }

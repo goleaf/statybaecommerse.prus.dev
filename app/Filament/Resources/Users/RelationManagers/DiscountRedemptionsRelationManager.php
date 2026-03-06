@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\RelationManagers\Concerns\ResolvesOwnerPageRedirect;
 use App\Filament\Resources\DiscountRedemptionResource;
+use App\Filament\Resources\UserResource;
 use App\Models\DiscountRedemption;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -21,6 +23,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class DiscountRedemptionsRelationManager extends RelationManager
 {
+    use ResolvesOwnerPageRedirect;
+
     protected static string $relationship = 'discountRedemptions';
 
     public function form(Schema $schema): Schema
@@ -71,7 +75,7 @@ class DiscountRedemptionsRelationManager extends RelationManager
                     ->icon('heroicon-m-plus')
                     ->url(fn (): string => DiscountRedemptionResource::getUrl('create', [
                         'user_id'  => $this->getOwnerRecord()->getKey(),
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
             ])
             ->recordActions([
@@ -79,13 +83,13 @@ class DiscountRedemptionsRelationManager extends RelationManager
                     ->icon('heroicon-m-eye')
                     ->url(fn (DiscountRedemption $record): string => DiscountRedemptionResource::getUrl('view', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 Action::make('edit')
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn (DiscountRedemption $record): string => DiscountRedemptionResource::getUrl('edit', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 DeleteAction::make(),
             ])
@@ -96,4 +100,3 @@ class DiscountRedemptionsRelationManager extends RelationManager
             ]);
     }
 }
-

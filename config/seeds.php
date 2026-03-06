@@ -19,7 +19,6 @@ use Database\Seeders\NewsSeeder;
 use Database\Seeders\OptimizedFullSeeder;
 use Database\Seeders\ServiceSeeder;
 use Database\Seeders\SettingsSeeder;
-use Database\Seeders\UsersCompanyTabSeeder;
 use Database\Seeders\UsersCustomerGroupsTabSeeder;
 use Database\Seeders\UsersPartnersTabSeeder;
 use Database\Seeders\WarehouseSeeder;
@@ -94,7 +93,6 @@ return [
         LegalSeeder::class,
         NewsSeeder::class,
         CustomerGroupSeeder::class,
-        UsersCompanyTabSeeder::class,
         UsersCustomerGroupsTabSeeder::class,
         UsersPartnersTabSeeder::class,
         ServiceSeeder::class,

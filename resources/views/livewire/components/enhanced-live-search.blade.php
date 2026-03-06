@@ -217,7 +217,12 @@
                             <!-- Enhanced Result Image -->
                             <div class="flex-shrink-0">
                                 {{-- Consolidate enhanced search imagery around the new API response keys. --}}
-                                @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
+                                @php
+                                    $image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null);
+                                    if (($result['type'] ?? null) === 'product' && empty($image)) {
+                                        $image = asset('images/placeholder-product.jpg');
+                                    }
+                                @endphp
                                 @if($image)
                                     <img
                                         src="{{ $image }}"
@@ -303,7 +308,7 @@
             <!-- Enhanced View All Results Link -->
             <div class="border-t border-gray-200 bg-gray-50">
                 <a 
-                    href="{{ route('localized.search', ['locale' => app()->getLocale(), 'q' => $query]) }}"
+                    href="{{ route('frontend.search.index', ['q' => $query]) }}"
                     class="block w-full px-4 py-3 text-center text-sm font-medium text-blue-600 hover:bg-blue-50 focus:bg-blue-50 focus:outline-none transition-colors duration-200"
                 >
                     <div class="flex items-center justify-center gap-2">
@@ -460,3 +465,4 @@
         @endif
     </div>
 </div>
+

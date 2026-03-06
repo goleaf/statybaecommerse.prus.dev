@@ -19,7 +19,7 @@ class RobotsController extends Controller
      */
     public function __invoke(): Response
     {
-        // Resolve the application URL so we can derive a stable host and scheme for the sitemap entries.
+        // Resolve the application URL so we can derive a stable host and scheme for the sitemap entry.
         $configuredAppUrl = config('app.url');
 
         // Safely coerce the application URL to a string because the configuration helper returns mixed values.
@@ -39,76 +39,17 @@ class RobotsController extends Controller
         $scheme = parse_url($appUrl, PHP_URL_SCHEME);
         $scheme = is_string($scheme) && $scheme !== '' ? $scheme : (request()->getScheme() ?: 'https');
 
-        // Normalise the supported locale list so both comma-separated strings and arrays are handled consistently.
-        $supportedLocalesConfig = config('app.supported_locales', 'en');
-
-        if ($supportedLocalesConfig instanceof Stringable) {
-            $supportedLocalesConfig = (string) $supportedLocalesConfig;
-        }
-
-        if (! is_array($supportedLocalesConfig) && ! is_string($supportedLocalesConfig)) {
-            $supportedLocalesConfig = '';
-        }
-
-        $locales = $this->normaliseLocales($supportedLocalesConfig);
-
-        // Compose the robots.txt directives, including sitemaps for every enabled locale.
+        // Compose robots.txt directives with one locale-agnostic sitemap URL.
         $lines = [
             'User-agent: *',
             'Disallow: /admin/',
+            sprintf('Sitemap: %s://%s/sitemap.xml', $scheme, $host),
         ];
-
-        foreach ($locales as $locale) {
-            $lines[] = sprintf('Sitemap: %s://%s/%s/sitemap.xml', $scheme, $host, $locale);
-        }
 
         // Join the robots rules with Unix newlines and ensure a trailing newline as search engines expect.
         $content = implode(PHP_EOL, $lines) . PHP_EOL;
 
         // Return the plain-text response with the generated robots.txt body.
         return response($content, Response::HTTP_OK)->header('Content-Type', 'text/plain');
-    }
-
-    /**
-     * Normalise the supported locales configuration value to a clean array of locale codes.
-     *
-     * @param  array<mixed>|Stringable|string $locales
-     * @return array<int, string>
-     */
-    private function normaliseLocales(array|string|Stringable $locales): array
-    {
-        // Convert comma-separated strings into arrays for uniform processing.
-        if (is_string($locales)) {
-            $locales = explode(',', $locales);
-        } elseif ($locales instanceof Stringable) {
-            $locales = explode(',', (string) $locales);
-        }
-
-        /** @var array<int, mixed> $localeArray */
-        $localeArray = $locales;
-
-        // Ensure each locale is treated as a string before trimming and filtering.
-        $normalisedLocales = array_map(
-            static function ($locale): string {
-                if ($locale instanceof Stringable) {
-                    return (string) $locale;
-                }
-
-                if (is_scalar($locale)) {
-                    return (string) $locale;
-                }
-
-                return '';
-            },
-            $localeArray,
-        );
-
-        // Trim whitespace, discard empty values, remove duplicates, and return the resulting list.
-        return collect($normalisedLocales)
-            ->map(static fn (string $locale): string => trim($locale))
-            ->filter()
-            ->unique()
-            ->values()
-            ->all();
     }
 }

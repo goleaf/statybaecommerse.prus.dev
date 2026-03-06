@@ -14,6 +14,10 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\CarbonInterface;
+use DateTimeInterface;
+use JsonException;
 use JsonSerializable;
 
 /**
@@ -81,6 +85,68 @@ final class UserPreference extends Model
         'metadata' => 'array',
     ];
 
+    protected static function booted(): void
+    {
+        static::saving(static function (self $preference): void {
+            $type = $preference->getAttribute('preference_type');
+            $key = $preference->getAttribute('preference_key');
+
+            $resolvedType = is_string($type) && $type !== '' ? $type : null;
+            $resolvedKey = is_string($key) && $key !== '' ? $key : null;
+
+            if ($resolvedKey === null) {
+                [, $parsedKey] = self::parseLegacyKey($preference->attributes['key'] ?? null);
+                $resolvedKey = $parsedKey;
+            }
+
+            if ($resolvedType === null) {
+                [$parsedType] = self::parseLegacyKey($preference->attributes['key'] ?? null);
+                $resolvedType = $parsedType;
+            }
+
+            $legacyKey = $resolvedKey;
+
+            if ($resolvedKey !== null && $resolvedType !== null) {
+                $legacyKey = $resolvedType . ':' . $resolvedKey;
+            }
+
+            if (! is_string($legacyKey) || $legacyKey === '') {
+                $legacyKey = sprintf('pref_%s', uniqid('', true));
+            }
+
+            $preference->attributes['key'] = $legacyKey;
+
+            $rawMetadata = $preference->getAttribute('metadata');
+            $metadata = null;
+
+            if (is_string($rawMetadata) && $rawMetadata !== '') {
+                $decodedMetadata = json_decode($rawMetadata, true);
+                $metadata = is_array($decodedMetadata) ? $decodedMetadata : null;
+            } elseif (is_array($rawMetadata)) {
+                $metadata = $rawMetadata;
+            }
+
+            $lastUpdated = $preference->getAttribute('last_updated');
+            $resolvedLastUpdated = null;
+
+            if ($lastUpdated instanceof CarbonInterface) {
+                $resolvedLastUpdated = $lastUpdated->toDateTimeString();
+            } elseif (is_string($lastUpdated) && $lastUpdated !== '') {
+                $resolvedLastUpdated = $lastUpdated;
+            }
+
+            $payload = array_filter([
+                'type'         => $resolvedType,
+                'key'          => $resolvedKey,
+                'score'        => self::normaliseScore($preference->getAttribute('preference_score')),
+                'metadata'     => $metadata,
+                'last_updated' => $resolvedLastUpdated,
+            ], static fn (mixed $value): bool => $value !== null);
+
+            $preference->attributes['value'] = self::encodeLegacyValuePayload($payload);
+        });
+    }
+
     /**
      * Translate legacy attribute names into the modern aliases so existing factories continue to work.
      */
@@ -128,6 +194,62 @@ final class UserPreference extends Model
     }
 
     /**
+     * @return array{0: string|null, 1: string|null}
+     */
+    private static function parseLegacyKey(mixed $legacyKey): array
+    {
+        if (! is_string($legacyKey) || $legacyKey === '') {
+            return [null, null];
+        }
+
+        $parts = explode(':', $legacyKey, 2);
+
+        if (count($parts) !== 2) {
+            return [null, $legacyKey];
+        }
+
+        $type = trim($parts[0]);
+        $key = trim($parts[1]);
+
+        return [
+            $type !== '' ? $type : null,
+            $key !== '' ? $key : null,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function decodeLegacyValuePayload(mixed $rawValue): array
+    {
+        if (is_array($rawValue)) {
+            return $rawValue;
+        }
+
+        if (! is_string($rawValue) || $rawValue === '') {
+            return [];
+        }
+
+        $decoded = json_decode($rawValue, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private static function encodeLegacyValuePayload(array $payload): string
+    {
+        try {
+            return json_encode($payload, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            $encoded = json_encode($payload);
+
+            return is_string($encoded) ? $encoded : '{}';
+        }
+    }
+
+    /**
      * Keep direct access to the legacy preference_score column precise for any existing call sites.
      *
      * @return Attribute<float|null, float|null>
@@ -135,8 +257,13 @@ final class UserPreference extends Model
     protected function preferenceScore(): Attribute
     {
         return Attribute::make(
-            get: self::normaliseScore(...),
-            set: self::normaliseScore(...),
+            get: static function (mixed $value, array $attributes): ?float {
+                $legacyPayload = self::decodeLegacyValuePayload($attributes['value'] ?? null);
+                $resolved = $attributes['preference_score'] ?? ($legacyPayload['score'] ?? $value);
+
+                return self::normaliseScore($resolved);
+            },
+            set: static fn (mixed $value): array => ['preference_score' => self::normaliseScore($value)],
         );
     }
 
@@ -149,7 +276,12 @@ final class UserPreference extends Model
     {
         // Link the friendly alias onto the stored `preference_score` column so existing queries keep working.
         return Attribute::make(
-            get: static fn (mixed $value, array $attributes): ?float => self::normaliseScore($attributes['preference_score'] ?? $value),
+            get: static function (mixed $value, array $attributes): ?float {
+                $legacyPayload = self::decodeLegacyValuePayload($attributes['value'] ?? null);
+                $resolved = $attributes['preference_score'] ?? ($legacyPayload['score'] ?? $value);
+
+                return self::normaliseScore($resolved);
+            },
             set: static fn (mixed $value): array => ['preference_score' => self::normaliseScore($value)],
         );
     }
@@ -166,7 +298,9 @@ final class UserPreference extends Model
         return Attribute::make(
             /** @return string|null */
             get: static function (mixed $value, array $attributes): ?string {
-                $resolved = $attributes['preference_type'] ?? $value;
+                $legacyPayload = self::decodeLegacyValuePayload($attributes['value'] ?? null);
+                [$legacyType] = self::parseLegacyKey($attributes['key'] ?? null);
+                $resolved = $attributes['preference_type'] ?? ($legacyPayload['type'] ?? ($legacyType ?? $value));
 
                 return is_string($resolved) ? $resolved : null;
             },
@@ -187,7 +321,9 @@ final class UserPreference extends Model
         return Attribute::make(
             /** @return string|null */
             get: static function (mixed $value, array $attributes): ?string {
-                $resolved = $attributes['preference_key'] ?? $value;
+                $legacyPayload = self::decodeLegacyValuePayload($attributes['value'] ?? null);
+                [, $legacyKey] = self::parseLegacyKey($attributes['key'] ?? null);
+                $resolved = $attributes['preference_key'] ?? ($legacyPayload['key'] ?? ($legacyKey ?? $value));
 
                 return is_string($resolved) ? $resolved : null;
             },
@@ -206,7 +342,8 @@ final class UserPreference extends Model
         // Normalise JSON payloads so callers always interact with PHP arrays when reading or writing metadata.
         return Attribute::make(
             get: static function (mixed $value, array $attributes): ?array {
-                $payload = $attributes['metadata'] ?? $value;
+                $legacyPayload = self::decodeLegacyValuePayload($attributes['value'] ?? null);
+                $payload = $attributes['metadata'] ?? ($legacyPayload['metadata'] ?? $value);
 
                 if ($payload === null) {
                     return null;
@@ -256,6 +393,60 @@ final class UserPreference extends Model
 
                 // Encode structured arrays to JSON strings to keep the database payload compliant across drivers.
                 return ['metadata' => json_encode($value, JSON_THROW_ON_ERROR)];
+            },
+        );
+    }
+
+    /**
+     * Keep the last_updated alias in sync with legacy payload-backed records.
+     *
+     * @return Attribute<Carbon|null, string|null>
+     */
+    protected function lastUpdated(): Attribute
+    {
+        return Attribute::make(
+            get: static function (mixed $value, array $attributes): ?Carbon {
+                $resolved = $attributes['last_updated'] ?? null;
+
+                if ($resolved instanceof CarbonInterface) {
+                    return Carbon::instance($resolved);
+                }
+
+                if (is_string($resolved) && $resolved !== '') {
+                    return Carbon::parse($resolved);
+                }
+
+                $legacyPayload = self::decodeLegacyValuePayload($attributes['value'] ?? null);
+                $legacyValue = $legacyPayload['last_updated'] ?? $value;
+
+                if ($legacyValue instanceof CarbonInterface) {
+                    return Carbon::instance($legacyValue);
+                }
+
+                if ($legacyValue instanceof DateTimeInterface) {
+                    return Carbon::parse($legacyValue->format('Y-m-d H:i:s'));
+                }
+
+                if (is_string($legacyValue) && $legacyValue !== '') {
+                    return Carbon::parse($legacyValue);
+                }
+
+                return null;
+            },
+            set: static function (mixed $value): array {
+                if ($value instanceof CarbonInterface) {
+                    return ['last_updated' => $value->toDateTimeString()];
+                }
+
+                if ($value instanceof DateTimeInterface) {
+                    return ['last_updated' => Carbon::parse($value->format('Y-m-d H:i:s'))->toDateTimeString()];
+                }
+
+                if ($value === null || $value === '') {
+                    return ['last_updated' => null];
+                }
+
+                return ['last_updated' => (string) $value];
             },
         );
     }

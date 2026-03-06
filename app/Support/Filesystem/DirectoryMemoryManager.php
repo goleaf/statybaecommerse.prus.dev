@@ -22,7 +22,7 @@ final class DirectoryMemoryManager
             return;
         }
 
-        $normalizedDirectory = rtrim($directory, DIRECTORY_SEPARATOR);
+        $normalizedDirectory = rtrim($directory, "/\\");
         $this->recentDirectories[$normalizedDirectory] = time();
 
         $this->cleanupIfNeeded();
@@ -37,11 +37,14 @@ final class DirectoryMemoryManager
             return [];
         }
 
-        $normalizedPrefix = rtrim($prefix, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+        $normalizedPrefix = $this->normalizeForMatching(rtrim($prefix, "/\\") . DIRECTORY_SEPARATOR);
 
         return array_keys(array_filter(
             $this->recentDirectories,
-            static fn (int $timestamp, string $directory): bool => str_starts_with($directory, $normalizedPrefix),
+            fn (int $timestamp, string $directory): bool => str_starts_with(
+                $this->normalizeForMatching($directory),
+                $normalizedPrefix
+            ),
             ARRAY_FILTER_USE_BOTH
         ));
     }
@@ -72,5 +75,10 @@ final class DirectoryMemoryManager
             self::MAX_REMEMBERED_DIRECTORIES,
             true
         );
+    }
+
+    private function normalizeForMatching(string $path): string
+    {
+        return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $path);
     }
 }

@@ -34,13 +34,17 @@ trait WithSeo
     public function getLocalizedUrls(): array
     {
         $urls = [];
-        $supportedLocales = ['lt', 'en', 'de'];
+        $supportedConfig = config('app.supported_locales', ['lt']);
+        $supportedLocales = is_array($supportedConfig)
+            ? $supportedConfig
+            : array_map('trim', explode(',', (string) $supportedConfig));
         $currentRoute = request()->route();
         if (! $currentRoute) {
             return $urls;
         }
         foreach ($supportedLocales as $locale) {
-            $parameters = array_merge($currentRoute->parameters(), ['locale' => $locale]);
+            $parameters = $currentRoute->parameters();
+            unset($parameters['locale']);
             $urls[$locale] = route($currentRoute->getName(), $parameters);
         }
 

@@ -45,7 +45,7 @@ return [
         'referred_user'                         => 'Pakviestas vartotojas',
         'role'                                  => 'Rolė',
         'similar_product'                       => 'Panašus produktas',
-        'size_type'                             => 'Dydžio tipas',
+        'size_type'                             => 'Dydžio variantas',
         'sku'                                   => 'SKU',
         'stock_status'                          => 'Atsargų būsena',
         'standard_invoice_template_for_billing' => 'Standartinis sąskaitos šablonas atsiskaitymui',

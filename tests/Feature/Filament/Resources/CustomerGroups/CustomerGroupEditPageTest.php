@@ -7,6 +7,7 @@ namespace Tests\Feature\Filament\Resources\CustomerGroups;
 use App\Filament\Resources\CustomerGroups\Pages\CreateCustomerGroup;
 use App\Filament\Resources\CustomerGroups\Pages\EditCustomerGroup;
 use App\Filament\Resources\UserResource;
+use App\Filament\Resources\Users\RelationManagers\CustomerGroupsRelationManager;
 use App\Models\AdminUser;
 use App\Models\CustomerGroup;
 use App\Models\User;
@@ -75,5 +76,37 @@ final class CustomerGroupEditPageTest extends TestCase
             'user_id'           => $user->getKey(),
             'customer_group_id' => $group->getKey(),
         ]);
+    }
+
+    public function test_create_page_ignores_livewire_update_redirect_query_and_falls_back_to_user_relation_page(): void
+    {
+        $this->resolveAdminPanel();
+        $this->actingAs(AdminUser::factory()->create(), 'admin');
+
+        $user = User::factory()->create();
+        $relationTabKey = array_search(CustomerGroupsRelationManager::class, UserResource::getRelations(), true);
+
+        $expectedRedirectParameters = [
+            'record' => $user,
+        ];
+
+        if ($relationTabKey !== false) {
+            $expectedRedirectParameters['relation'] = (string) $relationTabKey;
+        }
+
+        $expectedRedirectUrl = UserResource::getUrl('view', $expectedRedirectParameters);
+
+        Livewire::withQueryParams([
+            'attach_user_id' => $user->getKey(),
+            'redirect'       => url('/livewire/update'),
+        ])
+            ->test(CreateCustomerGroup::class)
+            ->fillForm([
+                'name' => 'Safe redirect group',
+                'type' => 'retail',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors()
+            ->assertRedirect($expectedRedirectUrl);
     }
 }

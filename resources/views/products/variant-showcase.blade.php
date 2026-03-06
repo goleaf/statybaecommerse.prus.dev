@@ -23,16 +23,25 @@
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @foreach($products as $product)
+                    @php
+                        $productShowUrl = Route::has('products.show')
+                            ? route('products.show', $product)
+                            : route('frontend.products.show', $product);
+                    @endphp
                     <div class="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
                          wire:click="selectProduct({{ $product->id }})"
                          wire:key="product-{{ $product->id }}">
-                        @if($product->main_image)
-                            <img src="{{ $product->main_image }}" 
+                        <a href="{{ $productShowUrl }}" onclick="event.stopPropagation();" class="block mb-3">
+                            <img src="{{ $product->main_image ?: asset('images/placeholder-product.jpg') }}" 
                                  alt="{{ $product->trans('name') ?? $product->name }}"
-                                 class="w-full h-48 object-cover rounded-lg mb-3">
-                        @endif
+                                 class="w-full h-48 object-cover rounded-lg">
+                        </a>
                         
-                        <h3 class="font-semibold text-gray-900 mb-2">{{ $product->trans('name') ?? $product->name }}</h3>
+                        <h3 class="font-semibold text-gray-900 mb-2">
+                            <a href="{{ $productShowUrl }}" onclick="event.stopPropagation();" class="hover:text-blue-600">
+                                {{ $product->trans('name') ?? $product->name }}
+                            </a>
+                        </h3>
                         <p class="text-sm text-gray-600 mb-2">{{ $product->trans('short_description') ?? $product->short_description ?? $product->trans('description') ?? $product->description }}</p>
                         
                         <div class="flex items-center justify-between">
@@ -68,11 +77,11 @@
                         </div>
                     </div>
                     
-                    @if($selectedProduct->main_image)
-                        <img src="{{ $selectedProduct->main_image }}" 
+                    <a href="{{ Route::has('products.show') ? route('products.show', $selectedProduct) : route('frontend.products.show', $selectedProduct) }}" class="block">
+                        <img src="{{ $selectedProduct->main_image ?: asset('images/placeholder-product.jpg') }}" 
                              alt="{{ $selectedProduct->trans('name') ?? $selectedProduct->name }}"
                              class="w-32 h-32 object-cover rounded-lg">
-                    @endif
+                    </a>
                 </div>
 
                 <!-- Variant Selector -->

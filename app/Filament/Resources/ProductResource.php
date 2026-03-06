@@ -16,7 +16,6 @@ use App\Filament\Resources\ProductResource\RelationManagers\OrdersRelationManage
 use App\Filament\Resources\ProductResource\RelationManagers\PricesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\RequestsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\SimilaritiesRelationManager;
-use App\Filament\Resources\ProductResource\RelationManagers\VariantCombinationsRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Filament\Resources\ProductResource\Schemas\ProductForm;
 use App\Filament\Resources\ProductResource\Tables\ProductsTable;
@@ -105,7 +104,6 @@ final class ProductResource extends BaseResource
     {
         $relations = [
             VariantsRelationManager::class,
-            VariantCombinationsRelationManager::class,
             PricesRelationManager::class,
             ImagesRelationManager::class,
             FeaturesRelationManager::class,

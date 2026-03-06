@@ -38,13 +38,27 @@ final class DirectoryScanner
      */
     private function fallbackGlobScan(string $directory): array
     {
-        $pattern = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*';
-        $paths = glob($pattern, GLOB_ONLYDIR) ?: [];
+        $entries = @scandir($directory);
 
-        return array_values(array_filter(
-            $paths,
-            static fn ($path): bool => is_string($path) && $path !== ''
-        ));
+        if (! is_array($entries)) {
+            return [];
+        }
+
+        $paths = [];
+
+        foreach ($entries as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+
+            $path = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $entry;
+
+            if (is_dir($path)) {
+                $paths[] = $path;
+            }
+        }
+
+        return $paths;
     }
 
     /**

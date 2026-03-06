@@ -22,6 +22,11 @@
 - JS uses ESLint + Prettier (`printWidth: 100`, single quotes, semicolons).
 - Format PHP with Pint (Laravel preset + project rules).
 
+## Localization Rules
+- Do not use JSON translation files (for example, `lang/*.json`).
+- Store Lithuanian translations only in PHP files under `lang/lt/*.php`.
+- For pagination and shared UI labels, use keyed PHP translations (for example, `pagination.showing`) instead of raw string keys.
+
 ## Testing Guidelines
 - Pest 3 is primary; create with `php artisan make:test --pest`.
 - Tests are `*Test.php` under `tests/` suites; run targeted tests with `php artisan test --compact` (file or `--filter`).

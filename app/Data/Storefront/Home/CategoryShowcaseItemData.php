@@ -45,8 +45,7 @@ final class CategoryShowcaseItemData implements Arrayable
             (int) $category->getKey(),
             $name,
             $slug,
-            route('localized.categories.show', [
-                'locale'   => $locale,
+            route('frontend.categories.show', [
                 'category' => $slug !== '' ? $slug : $category->getKey(),
             ]),
             $description !== '' ? (string) $description : null,
@@ -92,3 +91,4 @@ final class CategoryShowcaseItemData implements Arrayable
         ];
     }
 }
+

@@ -48,6 +48,8 @@
         :description="$emptyStateDescription ?? __('frontend.products_grid.empty_description')"
         icon="heroicon-o-cube"
         :actionText="$emptyStateAction ?? __('messages.shared')"
-        :actionUrl="$emptyStateActionUrl ?? route('localized.categories.index', ['locale' => app()->getLocale()])"
+        :actionUrl="$emptyStateActionUrl ?? route('frontend.categories.index', [])"
     />
 @endif
+
+

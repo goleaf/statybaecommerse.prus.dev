@@ -118,8 +118,8 @@ final class NavigationMenu extends Component
             return;
         }
         $this->redirect(
-            Route::has('localized.search')
-                ? route('localized.search', ['locale' => app()->getLocale(), 'q' => $this->searchQuery])
+            Route::has('frontend.search.index')
+                ? route('frontend.search.index', ['q' => $this->searchQuery])
                 : (Route::has('frontend.search.index')
                     ? route('frontend.search.index', ['q' => $this->searchQuery])
                     : url('/search?q=' . urlencode($this->searchQuery)))
@@ -134,3 +134,4 @@ final class NavigationMenu extends Component
         return view('livewire.components.navigation');
     }
 }
+

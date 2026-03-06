@@ -153,6 +153,48 @@ it('allows creating a referral reward from the referral rewards relation manager
         ->exists())->toBeTrue();
 });
 
+it('keeps newly created rewards visible for non-admin staff in the relation manager', function (): void {
+    $staffUser = User::factory()->create([
+        'is_admin' => false,
+    ]);
+
+    $this->actingAs($staffUser);
+
+    $referrer = User::factory()->create();
+    $referred = User::factory()->create();
+
+    $referral = Referral::factory()->create([
+        'referrer_id' => $referrer->id,
+        'referred_id' => $referred->id,
+        'status'      => 'pending',
+    ]);
+
+    $component = Livewire::test(ReferralRewardsRelationManager::class, [
+        'ownerRecord' => $referral,
+        'pageClass'   => EditReferral::class,
+    ])
+        ->assertSuccessful()
+        ->mountTableAction('create')
+        ->set('mountedActions.0.data.user_id', $referrer->id)
+        ->set('mountedActions.0.data.type', 'referrer_bonus')
+        ->set('mountedActions.0.data.amount', 25)
+        ->set('mountedActions.0.data.currency_code', 'EUR')
+        ->set('mountedActions.0.data.status', 'pending')
+        ->set('mountedActions.0.data.title', 'Scoped reward visibility')
+        ->set('mountedActions.0.data.priority', 0)
+        ->callMountedTableAction()
+        ->assertHasNoTableActionErrors();
+
+    $createdReward = ReferralReward::withoutGlobalScopes()
+        ->where('referral_id', $referral->id)
+        ->where('user_id', $referrer->id)
+        ->where('type', 'referrer_bonus')
+        ->where('amount', 25)
+        ->firstOrFail();
+
+    $component->assertCanSeeTableRecords([$createdReward]);
+});
+
 it('renders referral reward logs relation manager without scoped join failures', function (): void {
     $referrer = User::factory()->create();
     $referred = User::factory()->create();

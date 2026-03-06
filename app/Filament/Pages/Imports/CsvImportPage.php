@@ -1360,12 +1360,12 @@ abstract class CsvImportPage extends Page implements HasForms
 
     protected function getChunkSize(): int
     {
-        return 100;
+        return 100000;
     }
 
     protected function getImportProcessingTimeoutSeconds(): int
     {
-        return 120;
+        return 999999999;
     }
 
     protected function getMaxRows(): ?int

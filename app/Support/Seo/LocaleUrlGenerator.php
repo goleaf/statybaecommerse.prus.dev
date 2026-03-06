@@ -41,7 +41,8 @@ final class LocaleUrlGenerator
             return null;
         }
 
-        $resolvedParameters = array_merge($parameters, ['locale' => $locale]);
+        $resolvedParameters = $parameters;
+        unset($resolvedParameters['locale']);
 
         try {
             return route($routeName, $resolvedParameters);
@@ -82,17 +83,12 @@ final class LocaleUrlGenerator
         $path ??= parse_url($currentUrl, PHP_URL_PATH) ?: '/';
         $query ??= parse_url($currentUrl, PHP_URL_QUERY) ?: '';
 
-        $segments = array_values(array_filter(explode('/', ltrim((string) $path, '/'))));
-        if (isset($segments[0]) && in_array($segments[0], $this->supportedLocales(), true)) {
-            array_shift($segments);
-        }
-
-        $rest = trim(implode('/', $segments), '/');
+        $rest = trim((string) $path, '/');
         $queryString = $query !== '' ? '?' . $query : '';
 
         $links = [];
         foreach ($this->supportedLocales() as $locale) {
-            $url = $rest === '' ? url('/' . $locale) : url('/' . $locale . '/' . $rest);
+            $url = $rest === '' ? url('/') : url('/' . $rest);
             $links[$locale] = $url . $queryString;
         }
 

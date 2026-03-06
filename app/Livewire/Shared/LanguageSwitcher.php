@@ -42,13 +42,19 @@ class LanguageSwitcher extends Component
      */
     public function mount(): void
     {
-        $supported = config('app.supported_locales', ['en']);
+        $supported = config('app.supported_locales', ['lt']);
         $rawLocales = is_array($supported) ? $supported : explode(',', (string) $supported);
         $this->locales = array_values(array_filter(array_map(
             static fn ($locale): string => trim((string) $locale),
             $rawLocales
         ), static fn (string $locale): bool => $locale !== ''));
         $this->current = app()->getLocale();
+
+        if (count($this->locales) <= 1) {
+            $this->languageEntries = [];
+
+            return;
+        }
 
         $full = url()->full();
         $path = (string) (parse_url($full, PHP_URL_PATH) ?? '/');
@@ -71,7 +77,7 @@ class LanguageSwitcher extends Component
                 $links = [];
 
                 foreach ($this->locales as $locale) {
-                    $href = $rest === '' ? url('/' . $locale) : url('/' . $locale . '/' . $rest);
+                    $href = $rest === '' ? url('/') : url('/' . $rest);
 
                     $links[$locale] = (new LanguageLinkData(
                         $locale,

@@ -11,23 +11,32 @@ use App\Models\Product;
 use App\Support\Frontend\DataProviders\BrandCatalogueDataProvider;
 use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
 use App\Support\Frontend\DataProviders\ProductCatalogueDataProvider;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 final class ProductController extends Controller
 {
     public function __construct(private readonly ProductCatalogueDataProvider $dataProvider) {}
 
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        if ($redirect = $this->redirectLegacyCategoryIdentifier($request)) {
+            return $redirect;
+        }
+
         $data = $this->dataProvider->getListingData($request->all());
 
         return view('frontend.products.index', $data);
     }
 
-    public function search(Request $request): View
+    public function search(Request $request): View|RedirectResponse
     {
+        if ($redirect = $this->redirectLegacyCategoryIdentifier($request)) {
+            return $redirect;
+        }
+
         $data = $this->dataProvider->getListingData($request->all());
 
         return view('frontend.products.index', $data);
@@ -51,7 +60,7 @@ final class ProductController extends Controller
         ]));
     }
 
-    public function show(Product $product): RedirectResponse
+    public function show(Product $product): RedirectResponse|View
     {
         $locale = app()->getLocale();
         if (! is_string($locale) || $locale === '') {
@@ -67,9 +76,45 @@ final class ProductController extends Controller
             }
         }
 
-        return redirect()->route('localized.products.show', [
-            'locale'  => $locale,
-            'product' => $productSlug,
+        if (Route::has('frontend.products.show') && ! request()->routeIs('frontend.products.show')) {
+            return redirect()->route('frontend.products.show', [
+                'locale'  => $locale,
+                'product' => $productSlug,
+            ]);
+        }
+
+        $product->loadMissing(['brand', 'categories']);
+
+        return view('frontend.products.show', [
+            'product'         => $product,
+            'primaryCategory' => $product->categories->first(),
+            'relatedProducts' => $product->getRelatedProducts(4),
         ]);
     }
+
+    private function redirectLegacyCategoryIdentifier(Request $request): ?RedirectResponse
+    {
+        $categoryQuery = $request->query('category');
+        if (! is_scalar($categoryQuery)) {
+            return null;
+        }
+
+        $categoryValue = trim((string) $categoryQuery);
+        if ($categoryValue === '' || ! ctype_digit($categoryValue)) {
+            return null;
+        }
+
+        $category = Category::query()->find((int) $categoryValue);
+        if (! $category) {
+            return null;
+        }
+
+        $categorySlug = $category->getTranslatedSlug() ?: $category->slug;
+        if (! is_string($categorySlug) || $categorySlug === '') {
+            return null;
+        }
+
+        return redirect()->to($request->fullUrlWithQuery(['category' => $categorySlug]), 301);
+    }
 }
+

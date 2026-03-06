@@ -111,8 +111,7 @@ final class ProductListItemData implements Arrayable
 
         $imageUrl = $product->getImageUrl('lg') ?? $product->main_image ?? $product->thumbnail;
 
-        $detailUrl = route('localized.products.show', [
-            'locale'  => $locale,
+        $detailUrl = route('frontend.products.show', [
             'product' => $slug !== '' ? $slug : $product->getKey(),
         ]);
 
@@ -193,3 +192,4 @@ final class ProductListItemData implements Arrayable
         ];
     }
 }
+

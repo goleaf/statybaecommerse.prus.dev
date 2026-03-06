@@ -81,7 +81,7 @@
                             >
                             <span>
                                 {{ __('referrals.create.terms.prefix') }}
-                                <a href="{{ route('frontend.legal.terms') }}" class="font-medium text-primary-700 hover:text-primary-800">
+                                <a href="{{ \Illuminate\Support\Facades\Route::has('localized.legal.terms') ? route('localized.legal.terms') : url('/legal/terms') }}" class="font-medium text-primary-700 hover:text-primary-800">
                                     {{ __('referrals.create.terms.link') }}
                                 </a>
                             </span>

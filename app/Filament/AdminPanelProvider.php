@@ -16,6 +16,7 @@ use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentView;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\Widget;
@@ -131,7 +132,10 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandLogo(asset('images/logo.png'))
+            ->favicon(asset('favicon.svg'))
             ->brandLogoHeight('2.5rem')
+            ->maxContentWidth(Width::Full)
+            ->simplePageMaxContentWidth(Width::Large)
             ->authGuard('admin')
             ->authPasswordBroker('admin_users')
             ->darkMode(false)

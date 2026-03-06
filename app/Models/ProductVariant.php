@@ -200,6 +200,20 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function reservedQuantity(): int
     {
+        if ($this->relationLoaded('inventories')) {
+            $inventories = $this->getRelation('inventories');
+
+            if ($inventories->isNotEmpty()) {
+                $reserved = $inventories->sum(static function ($inventory): int {
+                    return max(0, (int) ($inventory->reserved ?? 0));
+                });
+
+                return (int) max($reserved, 0);
+            }
+
+            return max(0, (int) ($this->reserved_quantity ?? 0));
+        }
+
         $variantId = (int) ($this->getKey() ?? 0);
         $inventoryQuery = DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId);
 
@@ -228,6 +242,26 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function availableQuantity(): int
     {
+        if ($this->relationLoaded('inventories')) {
+            $inventories = $this->getRelation('inventories');
+
+            if ($inventories->isNotEmpty()) {
+                $available = $inventories->sum(static function ($inventory): float {
+                    $stock = Number::parseFloat((string) ($inventory->stock ?? 0));
+                    $reserved = Number::parseFloat((string) ($inventory->reserved ?? 0));
+
+                    return max(0.0, $stock - $reserved);
+                });
+
+                return (int) max($available, 0);
+            }
+
+            $stock = (int) ($this->stock_quantity ?? 0);
+            $reserved = (int) ($this->reserved_quantity ?? 0);
+
+            return max(0, $stock - $reserved);
+        }
+
         $variantId = (int) ($this->getKey() ?? 0);
         $inventoryQuery = DB::table('variant_inventories as vi')->where('vi.variant_id', $variantId);
 
@@ -319,7 +353,9 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function inventories(): HasMany
     {
-        return $this->hasMany(VariantInventory::class, 'variant_id');
+        // Availability math is based on raw warehouse rows, so avoid filtering by
+        // model-level scopes that can hide inventory records.
+        return $this->hasMany(VariantInventory::class, 'variant_id')->withoutGlobalScopes();
     }
 
     /**

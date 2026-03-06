@@ -852,7 +852,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             }
         }
 
-        return '';
+        return $this->resolveDatabasePrimaryImageUrl() ?? '';
     }
 
     public function registerMediaConversions(?Media $media = null): void
@@ -1396,7 +1396,13 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         $galleryCount = $this->getMedia('product_images')->count();
         $thumbnailCount = $this->getFirstMedia('thumbnail') instanceof Media ? 1 : 0;
 
-        return $galleryCount + $thumbnailCount;
+        $mediaCount = $galleryCount + $thumbnailCount;
+
+        if ($mediaCount > 0) {
+            return $mediaCount;
+        }
+
+        return $this->images()->count();
     }
 
     private function resolveSpatieProductImageUrl(?string $conversion = null): ?string
@@ -1409,14 +1415,20 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             }
         }
 
-        return null;
+        return $this->resolveDatabasePrimaryImageUrl();
     }
 
     private function resolveMediaUrl(string $collection, ?string $conversion = null): ?string
     {
-        $url = $conversion !== null && $conversion !== ''
-            ? $this->getFirstMediaUrl($collection, $conversion)
-            : $this->getFirstMediaUrl($collection);
+        $url = '';
+
+        if ($conversion !== null && $conversion !== '') {
+            $url = $this->getFirstMediaUrl($collection, $conversion);
+        }
+
+        if ($url === '') {
+            $url = $this->getFirstMediaUrl($collection);
+        }
 
         return $url !== '' ? $url : null;
     }
@@ -1451,7 +1463,41 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         }
 
         if ($mediaItems->isEmpty()) {
-            return [];
+            $imageRecords = $this->relationLoaded('images')
+                ? $this->images
+                : $this->images()
+                    ->orderBy('sort_order')
+                    ->orderBy('id')
+                    ->get();
+
+            if ($imageRecords->isEmpty()) {
+                return [];
+            }
+
+            return $imageRecords
+                ->values()
+                ->map(static function (ProductImage $image, int $index): array {
+                    $url = (string) $image->url;
+                    $label = $image->alt_text !== null && trim($image->alt_text) !== ''
+                        ? trim($image->alt_text)
+                        : null;
+
+                    return [
+                        'original'   => $url,
+                        'xl'         => $url,
+                        'lg'         => $url,
+                        'md'         => $url,
+                        'sm'         => $url,
+                        'xs'         => $url,
+                        'alt'        => $label,
+                        'title'      => $label,
+                        'generated'  => true,
+                        'is_default' => $index === 0,
+                        'width'      => 0,
+                        'height'     => 0,
+                    ];
+                })
+                ->all();
         }
 
         return $mediaItems
@@ -1476,6 +1522,24 @@ final class Product extends Model implements HasMedia, TranslatableRecord
                 ];
             })
             ->all();
+    }
+
+    private function resolveDatabasePrimaryImageUrl(): ?string
+    {
+        $primaryImage = $this->relationLoaded('images')
+            ? $this->images->sortBy('sort_order')->first()
+            : $this->images()
+                ->orderBy('sort_order')
+                ->orderBy('id')
+                ->first();
+
+        if (! $primaryImage instanceof ProductImage) {
+            return null;
+        }
+
+        $url = (string) $primaryImage->url;
+
+        return $url !== '' ? $url : null;
     }
 
     // Translation methods

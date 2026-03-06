@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\RelationManagers\Concerns\ResolvesOwnerPageRedirect;
 use App\Filament\Resources\Subscribers\SubscriberResource;
+use App\Filament\Resources\UserResource;
 use App\Models\Subscriber;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -22,6 +24,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SubscriberRelationManager extends RelationManager
 {
+    use ResolvesOwnerPageRedirect;
+
     protected static string $relationship = 'subscriber';
 
     public function form(Schema $schema): Schema
@@ -82,7 +86,7 @@ class SubscriberRelationManager extends RelationManager
                     ->icon('heroicon-m-plus')
                     ->url(fn (): string => SubscriberResource::getUrl('create', [
                         'user_id'  => $this->getOwnerRecord()->getKey(),
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
             ])
             ->recordActions([
@@ -90,13 +94,13 @@ class SubscriberRelationManager extends RelationManager
                     ->icon('heroicon-m-eye')
                     ->url(fn (Subscriber $record): string => SubscriberResource::getUrl('view', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 Action::make('edit')
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn (Subscriber $record): string => SubscriberResource::getUrl('edit', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 DeleteAction::make(),
             ])
@@ -107,4 +111,3 @@ class SubscriberRelationManager extends RelationManager
             ]);
     }
 }
-

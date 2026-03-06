@@ -5,8 +5,8 @@
     x-on:cart-count-changed.window="if (Number.isFinite(Number($event.detail?.quantity))) qty = Number($event.detail.quantity)"
 >
     @php
-        $cartUrl = Route::has('localized.cart.index')
-            ? route('localized.cart.index', ['locale' => app()->getLocale()])
+        $cartUrl = Route::has('frontend.cart.index')
+            ? route('frontend.cart.index', [])
             : (Route::has('frontend.cart.index')
                 ? route('frontend.cart.index')
                 : route('cart.index'));
@@ -35,3 +35,5 @@
         <span class="sr-only">{{ __('ui.items_in_cart_view_cart') }}</span>
     </a>
 </div>
+
+

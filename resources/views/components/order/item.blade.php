@@ -5,12 +5,26 @@
 
 @php($currency = (string) ($currency_code ?? 'EUR'))
 @php($unitPrice = (float) ($item->unit_price_amount ?? $item->unit_price ?? $item->price ?? 0))
+@php
+    $productUrl = null;
+    if ($item->product) {
+        $productUrl = route('product.show', $item->product->trans('slug') ?? $item->product->slug ?? $item->product);
+    }
+@endphp
 
 <div class="flex py-6 sm:py-8">
     <div class="min-w-0 flex-1">
         <div class="lg:flex-1">
             <div>
-                <h4 class="font-medium font-heading text-gray-950">{{ $item->name }}</h4>
+                <h4 class="font-medium font-heading text-gray-950">
+                    @if ($productUrl)
+                        <a href="{{ $productUrl }}" class="hover:text-blue-600 transition-colors">
+                            {{ $item->name }}
+                        </a>
+                    @else
+                        {{ $item->name }}
+                    @endif
+                </h4>
                 <div class="mt-1 gap-2 text-sm sm:flex sm:items-center">
                     <p class="font-medium text-gray-700">
                         {{ \Illuminate\Support\Number::currency((float) ($item->total ?? 0), $currency, app()->getLocale()) }}
@@ -24,7 +38,13 @@
     </div>
     <div class="ml-4 shrink-0 sm:order-first sm:m-0 sm:mr-6">
         <div class="col-start-2 col-end-3 sm:col-start-1 sm:row-span-2 sm:row-start-1">
-            <x-product.thumbnail :product="$item->product" class="size-20" />
+            @if ($productUrl)
+                <a href="{{ $productUrl }}" class="block">
+                    <x-product.thumbnail :product="$item->product" class="size-20" />
+                </a>
+            @else
+                <x-product.thumbnail :product="$item->product" class="size-20" />
+            @endif
         </div>
     </div>
 </div>

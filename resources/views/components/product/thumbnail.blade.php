@@ -1,5 +1,7 @@
 @props(['product', 'containerClass' => null])
 
+@php($placeholderImageUrl = asset('images/placeholder-product.jpg'))
+
 <div @class([
     'aspect-1 ring-1 ring-gray-100 overflow-hidden',
     $containerClass,
@@ -15,10 +17,11 @@
              height="300"
              {{ $attributes->merge(['class' => 'size-full max-w-none object-cover object-center group-hover:opacity-75']) }} />
     @else
-        <div
-             {{ $attributes->merge(['class' => 'size-full max-w-none bg-gray-200 flex items-center justify-center']) }}>
-            <span
-                  class="text-sm text-gray-500 font-medium">{{ strtoupper(substr($product->trans('name'), 0, 3)) }}</span>
-        </div>
+        <img src="{{ $placeholderImageUrl }}"
+             alt="{{ $product->trans('name') ?? $product->name }}"
+             loading="lazy"
+             width="300"
+             height="300"
+             {{ $attributes->merge(['class' => 'size-full max-w-none object-cover object-center group-hover:opacity-75']) }} />
     @endif
 </div>

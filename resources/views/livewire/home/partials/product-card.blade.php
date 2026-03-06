@@ -33,7 +33,7 @@
     $imageUrl = $productData['image_url']
         ?? ($productData['main_image'] ?? null)
         ?? ($productData['thumbnail'] ?? null);
-    $fallbackImageUrl = product_placeholder_url('large');
+    $fallbackImageUrl = asset('images/placeholder-product.jpg');
     $name = $productData['name'] ?? '';
     $detailUrl = $productData['detail_url'] ?? null;
     $productRouteKey = null;
@@ -108,12 +108,22 @@
 <article {{ $attributes }} aria-labelledby="product-title-{{ $id }}" class="h-full">
     {{-- Product Image Section --}}
     <div class="relative w-full aspect-[3/2] bg-gray-100 rounded-t-lg overflow-hidden">
-        @if (! empty($imageUrl))
-            <img src="{{ $imageUrl }}" alt="{{ $name }}"
-                 class="w-full h-full object-cover" loading="lazy">
+        @if ($detailUrl !== '#')
+            <a href="{{ $detailUrl }}" class="flex h-full w-full items-center justify-center p-2">
         @else
-            <img src="{{ $fallbackImageUrl }}" alt="{{ $name }}"
-                 class="w-full h-full object-cover" loading="lazy">
+            <div class="flex h-full w-full items-center justify-center p-2">
+        @endif
+            @if (! empty($imageUrl))
+                <img src="{{ $imageUrl }}" alt="{{ $name }}"
+                     class="h-auto w-auto max-h-full max-w-full object-contain" loading="lazy">
+            @else
+                <img src="{{ $fallbackImageUrl }}" alt="{{ $name }}"
+                     class="h-auto w-auto max-h-full max-w-full object-contain" loading="lazy">
+            @endif
+        @if ($detailUrl !== '#')
+            </a>
+        @else
+            </div>
         @endif
 
         {{-- Badge in top-right corner --}}

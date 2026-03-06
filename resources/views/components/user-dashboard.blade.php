@@ -94,7 +94,7 @@
             <h2 class="text-xl font-semibold text-gray-900 mb-6">{{ __('frontend.user_dashboard.quick_actions.title') }}</h2>
 
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <a href="{{ route('orders.index', ['locale' => app()->getLocale()]) ?? '/orders' }}"
+                <a href="{{ route('orders.index', []) ?? '/orders' }}"
                    class="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
                     <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -104,7 +104,7 @@
                     <span class="text-sm font-medium text-gray-900">{{ __('frontend.user_dashboard.quick_actions.view_orders') }}</span>
                 </a>
 
-                <a href="{{ route('addresses.index', ['locale' => app()->getLocale()]) ?? '/addresses' }}"
+                <a href="{{ route('addresses.index', []) ?? '/addresses' }}"
                    class="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
                     <svg class="w-8 h-8 text-green-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -114,7 +114,7 @@
                     <span class="text-sm font-medium text-gray-900">{{ __('frontend.user_dashboard.quick_actions.addresses') }}</span>
                 </a>
 
-                <a href="{{ route('profile.edit', ['locale' => app()->getLocale()]) ?? '/profile/edit' }}"
+                <a href="{{ route('profile.edit', []) ?? '/profile/edit' }}"
                    class="flex flex-col items-center p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200">
                     <svg class="w-8 h-8 text-purple-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -131,7 +131,7 @@
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-xl font-semibold text-gray-900">{{ __('frontend.user_dashboard.recent_orders.title') }}</h2>
-                        <a href="{{ route('orders.index', ['locale' => app()->getLocale()]) ?? '/orders' }}"
+                        <a href="{{ route('orders.index', []) ?? '/orders' }}"
                            class="text-blue-600 hover:text-blue-700 font-medium text-sm">
                             {{ __('frontend.user_dashboard.actions.view_all') }}
                         </a>
@@ -186,7 +186,7 @@
                             </svg>
                             <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('frontend.user_dashboard.recent_orders.empty_title') }}</h3>
                             <p class="text-gray-600 mb-4">{{ __('frontend.user_dashboard.recent_orders.empty_description') }}</p>
-                            <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                            <a href="{{ route('products.index', []) ?? '/products' }}"
                                class="btn-gradient px-6 py-2 rounded-xl font-medium text-sm">
                                 {{ __('frontend.user_dashboard.recent_orders.cta') }}
                             </a>
@@ -236,7 +236,7 @@
                         </div>
 
                         <div class="pt-4">
-                            <a href="{{ route('profile.edit', ['locale' => app()->getLocale()]) ?? '/profile/edit' }}"
+                            <a href="{{ route('profile.edit', []) ?? '/profile/edit' }}"
                                class="w-full btn-gradient py-2 rounded-xl font-medium text-center block">
                                 {{ __('frontend.user_dashboard.account.edit_profile') }}
                             </a>
@@ -253,7 +253,7 @@
                 <div class="bg-white border border-gray-200 rounded-2xl p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h2 class="text-xl font-semibold text-gray-900">{{ __('frontend.user_dashboard.addresses.title') }}</h2>
-                        <a href="{{ route('addresses.index', ['locale' => app()->getLocale()]) ?? '/addresses' }}"
+                        <a href="{{ route('addresses.index', []) ?? '/addresses' }}"
                            class="text-blue-600 hover:text-blue-700 font-medium text-sm">
                             {{ __('frontend.user_dashboard.addresses.manage') }}
                         </a>
@@ -292,7 +292,7 @@
                             </svg>
                             <h3 class="text-lg font-medium text-gray-900 mb-2">{{ __('frontend.user_dashboard.addresses.empty_title') }}</h3>
                             <p class="text-gray-600 mb-4">{{ __('frontend.user_dashboard.addresses.empty_description') }}</p>
-                            <a href="{{ route('addresses.create', ['locale' => app()->getLocale()]) ?? '/addresses/create' }}"
+                            <a href="{{ route('addresses.create', []) ?? '/addresses/create' }}"
                                class="btn-gradient px-6 py-2 rounded-xl font-medium text-sm">
                                 {{ __('frontend.user_dashboard.addresses.add') }}
                             </a>
@@ -314,3 +314,4 @@
         }
     }
 </script>
+

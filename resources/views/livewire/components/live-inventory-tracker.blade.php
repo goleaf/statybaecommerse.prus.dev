@@ -275,7 +275,7 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
                                     {{-- Resolve the best possible inventory thumbnail from the API response. --}}
-                                    @php($image = $item['main_image'] ?? $item['thumbnail'] ?? ($item['image'] ?? null))
+                                    @php($image = ($item['main_image'] ?? $item['thumbnail'] ?? ($item['image'] ?? null)) ?: asset('images/placeholder-product.jpg'))
                                     @if($image)
                                         <img class="h-10 w-10 rounded-lg object-cover" src="{{ $image }}" alt="{{ $item['name'] }}">
                                     @else

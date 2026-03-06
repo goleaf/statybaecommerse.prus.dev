@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (Notification.permission === 'granted') {
                 new Notification(notification.title, {
                     body: notification.message,
-                    icon: '/favicon.ico'
+                    icon: '/favicon-32x32.png'
                 });
             }
             

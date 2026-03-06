@@ -197,7 +197,7 @@
                     {{ __('ui.search_clear_query') }}
                 </button>
                 <a
-                    href="{{ route('localized.collections.index', ['locale' => app()->getLocale()]) }}"
+                    href="{{ route('frontend.collections.index', []) }}"
                     class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 >
                     <x-heroicon-o-rectangle-stack class="h-4 w-4" />
@@ -243,8 +243,8 @@
     {{-- Back button guides the shopper to continue browsing --}}
     <div class="mt-16 text-center">
         @php
-            $homeUrl = \Illuminate\Support\Facades\Route::has('localized.home')
-                ? route('localized.home', ['locale' => app()->getLocale()])
+            $homeUrl = \Illuminate\Support\Facades\Route::has('home')
+                ? route('home', [])
                 : route('home');
         @endphp
         <a
@@ -273,8 +273,8 @@
                 'name' => $p->trans('name') ?? $p->name,
             ];
         }
-        $searchUrl = \Illuminate\Support\Facades\Route::has('localized.search')
-            ? route('localized.search', ['locale' => app()->getLocale()])
+        $searchUrl = \Illuminate\Support\Facades\Route::has('frontend.search.index')
+            ? route('frontend.search.index', [])
             : (\Illuminate\Support\Facades\Route::has('frontend.search.index')
                 ? route('frontend.search.index')
                 : url('/search'));
@@ -338,3 +338,5 @@
             :preload-sizes="$preSizes"
             canonical="{{ url()->current() }}" />
 @endsection
+
+

@@ -9,7 +9,7 @@ use App\Models\Order;
 /**
  * Single responsibility action for cancelling orders
  */
-final readonly class CancelOrderAction
+class CancelOrderAction
 {
     public function execute(Order $order, string $reason): Order
     {

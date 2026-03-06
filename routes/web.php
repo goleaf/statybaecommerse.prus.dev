@@ -365,7 +365,8 @@ Route::get('/ready', [HealthController::class, 'ready'])->name('ready');
 
 // Language switching
 Route::post('/locale', LocaleController::class)->name('locale.switch');
-Route::get('/lang/{locale}', LocaleController::class)
+Route::get('/lang/{locale?}', LocaleController::class)
+    ->defaults('locale', 'lt')
     ->where(['locale' => '[A-Za-z\-_]+'])
     ->name('language.switch');
 
@@ -385,7 +386,19 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
 Route::get('/products/{product}/gallery', function ($product) {
-    return redirect('/' . app()->getLocale() . '/products/' . $product . '/gallery');
+    if (\Illuminate\Support\Facades\Route::has('localized.products.show')) {
+        return redirect()->route('localized.products.show', ['product' => $product], 301);
+    }
+
+    if (\Illuminate\Support\Facades\Route::has('frontend.products.show')) {
+        return redirect()->route('frontend.products.show', ['product' => $product], 301);
+    }
+
+    if (\Illuminate\Support\Facades\Route::has('products.show')) {
+        return redirect()->route('products.show', ['product' => $product], 301);
+    }
+
+    abort(404);
 })->name('products.gallery');
 // Alias for legacy route names - handled by route model binding
 Route::get('/product/{product}', function ($product) {
@@ -395,29 +408,21 @@ Route::get('/product/{product}', function ($product) {
     return redirect()->route('products.show', $productSlug);
 })->name('product.show');
 
-Route::get('/categories', function () {
-    return redirect('/' . app()->getLocale() . '/categories');
-})->name('categories.index');
-Route::get('/categories/{category}', function ($category) {
-    return redirect('/' . app()->getLocale() . '/categories/' . $category);
-})->name('categories.show');
+Route::get('/categories', \App\Livewire\Pages\Category\Index::class)->name('categories.index');
+Route::get('/categories/{category}', \App\Livewire\Pages\Category\Show::class)->name('categories.show');
 // Legacy singular /category/{slug} redirect → localized page (permanent)
 Route::get('/category/{category}', function (string $category) {
-    return redirect('/' . app()->getLocale() . '/categories/' . $category, 301);
+    return redirect('/categories/' . $category, 301);
 })->name('category.show.legacy');
 // Brands
-Route::get('/brands', function () {
-    return redirect('/' . app()->getLocale() . '/brands');
-})->name('brands.index');
-Route::get('/brands/{brand}', function ($brand) {
-    return redirect('/' . app()->getLocale() . '/brands/' . $brand);
-})->name('brands.show');
+Route::get('/brands', \App\Livewire\Pages\Brand\Index::class)->name('brands.index');
+Route::get('/brands/{slug}', [\App\Http\Controllers\BrandController::class, 'show'])->name('brands.show');
 Route::get('/{locale}/{duplicateLocale}/brands', function (string $locale, string $duplicateLocale, Request $request) {
     if (strtolower($locale) !== strtolower($duplicateLocale)) {
         abort(404);
     }
 
-    $target = '/' . $locale . '/brands';
+    $target = '/brands';
     $queryString = $request->getQueryString();
 
     return redirect($target . ($queryString !== null && $queryString !== '' ? '?' . $queryString : ''), 301);
@@ -435,7 +440,7 @@ Route::get('/{locale}/{duplicateLocale}/brands/{slug}', function (
         abort(404);
     }
 
-    $target = '/' . $locale . '/brands/' . $slug;
+    $target = '/brands/' . $slug;
     $queryString = $request->getQueryString();
 
     return redirect($target . ($queryString !== null && $queryString !== '' ? '?' . $queryString : ''), 301);
@@ -456,17 +461,10 @@ Route::prefix('collections')->name('collections.')->group(function () {
     Route::get('/api/statistics', [App\Http\Controllers\CollectionController::class, 'statistics'])->name('api.statistics');
 });
 Route::get('/cart', Pages\Cart::class)->name('cart.index');
-Route::get('/search', function () {
-    return redirect('/' . app()->getLocale() . '/search');
-})->name('search');
+Route::get('/search', \App\Livewire\Pages\Search::class)->name('search');
 
-Route::prefix('legal')->name('frontend.legal.')->group(function (): void {
-    Route::get('/privacy', [App\Http\Controllers\Frontend\LegalController::class, 'privacy'])->name('privacy');
-    Route::get('/terms', [App\Http\Controllers\Frontend\LegalController::class, 'terms'])->name('terms');
-    Route::get('/cookies', [App\Http\Controllers\Frontend\LegalController::class, 'cookies'])->name('cookies');
-    Route::get('/shipping', [App\Http\Controllers\Frontend\LegalController::class, 'shipping'])->name('shipping');
-    Route::get('/returns', [App\Http\Controllers\Frontend\LegalController::class, 'returns'])->name('returns');
-});
+// Legal routes are defined in the localized storefront group below.
+// Keep only the dedicated Lithuanian legacy alias here.
 
 Route::get('/privatumo-politika', function () {
     return redirect('/legal/privacy', 301);
@@ -488,11 +486,6 @@ Route::prefix('legal')->name('legal.')->group(function () {
         ->name('show');
 });
 
-// Legacy legal route
-Route::get('/legal/{slug}', function ($slug) {
-    return redirect('/' . app()->getLocale() . '/legal/' . $slug);
-})->name('legal.show.legacy');
-
 // Auth routes
 require __DIR__ . '/auth.php';
 
@@ -500,7 +493,7 @@ require __DIR__ . '/auth.php';
 Route::middleware('auth')->group(function (): void {
     Route::get('/checkout', Pages\Checkout::class)->name('checkout.index');
     Route::get('/checkout/confirmation/{number}', function (string $number) {
-        return redirect()->route('localized.order.confirmed', ['locale' => app()->getLocale(), 'number' => $number]);
+        return redirect()->route('localized.order.confirmed', ['number' => $number]);
     })->name('checkout.confirmation');
     Route::get('/orders', Pages\Account\Orders::class)->name('orders.index');
     // Account routes are defined in routes/auth.php.
@@ -546,7 +539,9 @@ Route::prefix('api')->group(function (): void {
 // Public utility endpoints
 Route::get('/robots.txt', App\Http\Controllers\RobotsController::class)->name('robots');
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
-Route::get('/{locale}/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'locale'])->name('sitemap.locale');
+Route::get('/{locale}/sitemap.xml', function (string $locale) {
+    return redirect()->route('sitemap', [], 301);
+})->where(['locale' => 'lt'])->name('sitemap.locale');
 
 Route::get('/catalog.csv', function (\Illuminate\Http\Request $request) {
     $only = (string) $request->query('only', 'products');
@@ -563,15 +558,13 @@ Route::get('/catalog.csv', function (\Illuminate\Http\Request $request) {
 })->name('catalog.csv');
 
 Route::get('/{locale}/catalog.csv', function (string $locale, \Illuminate\Http\Request $request) {
-    app()->setLocale($locale);
-
     $only = (string) $request->query('only', 'products');
     if ($only === 'categories') {
         return redirect()->route('categories.csv');
     }
 
-    return redirect()->route('products.csv');
-})->where(['locale' => '[A-Za-z\-_]+'])->name('catalog.locale');
+    return redirect()->route('products.csv', [], 301);
+})->where(['locale' => 'lt'])->name('catalog.locale');
 
 Route::get('/products.csv', function () {
     $locale = 'lt';
@@ -715,9 +708,7 @@ Route::prefix('locations/api')->name('locations.api.')->group(function () {
 });
 
 // Locations pages
-Route::get('/locations', function () {
-    return redirect('/' . app()->getLocale() . '/locations');
-})->name('locations.index');
+Route::get('/locations', \App\Livewire\Pages\Location\Index::class)->name('locations.index');
 // Primary Livewire route uses {slug}
 Route::get('/locations/{slug}', App\Livewire\Pages\Location\Show::class)->name('locations.view');
 // Backward-compatible ID-based route name used by blades; redirects to slug route
@@ -729,106 +720,103 @@ Route::get('/locations/{id}', function ($id) {
 })->whereNumber('id')->name('locations.show.legacy');
 
 Route::get('/brochures', function () {
-    return redirect()->route('localized.brochures.index', ['locale' => app()->getLocale()]);
+    return redirect()->route('localized.brochures.index');
 })->name('brochures.index');
 
-// --- Locale-prefixed public routes used in tests ---
-Route::prefix('{locale}')
-    ->where(['locale' => '[A-Za-z\-_]+'])
-    ->group(function (): void {
-        // Localized home route (e.g., /lt)
-        Route::get('/', Pages\Home::class)->name('localized.home');
+Route::group([], function (): void {
+    // Localized route names without locale URL prefix.
+    Route::get('/', Pages\Home::class)->name('localized.home');
 
-        // About page
-        Route::view('/about', 'frontend.about.index')->name('localized.about');
+    // About page
+    Route::view('/about', 'frontend.about.index')->name('localized.about');
 
-        // Contact page
-        Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('localized.contact.index');
-        Route::post('/contact/send', [App\Http\Controllers\Frontend\ContactController::class, 'send'])->name('localized.contact.send');
+    // Contact page
+    Route::get('/contact', [App\Http\Controllers\Frontend\ContactController::class, 'index'])->name('localized.contact.index');
+    Route::post('/contact/send', [App\Http\Controllers\Frontend\ContactController::class, 'send'])->name('localized.contact.send');
 
-        // Category index
-        Route::get('/categories', \App\Livewire\Pages\Category\Index::class)->name('localized.categories.index');
+    // Category index
+    Route::get('/categories', \App\Livewire\Pages\Category\Index::class)->name('localized.categories.index');
 
-        // Category show
-        Route::get('/categories/{category}', \App\Livewire\Pages\Category\Show::class)->name('localized.categories.show');
+    // Category show
+    Route::get('/categories/{category}', \App\Livewire\Pages\Category\Show::class)->name('localized.categories.show');
 
-        // Product routes
-        Route::get('/products', Pages\ProductCatalog::class)->name('localized.products.index');
-        Route::get('/products/{product}', Pages\SingleProduct::class)->name('localized.products.show');
+    // Product routes
+    Route::get('/products', Pages\ProductCatalog::class)->name('localized.products.index');
+    Route::get('/products/{product}', Pages\SingleProduct::class)->name('localized.products.show');
 
-        // Product Request routes (authenticated users only)
-        Route::middleware(['auth'])->group(function () {
-            Route::get('/products/{product}/request', [App\Http\Controllers\ProductRequestController::class, 'create'])->name('localized.product-requests.create');
-            Route::post('/product-requests', [App\Http\Controllers\ProductRequestController::class, 'store'])->name('localized.product-requests.store');
-            Route::get('/product-requests', [App\Http\Controllers\ProductRequestController::class, 'index'])->name('localized.product-requests.index');
-            Route::get('/product-requests/{productRequest}', [App\Http\Controllers\ProductRequestController::class, 'show'])->name('localized.product-requests.show');
-            Route::patch('/product-requests/{productRequest}/cancel', [App\Http\Controllers\ProductRequestController::class, 'cancel'])->name('localized.product-requests.cancel');
-        });
-
-        // Inventory routes
-        Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('localized.inventory.index');
-
-        // Cart page
-        Route::get('/cart', Pages\Cart::class)->name('localized.cart.index');
-
-        // Search page
-        Route::get('/search', \App\Livewire\Pages\Search::class)->name('localized.search');
-
-        // Brand index
-        Route::get('/brands', \App\Livewire\Pages\Brand\Index::class)->name('localized.brands.index');
-
-        // News localized routes
-        Route::prefix('news')->group(function (): void {
-            Route::get('/', [NewsController::class, 'index'])->name('localized.news.index');
-            Route::get('/category/{slug}', [NewsController::class, 'category'])->name('localized.news.category');
-            Route::get('/tag/{slug}', [NewsController::class, 'tag'])->name('localized.news.tag');
-            Route::get('/{slug}', [NewsController::class, 'show'])->name('localized.news.show');
-        });
-
-        Route::prefix('naujienos')->group(function (): void {
-            Route::get('/', [NewsController::class, 'index'])->name('localized.news.index.lt');
-            Route::get('/category/{slug}', [NewsController::class, 'category'])->name('localized.news.category.lt');
-            Route::get('/tag/{slug}', [NewsController::class, 'tag'])->name('localized.news.tag.lt');
-            Route::get('/{slug}', [NewsController::class, 'show'])->name('localized.news.show.lt');
-        });
-
-        // Brand show
-        Route::get('/brands/{slug}', [\App\Http\Controllers\BrandController::class, 'show'])->name('localized.brands.show');
-
-        // Locations index
-        Route::get('/locations', \App\Livewire\Pages\Location\Index::class)->name('localized.locations.index');
-
-        // Location show by slug
-        Route::get('/locations/{slug}', \App\Livewire\Pages\Location\Show::class)->name('localized.locations.show');
-
-        // Collections routes
-        Route::get('/collections', \App\Livewire\Pages\Collection\Index::class)->name('localized.collections.index');
-        Route::get('/collections/{collection}', \App\Livewire\Pages\Collection\Show::class)->name('localized.collections.show');
-
-        // Brochure downloads
-        Route::get('/brochures', [BrochureController::class, 'index'])->name('localized.brochures.index');
-
-        // Legal pages
-        Route::prefix('legal')->name('localized.legal.')->group(function (): void {
-            Route::get('/privacy', [App\Http\Controllers\Frontend\LegalController::class, 'privacy'])->name('privacy');
-            Route::get('/terms', [App\Http\Controllers\Frontend\LegalController::class, 'terms'])->name('terms');
-            Route::get('/cookies', [App\Http\Controllers\Frontend\LegalController::class, 'cookies'])->name('cookies');
-            Route::get('/shipping', [App\Http\Controllers\Frontend\LegalController::class, 'shipping'])->name('shipping');
-            Route::get('/returns', [App\Http\Controllers\Frontend\LegalController::class, 'returns'])->name('returns');
-        });
-
-        // Order confirmation by number (must be authed in tests)
-        Route::middleware('auth')->get('/order/confirmed/{number}', function (string $locale, string $number) {
-            if (\Illuminate\Support\Facades\Schema::hasTable('orders')) {
-                $exists = \Illuminate\Support\Facades\DB::table('orders')->where('number', $number)->exists();
-                if ($exists) {
-                    return response('OK');
-                }
-            }
-
-            return redirect('/');
-        })->name('localized.order.confirmed');
+    // Product Request routes (authenticated users only)
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/products/{product}/request', [App\Http\Controllers\ProductRequestController::class, 'create'])->name('localized.product-requests.create');
+        Route::post('/product-requests', [App\Http\Controllers\ProductRequestController::class, 'store'])->name('localized.product-requests.store');
+        Route::get('/product-requests', [App\Http\Controllers\ProductRequestController::class, 'index'])->name('localized.product-requests.index');
+        Route::get('/product-requests/{productRequest}', [App\Http\Controllers\ProductRequestController::class, 'show'])->name('localized.product-requests.show');
+        Route::patch('/product-requests/{productRequest}/cancel', [App\Http\Controllers\ProductRequestController::class, 'cancel'])->name('localized.product-requests.cancel');
     });
+
+    // Inventory routes
+    Route::get('/inventory', [App\Http\Controllers\InventoryController::class, 'index'])->name('localized.inventory.index');
+
+    // Cart page
+    Route::get('/cart', Pages\Cart::class)->name('localized.cart.index');
+
+    // Search page
+    Route::get('/search', \App\Livewire\Pages\Search::class)->name('localized.search');
+
+    // Brand index
+    Route::get('/brands', \App\Livewire\Pages\Brand\Index::class)->name('localized.brands.index');
+
+    // News localized routes
+    Route::prefix('news')->group(function (): void {
+        Route::get('/', [NewsController::class, 'index'])->name('localized.news.index');
+        Route::get('/category/{slug}', [NewsController::class, 'category'])->name('localized.news.category');
+        Route::get('/tag/{slug}', [NewsController::class, 'tag'])->name('localized.news.tag');
+        Route::get('/{slug}', [NewsController::class, 'show'])->name('localized.news.show');
+    });
+
+    Route::prefix('naujienos')->group(function (): void {
+        Route::get('/', [NewsController::class, 'index'])->name('localized.news.index.lt');
+        Route::get('/category/{slug}', [NewsController::class, 'category'])->name('localized.news.category.lt');
+        Route::get('/tag/{slug}', [NewsController::class, 'tag'])->name('localized.news.tag.lt');
+        Route::get('/{slug}', [NewsController::class, 'show'])->name('localized.news.show.lt');
+    });
+
+    // Brand show
+    Route::get('/brands/{slug}', [\App\Http\Controllers\BrandController::class, 'show'])->name('localized.brands.show');
+
+    // Locations index
+    Route::get('/locations', \App\Livewire\Pages\Location\Index::class)->name('localized.locations.index');
+
+    // Location show by slug
+    Route::get('/locations/{slug}', \App\Livewire\Pages\Location\Show::class)->name('localized.locations.show');
+
+    // Collections routes
+    Route::get('/collections', \App\Livewire\Pages\Collection\Index::class)->name('localized.collections.index');
+    Route::get('/collections/{collection}', \App\Livewire\Pages\Collection\Show::class)->name('localized.collections.show');
+
+    // Brochure downloads
+    Route::get('/brochures', [BrochureController::class, 'index'])->name('localized.brochures.index');
+
+    // Legal pages
+    Route::prefix('legal')->name('localized.legal.')->group(function (): void {
+        Route::get('/privacy', [App\Http\Controllers\Frontend\LegalController::class, 'privacy'])->name('privacy');
+        Route::get('/terms', [App\Http\Controllers\Frontend\LegalController::class, 'terms'])->name('terms');
+        Route::get('/cookies', [App\Http\Controllers\Frontend\LegalController::class, 'cookies'])->name('cookies');
+        Route::get('/shipping', [App\Http\Controllers\Frontend\LegalController::class, 'shipping'])->name('shipping');
+        Route::get('/returns', [App\Http\Controllers\Frontend\LegalController::class, 'returns'])->name('returns');
+    });
+
+    // Order confirmation by number (must be authed in tests)
+    Route::middleware('auth')->get('/order/confirmed/{number}', function (string $number) {
+        if (\Illuminate\Support\Facades\Schema::hasTable('orders')) {
+            $exists = \Illuminate\Support\Facades\DB::table('orders')->where('number', $number)->exists();
+            if ($exists) {
+                return response('OK');
+            }
+        }
+
+        return redirect('/');
+    })->name('localized.order.confirmed');
+});
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {
@@ -868,7 +856,7 @@ Route::middleware('auth')->group(function (): void {
 
 // Localized notification routes
 Route::middleware(['auth', 'localize'])->group(function (): void {
-    Route::get('/{locale}/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('localized.notifications.index');
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('localized.notifications.index');
 });
 
 // Attribute Frontend Routes
@@ -942,7 +930,7 @@ Route::middleware('auth')->group(function (): void {
 
 // Localized notification routes
 Route::middleware(['auth', 'localize'])->group(function (): void {
-    Route::get('/{locale}/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('localized.notifications.index');
+    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('localized.notifications.index');
 });
 
 // Attribute Frontend Routes
@@ -1029,3 +1017,17 @@ Route::prefix('attributes')->name('attributes.')->group(function () {
     Route::get('/api/statistics', [App\Http\Controllers\Frontend\AttributeController::class, 'statistics'])->name('api.statistics');
     Route::get('/{attribute}/values', [App\Http\Controllers\Frontend\AttributeController::class, 'values'])->name('values');
 });
+
+// Legacy locale-prefixed frontend URLs: /lt/... -> /...
+Route::get('/{locale}/{path?}', function (string $locale, ?string $path, Request $request) {
+    $targetPath = $path !== null && $path !== ''
+        ? '/' . ltrim($path, '/')
+        : '/';
+    $queryString = $request->getQueryString();
+
+    return redirect($targetPath . ($queryString !== null && $queryString !== '' ? '?' . $queryString : ''), 301);
+})->where([
+    'locale' => 'lt',
+    'path'   => '.*',
+]);
+

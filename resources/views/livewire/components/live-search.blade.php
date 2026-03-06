@@ -112,6 +112,9 @@
                                 {{-- Blend modern and legacy image keys for live search suggestions. --}}
                                 @php
                                     $image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null);
+                                    if (($result['type'] ?? null) === 'product' && empty($image)) {
+                                        $image = asset('images/placeholder-product.jpg');
+                                    }
                                 @endphp
                                 @if($image)
                                     <img
@@ -197,7 +200,7 @@
             {{-- View All Results Link --}}
             <div class="border-t border-sage/30">
                 <a 
-                    href="{{ route('localized.search', ['locale' => app()->getLocale(), 'q' => $query]) }}"
+                    href="{{ route('frontend.search.index', ['q' => $query]) }}"
                     class="block w-full px-4 py-3 text-center text-sm font-medium text-sage/70 hover:bg-sage/20 hover:text-sage focus:bg-sage/20 focus:text-sage focus:outline-none transition-all duration-200 ease-in-out"
                 >
                     {{ __('frontend.search.view_all_results') }}
@@ -334,3 +337,4 @@
         @endif
     </div>
 </div>
+

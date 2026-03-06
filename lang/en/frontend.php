@@ -443,6 +443,9 @@ return [
         'title' => 'Component showcase',
     ],
     'contact' => [
+        'flash' => [
+            'success' => 'Thank you! Your message has been sent successfully. We will contact you soon.',
+        ],
         'form' => [
             'email'        => 'Email',
             'message'      => 'Message',

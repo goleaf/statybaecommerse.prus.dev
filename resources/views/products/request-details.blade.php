@@ -4,6 +4,11 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
+    @php
+        $productShowRoute = Route::has('products.show')
+            ? route('products.show', $productRequest->product)
+            : route('frontend.products.show', $productRequest->product);
+    @endphp
     <div class="max-w-4xl mx-auto">
         <div class="mb-6">
             <h1 class="text-3xl font-bold text-gray-900 mb-2">
@@ -25,13 +30,17 @@
                     
                     <div class="flex items-start space-x-4">
                         @if($productRequest->product->getMainImage())
-                            <img src="{{ $productRequest->product->getMainImage() }}" 
-                                 alt="{{ $productRequest->product->trans('name') ?? $productRequest->product->name }}" 
-                                 class="w-20 h-20 object-cover rounded-lg">
+                            <a href="{{ $productShowRoute }}" class="block">
+                                <img src="{{ $productRequest->product->getMainImage() }}" 
+                                     alt="{{ $productRequest->product->trans('name') ?? $productRequest->product->name }}" 
+                                     class="w-20 h-20 object-cover rounded-lg">
+                            </a>
                         @endif
                         <div class="flex-1">
                             <h3 class="text-lg font-medium text-gray-900">
-                                {{ $productRequest->product->trans('name') ?? $productRequest->product->name }}
+                                <a href="{{ $productShowRoute }}" class="hover:text-blue-600">
+                                    {{ $productRequest->product->trans('name') ?? $productRequest->product->name }}
+                                </a>
                             </h3>
                             <p class="text-sm text-gray-600 mb-2">
                                 {{ __('translations.sku') }}: {{ $productRequest->product->sku }}
@@ -170,7 +179,7 @@
                     </h3>
                     
                     <div class="space-y-3">
-                        <a href="{{ route('products.show', $productRequest->product) }}" 
+                        <a href="{{ $productShowRoute }}" 
                            class="w-full inline-flex justify-center items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                             {{ __('translations.view_product') }}
                         </a>

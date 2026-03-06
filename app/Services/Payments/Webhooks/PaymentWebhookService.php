@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 /**
@@ -30,6 +31,9 @@ use Throwable;
  */
 final class PaymentWebhookService
 {
+    /** @var array<string, bool> */
+    private array $columnPresenceCache = [];
+
     /**
      * Handle a webhook callback for the given provider and return the response
      * payload plus HTTP status code that should be returned to the provider.
@@ -289,7 +293,9 @@ final class PaymentWebhookService
                 break;
             case OrderPaymentState::FULFILLED:
                 $order->payment_status = PaymentStatus::PAID;
-                $order->fulfillment_status = 'fulfilled';
+                if ($this->orderHasColumn('fulfillment_status')) {
+                    $order->fulfillment_status = 'fulfilled';
+                }
                 $order->status = OrderStatus::DELIVERED;
                 $order->delivered_at = $order->delivered_at ?? Carbon::now();
                 $shouldDispatchFulfillmentEmail = true;
@@ -300,7 +306,9 @@ final class PaymentWebhookService
             case OrderPaymentState::REFUNDED:
                 $order->payment_status = PaymentStatus::REFUNDED;
                 $order->status = OrderStatus::REFUNDED;
-                $order->fulfillment_status = 'refunded';
+                if ($this->orderHasColumn('fulfillment_status')) {
+                    $order->fulfillment_status = 'refunded';
+                }
                 break;
         }
 
@@ -311,5 +319,22 @@ final class PaymentWebhookService
         if ($shouldDispatchFulfillmentEmail) {
             SendOrderFulfillmentEmail::dispatch($order->id);
         }
+    }
+
+    private function orderHasColumn(string $column): bool
+    {
+        if (array_key_exists($column, $this->columnPresenceCache)) {
+            return $this->columnPresenceCache[$column];
+        }
+
+        try {
+            $hasColumn = Schema::hasColumn((new Order)->getTable(), $column);
+        } catch (Throwable) {
+            $hasColumn = false;
+        }
+
+        $this->columnPresenceCache[$column] = $hasColumn;
+
+        return $hasColumn;
     }
 }

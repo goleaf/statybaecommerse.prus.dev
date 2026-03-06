@@ -4,6 +4,11 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
+    @php
+        $productShowRoute = Route::has('products.show')
+            ? route('products.show', $product)
+            : route('frontend.products.show', $product);
+    @endphp
     <div class="max-w-2xl mx-auto">
         <div class="bg-white rounded-lg shadow-md p-6">
             <div class="mb-6">
@@ -19,12 +24,18 @@
             <div class="bg-gray-50 rounded-lg p-4 mb-6">
                 <div class="flex items-center space-x-4">
                     @if($product->getMainImage())
-                        <img src="{{ $product->getMainImage() }}" 
-                             alt="{{ $product->trans('name') ?? $product->name }}" 
-                             class="w-16 h-16 object-cover rounded-lg">
+                        <a href="{{ $productShowRoute }}" class="block">
+                            <img src="{{ $product->getMainImage() }}" 
+                                 alt="{{ $product->trans('name') ?? $product->name }}" 
+                                 class="w-16 h-16 object-cover rounded-lg">
+                        </a>
                     @endif
                     <div>
-                        <h3 class="font-semibold text-gray-900">{{ $product->trans('name') ?? $product->name }}</h3>
+                        <h3 class="font-semibold text-gray-900">
+                            <a href="{{ $productShowRoute }}" class="hover:text-blue-600">
+                                {{ $product->trans('name') ?? $product->name }}
+                            </a>
+                        </h3>
                         <p class="text-sm text-gray-600">{{ $product->sku }}</p>
                         @if($product->price)
                             <p class="text-sm font-medium text-green-600">
@@ -120,13 +131,6 @@
                 </div>
 
                 <div class="flex items-center justify-between pt-6 border-t">
-                    @php
-                        // Determine the correct product show route, gracefully falling back to the frontend alias when the
-                        // non-localized route name is unavailable in the current routing configuration.
-                        $productShowRoute = Route::has('products.show')
-                            ? route('products.show', $product)
-                            : route('frontend.products.show', $product);
-                    @endphp
                     <a href="{{ $productShowRoute }}"
                        class="text-gray-600 hover:text-gray-800 transition-colors">
                         {{ __('translations.back_to_product') }}

@@ -242,7 +242,7 @@
                 description="{{ __('frontend.component_showcase.empty_state.description') }}"
                 icon="heroicon-o-cube"
                 action-text="{{ __('frontend.component_showcase.empty_state.action') }}"
-                action-url="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
+                action-url="{{ route('frontend.products.index', []) }}"
             />
         </x-shared.section>
 
@@ -325,3 +325,5 @@
         </x-shared.section>
     </div>
 </div>
+
+

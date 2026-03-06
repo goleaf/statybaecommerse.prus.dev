@@ -10,6 +10,7 @@ use Filament\Actions\CreateAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 final class ReferralRewardsRelationManager extends RelationManager
@@ -29,8 +30,13 @@ final class ReferralRewardsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return ReferralRewardsTable::configure($table)
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->withoutGlobalScopes())
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->mutateDataUsing(fn (array $data): array => [
+                        ...$data,
+                        'referral_id' => $this->getOwnerRecord()->getKey(),
+                    ]),
             ]);
     }
 }

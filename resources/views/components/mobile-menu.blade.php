@@ -72,7 +72,7 @@
 
             {{-- Main Navigation --}}
             <nav class="space-y-2">
-                <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) ?? url('/') }}"
+                <a href="{{ route('home', []) ?? url('/') }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -82,7 +82,7 @@
                     {{ __('messages.frontend') }}
                 </a>
 
-                <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
+                <a href="{{ route('frontend.products.index', []) }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -91,7 +91,7 @@
                     {{ __('messages.frontend') }}
                 </a>
 
-                <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                <a href="{{ route('frontend.categories.index', []) }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -101,7 +101,7 @@
                     {{ __('messages.frontend') }}
                 </a>
 
-                <a href="{{ route('localized.brands.index', ['locale' => app()->getLocale()]) }}"
+                <a href="{{ route('frontend.brands.index', []) }}"
                    class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -142,7 +142,7 @@
                                      x-cloak
                                      class="ml-4 space-y-1">
                                     @foreach ($category->children as $subcategory)
-                                        <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $subcategory->slug]) }}"
+                                        <a href="{{ route('frontend.categories.show', ['category' => $subcategory->slug]) }}"
                                            class="block px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                                             {{ $subcategory->name }}
                                         </a>
@@ -175,7 +175,7 @@
             {{-- User Account Section --}}
             <div class="border-t border-gray-200 pt-4">
                 @auth
-                    <a href="{{ route('account.index', ['locale' => app()->getLocale()]) ?? '/account' }}"
+                    <a href="{{ route('account.index', []) ?? '/account' }}"
                        class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -184,7 +184,7 @@
                         {{ __('messages.frontend') }}
                     </a>
 
-                    <form method="POST" action="{{ route('logout', ['locale' => app()->getLocale()]) ?? '/logout' }}"
+                    <form method="POST" action="{{ route('logout', []) ?? '/logout' }}"
                           class="mt-2">
                         @csrf
                         <button type="submit"
@@ -198,7 +198,7 @@
                         </button>
                     </form>
                 @else
-                    <a href="{{ route('login', ['locale' => app()->getLocale()]) ?? '/login' }}"
+                    <a href="{{ route('login', []) ?? '/login' }}"
                        class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -208,7 +208,7 @@
                         {{ __('messages.frontend') }}
                     </a>
 
-                    <a href="{{ route('register', ['locale' => app()->getLocale()]) ?? '/register' }}"
+                    <a href="{{ route('register', []) ?? '/register' }}"
                        class="flex items-center gap-3 px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors duration-200">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -227,3 +227,5 @@
         </div>
     </div>
 </div>
+
+

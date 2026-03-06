@@ -56,6 +56,9 @@ return [
 ];
 ```
 
+- **File Format Policy**: Use PHP translation files only (`lang/<locale>/*.php`).
+- **Do Not Use**: JSON translation files (for example, `lang/*.json`).
+
 ### Integration Points
 - **Blade Templates**: `{{ __('categories.index_close') }}`
 - **Livewire Components**: Property-based translation loading
@@ -101,6 +104,7 @@ return [
 3. Include accessibility labels where needed
 4. Write tests for new translation keys
 5. Validate in UI context
+6. Keep all new translations in PHP files only; do not add JSON translation files
 
 ### Deployment Checklist
 - [ ] Both Lithuanian and English translations added

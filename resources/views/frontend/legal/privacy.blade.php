@@ -1,9 +1,11 @@
 @extends('frontend.layouts.app')
 
 @php
-    $defaultTitle = __('frontend.legal.privacy_policy');
+    $page = \App\Support\Frontend\InfoPages::get('privacy') ?? [];
+    $defaultTitle = $page['title'] ?? __('frontend.legal.privacy_policy');
     $pageTitle = $legal?->getTranslatedSeoTitle() ?? $legal?->getTranslatedTitle() ?? $defaultTitle;
-    $pageDescription = $legal?->getTranslatedSeoDescription() ?? __('frontend.legal.descriptions.privacy');
+    $pageDescription = $legal?->getTranslatedSeoDescription() ?? $page['description'] ?? __('frontend.legal.descriptions.privacy');
+    $contentHtml = $legal?->getTranslatedContent();
 
     $documentName = \Illuminate\Support\Str::lower($defaultTitle);
     $emptyMessage = __('frontend.legal.document_unavailable', [
@@ -18,15 +20,18 @@
 @endsection
 
 @section('content')
-    <section class="bg-gray-50 dark:bg-gray-950 py-12 md:py-16">
-        <div class="container mx-auto px-4">
-            @include('frontend.legal.partials.document', [
-                'legal' => $legal,
-                'heading' => $legal?->getTranslatedTitle() ?? $defaultTitle,
-                'description' => $pageDescription,
-                'emptyMessage' => $emptyMessage,
-                'fallbackKey' => 'privacy',
-            ])
-        </div>
-    </section>
+    @include('frontend.info.partials.page', [
+        'page' => array_merge($page, [
+            'title' => $legal?->getTranslatedTitle() ?? $defaultTitle,
+            'description' => $pageDescription,
+        ]),
+        'relatedPages' => \App\Support\Frontend\InfoPages::resolveRelatedPages($page['related_pages'] ?? []),
+        'actions' => \App\Support\Frontend\InfoPages::resolveActions($page['actions'] ?? []),
+        'contentHtml' => $contentHtml,
+        'documentMeta' => array_filter([
+            \App\Models\Legal::getTypes()[$legal?->type ?? ''] ?? null,
+            $legal?->is_required ? __('messages.is_required') : null,
+        ]),
+        'emptyMessage' => $emptyMessage,
+    ])
 @endsection

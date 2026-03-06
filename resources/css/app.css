@@ -1,9 +1,10 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --btn-primary-bg: #16a34a;
-  --btn-primary-bg-hover: #15803d;
-  --btn-primary-ring: #22c55e;
+  --btn-primary-bg: #0891b2;
+  --btn-primary-bg-hover: #0e7490;
+  --btn-primary-ring: #06b6d4;
 }
 
 button,
@@ -345,11 +346,11 @@ footer .footer-contact-item {
 }
 
 :root {
-  --color-primary: 14 165 233;
+  --color-primary: 8 145 178;
   --color-primary-foreground: 255 255 255;
-  --color-secondary: 100 116 139;
+  --color-secondary: 71 85 105;
   --color-secondary-foreground: 255 255 255;
-  --color-accent: 217 70 239;
+  --color-accent: 6 182 212;
   --color-accent-foreground: 255 255 255;
   --color-background: 248 250 252;
   --color-foreground: 15 23 42;
@@ -357,13 +358,13 @@ footer .footer-contact-item {
   --color-muted-foreground: 100 116 139;
   --color-border: 226 232 240;
   --color-input: 255 255 255;
-  --color-ring: 14 165 233;
-  --gradient-primary: linear-gradient(135deg, rgb(14 165 233) 0%, rgb(59 130 246) 100%);
+  --color-ring: 6 182 212;
+  --gradient-primary: linear-gradient(135deg, rgb(6 182 212) 0%, rgb(14 116 144) 100%);
   --gradient-secondary: linear-gradient(135deg, rgb(100 116 139) 0%, rgb(71 85 105) 100%);
-  --gradient-accent: linear-gradient(135deg, rgb(217 70 239) 0%, rgb(168 85 247) 100%);
-  --gradient-hero: linear-gradient(135deg, rgb(59 130 246) 0%, rgb(147 51 234) 50%, rgb(236 72 153) 100%);
+  --gradient-accent: linear-gradient(135deg, rgb(34 211 238) 0%, rgb(8 145 178) 100%);
+  --gradient-hero: linear-gradient(135deg, rgb(6 182 212) 0%, rgb(14 116 144) 50%, rgb(15 23 42) 100%);
   --primary-color: rgb(var(--color-primary));
-  --primary-color-hint: rgb(2 132 199);
+  --primary-color-hint: rgb(14 116 144);
   --mobile-padding: 1rem;
   --mobile-margin: 0.5rem;
   --mobile-font-size: 0.875rem;
@@ -380,7 +381,7 @@ footer .footer-contact-item {
   --color-muted-foreground: 148 163 184;
   --color-border: 51 65 85;
   --color-input: 2 6 23;
-  --color-ring: 59 130 246;
+  --color-ring: 6 182 212;
 }
 
 .product-card__stock .text-green-500,

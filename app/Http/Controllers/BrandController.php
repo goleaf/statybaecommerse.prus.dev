@@ -23,7 +23,7 @@ final class BrandController extends Controller
     /**
      * Display the specified resource with related data.
      */
-    public function show(Request $request, string $locale, string $slug): View|RedirectResponse
+    public function show(Request $request, string $slug): View|RedirectResponse
     {
         // Find brand by slug (check both main slug and translated slugs)
         $brand = Brand::query()->with(['translations', 'media'])->where('slug', $slug)->where('is_enabled', true)->first();
@@ -40,11 +40,31 @@ final class BrandController extends Controller
         $canonicalSlug = $this->getCanonicalSlug($brand);
         // If the current slug is not the canonical slug, redirect
         if ($canonicalSlug !== $slug) {
-            return redirect()->route('localized.brands.show', ['locale' => $locale, 'slug' => $canonicalSlug], 301);
+            return redirect()->route('localized.brands.show', ['slug' => $canonicalSlug], 301);
         }
+        // Provide default values for filter/sort options.
+        $availableSorts = [
+            'featured'    => __('frontend.search.popular'),
+            'latest'      => __('frontend.search.recent'),
+            'price_asc'   => __('frontend.search.price_low_to_high'),
+            'price_desc'  => __('frontend.search.price_high_to_low'),
+            'bestsellers' => __('frontend.search_results.sort.relevance'),
+        ];
+        $availableFilters = [
+            'featured' => __('frontend.search.popular'),
+            'in_stock' => __('frontend.search.in_stock_only'),
+        ];
+        $requestedSort = (string) $request->query('sort', 'featured');
+        $activeSort = array_key_exists($requestedSort, $availableSorts)
+            ? $requestedSort
+            : 'featured';
+        $rawFilter = $request->query('filter');
+        $activeFilter = is_string($rawFilter) && $rawFilter !== '' && array_key_exists($rawFilter, $availableFilters)
+            ? $rawFilter
+            : null;
         // Load products for this brand with proper relationships.
         // Keep the existing storefront constraints for the main listing.
-        $products = $brand->products()
+        $productsQuery = $brand->products()
             ->forProductList()
             ->withListRelations()
             ->published()
@@ -52,8 +72,29 @@ final class BrandController extends Controller
             ->whereNotNull('name')
             ->where('name', '!=', '')
             ->whereNotNull('slug')
-            ->where('slug', '!=', '')
-            ->orderByDesc('published_at')
+            ->where('slug', '!=', '');
+
+        if ($activeFilter === 'featured') {
+            $productsQuery->where('is_featured', true);
+        }
+        if ($activeFilter === 'in_stock') {
+            $productsQuery->where(static function (Builder $query): void {
+                $query->where('manage_stock', false)
+                    ->orWhere('stock_quantity', '>', 0);
+            });
+        }
+        match ($activeSort) {
+            'latest'      => $productsQuery->orderByDesc('published_at'),
+            'price_asc'   => $productsQuery->orderBy('price')->orderBy('name'),
+            'price_desc'  => $productsQuery->orderByDesc('price')->orderBy('name'),
+            'bestsellers' => $productsQuery
+                ->withSum('orderItems as sales_count', 'quantity')
+                ->orderByDesc('sales_count')
+                ->orderByDesc('published_at'),
+            default => $productsQuery->orderByDesc('is_featured')->orderByDesc('published_at'),
+        };
+
+        $products = $productsQuery
             ->paginate(12)
             ->withQueryString();
 
@@ -71,7 +112,7 @@ final class BrandController extends Controller
         // If the main brand grid is empty, prepare fallback sections:
         // 8 products per category/subcategory, newest first by created_at.
         $categoryProductSections = collect();
-        if ($products->isEmpty() && $relatedCategories->isNotEmpty()) {
+        if ($products->isEmpty() && $relatedCategories->isNotEmpty() && $activeFilter === null) {
             $categoryProductSections = $this->buildCategoryProductSections($brand, $relatedCategories);
         }
 
@@ -79,31 +120,17 @@ final class BrandController extends Controller
         $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName() . ' - ' . config('app.name');
         $seoDescription = $brand->getTranslatedSeoDescription() ?: $brand->getTranslatedDescription();
 
-        // Provide default values for filter/sort options
-        $availableSorts = [
-            'featured'    => __('frontend.search.popular'),
-            'latest'      => __('frontend.search.recent'),
-            'price_asc'   => __('frontend.search.price_low_to_high'),
-            'price_desc'  => __('frontend.search.price_high_to_low'),
-            'bestsellers' => __('frontend.search_results.sort.relevance'),
-        ];
-
-        $availableFilters = [
-            'featured' => __('frontend.search.popular'),
-            'in_stock' => __('frontend.search.in_stock_only'),
-        ];
-
         return view('frontend.brands.show', [
-            'brand'             => $brand,
-            'products'          => $products,
-            'relatedCategories' => $relatedCategories,
+            'brand'                   => $brand,
+            'products'                => $products,
+            'relatedCategories'       => $relatedCategories,
             'categoryProductSections' => $categoryProductSections,
-            'availableSorts'    => $availableSorts,
-            'availableFilters'  => $availableFilters,
-            'activeSort'        => $request->get('sort', 'featured'),
-            'activeFilter'      => $request->get('filter'),
-            'seoTitle'          => $seoTitle,
-            'seoDescription'    => $seoDescription,
+            'availableSorts'          => $availableSorts,
+            'availableFilters'        => $availableFilters,
+            'activeSort'              => $activeSort,
+            'activeFilter'            => $activeFilter,
+            'seoTitle'                => $seoTitle,
+            'seoDescription'          => $seoDescription,
         ]);
     }
 

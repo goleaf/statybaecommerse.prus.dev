@@ -13,7 +13,7 @@ return [
      * | other UI elements where an application name needs to be displayed.
      * |
      */
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Statybos E-commerce'),
 
     /*
      * |--------------------------------------------------------------------------
@@ -86,7 +86,7 @@ return [
      * | and sitemap generation. Example: "en,lt,de".
      * |
      */
-    'supported_locales' => env('APP_SUPPORTED_LOCALES', 'lt,en,ru,de'),
+    'supported_locales' => 'lt',
 
     /*
      * |--------------------------------------------------------------------------
@@ -102,24 +102,6 @@ return [
             'name'      => 'Lietuvių',
             'native'    => 'Lietuvių',
             'flag'      => '🇱🇹',
-            'direction' => 'ltr',
-        ],
-        'en' => [
-            'name'      => 'English',
-            'native'    => 'English',
-            'flag'      => '🇺🇸',
-            'direction' => 'ltr',
-        ],
-        'ru' => [
-            'name'      => 'Russian',
-            'native'    => 'Русский',
-            'flag'      => '🇷🇺',
-            'direction' => 'ltr',
-        ],
-        'de' => [
-            'name'      => 'German',
-            'native'    => 'Deutsch',
-            'flag'      => '🇩🇪',
             'direction' => 'ltr',
         ],
     ],
@@ -178,3 +160,4 @@ return [
         'store'  => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 ];
+

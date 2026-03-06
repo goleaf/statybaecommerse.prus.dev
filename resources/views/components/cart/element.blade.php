@@ -7,13 +7,16 @@
         $item->associatedModel instanceof \App\Models\ProductVariant
             ? $item->associatedModel->product
             : $item->associatedModel;
+    $productUrl = route('product.show', method_exists($model, 'trans') ? $model->trans('slug') ?? $model->slug : $model->slug);
 @endphp
 
 <li class="flex items-start py-6 space-x-4">
-    <x-product.thumbnail :product="$item->associatedModel" class="size-20 border aspect-none border-primary-700" />
+    <a href="{{ $productUrl }}" class="block">
+        <x-product.thumbnail :product="$item->associatedModel" class="size-20 border aspect-none border-primary-700" />
+    </a>
     <div class="flex-auto">
         <h3 class="font-medium font-heading text-white">
-            <x-link :href="route('product.show', method_exists($model, 'trans') ? $model->trans('slug') ?? $model->slug : $model->slug)">
+            <x-link :href="$productUrl">
                 {{ $item->name }}
             </x-link>
         </h3>

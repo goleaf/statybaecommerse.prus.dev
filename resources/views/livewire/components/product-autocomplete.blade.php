@@ -91,7 +91,7 @@
                             {{-- Product Image --}}
                             <div class="flex-shrink-0">
                                 {{-- Respect refreshed API fields when rendering product suggestions. --}}
-                                @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
+                                @php($image = ($result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null)) ?: asset('images/placeholder-product.jpg'))
                                 @if($image)
                                     <img
                                         src="{{ $image }}"

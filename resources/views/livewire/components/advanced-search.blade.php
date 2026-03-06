@@ -219,7 +219,12 @@
                         {{-- Result Image --}}
                         <div class="flex-shrink-0">
                             {{-- Prefer new media keys while retaining support for older structures. --}}
-                            @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
+                            @php
+                                $image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null);
+                                if (($result['type'] ?? null) === 'product' && empty($image)) {
+                                    $image = asset('images/placeholder-product.jpg');
+                                }
+                            @endphp
                             @if($image)
                                 <img src="{{ $image }}"
                                      alt="{{ $result['title'] }}"

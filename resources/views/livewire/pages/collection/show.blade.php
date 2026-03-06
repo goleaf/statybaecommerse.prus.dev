@@ -31,7 +31,7 @@
         </x-alert>
     @endif
     <x-breadcrumbs :items="[
-        ['label' => __('messages.collections'), 'url' => route('localized.collections.index', ['locale' => app()->getLocale()])],
+        ['label' => __('messages.collections'), 'url' => route('frontend.collections.index', [])],
         ['label' => $collection->trans('name') ?? $collection->name],
     ]" />
     <div class="flex items-center justify-between mb-6">
@@ -177,7 +177,7 @@
 
     <!-- Back Button -->
     <div class="mt-8 text-center">
-        <a href="{{ route('localized.collections.index', ['locale' => app()->getLocale()]) }}" 
+        <a href="{{ route('frontend.collections.index', []) }}" 
            class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-md transition duration-200">
             <x-heroicon-o-arrow-left class="w-4 h-4 mr-2" />
             {{ __('frontend.buttons.back_to_collections') }}
@@ -204,3 +204,5 @@
         </script>
     @endif
 @endpush
+
+

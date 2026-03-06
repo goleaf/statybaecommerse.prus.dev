@@ -63,11 +63,11 @@ final class ImportProducts extends CsvImportPage
 
     protected function getChunkSize(): int
     {
-        return 20;
+        return 100;
     }
 
     protected function getImportProcessingTimeoutSeconds(): int
     {
-        return 300;
+        return 3000000;
     }
 }

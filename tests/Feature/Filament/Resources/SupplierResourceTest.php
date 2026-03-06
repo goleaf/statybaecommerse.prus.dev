@@ -70,7 +70,6 @@ it('can create supplier and auto-generate code when omitted', function () {
     Livewire::test(CreateSupplier::class)
         ->fillForm([
             'name'          => 'New Supplier',
-            'code'          => '',
             'contact_email' => 'supplier@example.com',
             'contact_phone' => '+15550000001',
             'is_enabled'    => true,

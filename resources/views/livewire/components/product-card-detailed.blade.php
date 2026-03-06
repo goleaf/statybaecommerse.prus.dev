@@ -2,20 +2,17 @@
     {{-- Product Image --}}
     <div class="relative aspect-square overflow-hidden bg-gray-50">
         @php
-            $imageUrl = $product->getImageUrl('preview') ?? $product->main_image ?? $product->thumbnail;
+            $imageUrl = $product->getImageUrl('preview') ?? $product->main_image ?? $product->thumbnail ?? asset('images/placeholder-product.jpg');
+            $productUrl = route('product.show', $product->slug ?? $product);
         @endphp
-        @if($imageUrl)
+        <a href="{{ $productUrl }}" class="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
             <img 
                 src="{{ $imageUrl }}" 
                 alt="{{ $product->name }}"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 loading="lazy"
             >
-        @else
-            <div class="w-full h-full flex items-center justify-center bg-gray-100">
-                <x-heroicon-o-photo class="w-16 h-16 text-gray-400" />
-            </div>
-        @endif
+        </a>
 
         {{-- Product Badges --}}
         <div class="absolute top-3 left-3 flex flex-col gap-2">

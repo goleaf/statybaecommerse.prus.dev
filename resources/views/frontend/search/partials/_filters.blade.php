@@ -25,7 +25,7 @@
             >
                 <option value="">{{ __('frontend.search.all_categories') }}</option>
                 @foreach ($categories as $category)
-                    <option value="{{ $category->id }}" @selected((string) $selectedCategory === (string) $category->id)>
+                    <option value="{{ $category->slug }}" @selected((string) $selectedCategory === (string) $category->slug)>
                         {{ $category->name }}
                     </option>
                 @endforeach

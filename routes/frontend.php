@@ -17,12 +17,8 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::middleware(['web'])->group(function () {
-    // Homepage - redirect to /lt (localized home)
-    Route::get('/', function () {
-        $locale = config('app.locale', 'lt');
-
-        return redirect()->route('localized.home', ['locale' => $locale]);
-    })->name('home');
+    // Homepage
+    Route::get('/', \App\Livewire\Pages\Home::class)->name('home');
 
     // About page
     Route::view('/about', 'frontend.about.index')->name('frontend.about.index');
@@ -38,7 +34,7 @@ Route::middleware(['web'])->group(function () {
 
     // Categories
     Route::prefix('categories')->name('frontend.categories.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\CategoryController::class, 'index'])->name('index');
+        Route::get('/', \App\Livewire\Pages\Category\Index::class)->name('index');
         Route::get('/{category}', [App\Http\Controllers\Frontend\CategoryController::class, 'show'])->name('show');
     });
 
@@ -160,6 +156,23 @@ Route::middleware(['web'])->group(function () {
         Route::post('/subscribe', [App\Http\Controllers\Frontend\NewsletterController::class, 'subscribe'])->name('subscribe');
         Route::post('/unsubscribe', [App\Http\Controllers\Frontend\NewsletterController::class, 'unsubscribe'])->name('unsubscribe');
     });
+
+    // Informational footer pages.
+    Route::prefix('pagalba')->name('frontend.info.')->group(function () {
+        Route::get('/duk', [App\Http\Controllers\Frontend\InfoPageController::class, 'show'])->defaults('page', 'faq')->name('faq');
+        Route::get('/apmokejimo-budai', [App\Http\Controllers\Frontend\InfoPageController::class, 'show'])->defaults('page', 'payment-methods')->name('payment-methods');
+    });
+
+    Route::prefix('katalogas')->name('frontend.info.')->group(function () {
+        Route::get('/populiariausios-prekes', [App\Http\Controllers\Frontend\InfoPageController::class, 'show'])->defaults('page', 'popular-products')->name('popular-products');
+        Route::get('/statybines-medziagos', [App\Http\Controllers\Frontend\InfoPageController::class, 'show'])->defaults('page', 'building-materials')->name('building-materials');
+        Route::get('/irankiai-ir-iranga', [App\Http\Controllers\Frontend\InfoPageController::class, 'show'])->defaults('page', 'tools-equipment')->name('tools-equipment');
+        Route::get('/specialus-pasiulymai', [App\Http\Controllers\Frontend\InfoPageController::class, 'show'])->defaults('page', 'special-offers')->name('special-offers');
+    });
+
+    Route::get('/paslaugos/meistrams', [App\Http\Controllers\Frontend\InfoPageController::class, 'show'])
+        ->defaults('page', 'services-for-craftsmen')
+        ->name('frontend.info.services-for-craftsmen');
 
     // Sitemap
     Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');

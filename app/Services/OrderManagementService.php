@@ -56,11 +56,14 @@ final class OrderManagementService extends BaseService
             $this->inventoryService->reserveStock($orderData->items);
 
             // Send notifications
-            $this->notificationService->createOrderNotification(
-                $order->customer,
-                'created',
-                ['id' => $order->id, 'number' => $order->number]
-            );
+            $recipient = $this->resolveNotificationRecipient($order);
+            if ($recipient instanceof User) {
+                $this->notificationService->createOrderNotification(
+                    $recipient,
+                    'created',
+                    ['id' => $order->id, 'number' => $order->number]
+                );
+            }
 
             $this->log('info', 'Order created successfully', [
                 'order_id'     => $order->id,
@@ -92,7 +95,7 @@ final class OrderManagementService extends BaseService
 
             // Validate status transition
             if (! $this->isValidStatusTransition($order->status, $newStatus)) {
-                return $this->error(__('orders.invalid_status_transition'));
+                return $this->error('orders.invalid_status_transition');
             }
 
             // Update status
@@ -130,7 +133,7 @@ final class OrderManagementService extends BaseService
             }
 
             if (! $this->canCancelOrder($order)) {
-                return $this->error(__('orders.cannot_cancel'));
+                return $this->error('orders.cannot_cancel');
             }
 
             // Cancel the order
@@ -140,11 +143,14 @@ final class OrderManagementService extends BaseService
             $this->inventoryService->restoreStock($order->items);
 
             // Send notification
-            $this->notificationService->createOrderNotification(
-                $order->customer,
-                'cancelled',
-                ['id' => $order->id, 'number' => $order->number]
-            );
+            $recipient = $this->resolveNotificationRecipient($order);
+            if ($recipient instanceof User) {
+                $this->notificationService->createOrderNotification(
+                    $recipient,
+                    'cancelled',
+                    ['id' => $order->id, 'number' => $order->number]
+                );
+            }
 
             $this->log('info', 'Order cancelled', [
                 'order_id' => $order->id,
@@ -209,10 +215,13 @@ final class OrderManagementService extends BaseService
     /**
      * Validate if status transition is allowed
      */
-    private function isValidStatusTransition(string $currentStatus, string $newStatus): bool
+    private function isValidStatusTransition(mixed $currentStatus, string $newStatus): bool
     {
+        $currentStatus = $this->normalizeOrderStatus($currentStatus);
+        $newStatus = $this->normalizeOrderStatus($newStatus);
+
         $allowedTransitions = [
-            'pending'    => ['confirmed', 'cancelled'],
+            'pending'    => ['confirmed', 'processing', 'cancelled'],
             'confirmed'  => ['processing', 'cancelled'],
             'processing' => ['shipped', 'cancelled'],
             'shipped'    => ['delivered'],
@@ -243,31 +252,40 @@ final class OrderManagementService extends BaseService
         $this->inventoryService->confirmReservation($order->items);
 
         // Send confirmation notification
-        $this->notificationService->createOrderNotification(
-            $order->customer,
-            'confirmed',
-            ['id' => $order->id, 'number' => $order->number]
-        );
+        $recipient = $this->resolveNotificationRecipient($order);
+        if ($recipient instanceof User) {
+            $this->notificationService->createOrderNotification(
+                $recipient,
+                'confirmed',
+                ['id' => $order->id, 'number' => $order->number]
+            );
+        }
     }
 
     private function handleOrderShipped(Order $order): void
     {
         // Send shipping notification with tracking info
-        $this->notificationService->createOrderNotification(
-            $order->customer,
-            'shipped',
-            ['id' => $order->id, 'number' => $order->number]
-        );
+        $recipient = $this->resolveNotificationRecipient($order);
+        if ($recipient instanceof User) {
+            $this->notificationService->createOrderNotification(
+                $recipient,
+                'shipped',
+                ['id' => $order->id, 'number' => $order->number]
+            );
+        }
     }
 
     private function handleOrderDelivered(Order $order): void
     {
         // Mark as delivered and send notification
-        $this->notificationService->createOrderNotification(
-            $order->customer,
-            'delivered',
-            ['id' => $order->id, 'number' => $order->number]
-        );
+        $recipient = $this->resolveNotificationRecipient($order);
+        if ($recipient instanceof User) {
+            $this->notificationService->createOrderNotification(
+                $recipient,
+                'delivered',
+                ['id' => $order->id, 'number' => $order->number]
+            );
+        }
     }
 
     private function handleOrderCancelled(Order $order): void
@@ -281,6 +299,49 @@ final class OrderManagementService extends BaseService
      */
     private function canCancelOrder(Order $order): bool
     {
-        return in_array($order->status, ['pending', 'confirmed', 'processing']);
+        return in_array($this->normalizeOrderStatus($order->status), ['pending', 'confirmed', 'processing'], true);
+    }
+
+    /**
+     * Resolve the user that should receive order lifecycle notifications.
+     */
+    private function resolveNotificationRecipient(Order $order): ?User
+    {
+        if ($order->relationLoaded('user')) {
+            $loaded = $order->getRelation('user');
+
+            if ($loaded instanceof User) {
+                return $loaded;
+            }
+        }
+
+        if ($order->user instanceof User) {
+            return $order->user;
+        }
+
+        $userId = $order->getAttribute('user_id');
+        if (is_numeric($userId)) {
+            $resolved = User::query()->find((int) $userId);
+
+            if ($resolved instanceof User) {
+                return $resolved;
+            }
+        }
+
+        $customerId = $order->getAttribute('customer_id');
+        if (is_numeric($customerId)) {
+            return User::query()->find((int) $customerId);
+        }
+
+        return null;
+    }
+
+    private function normalizeOrderStatus(mixed $status): string
+    {
+        if (is_object($status) && property_exists($status, 'value')) {
+            $status = $status->value;
+        }
+
+        return strtolower(trim((string) $status));
     }
 }

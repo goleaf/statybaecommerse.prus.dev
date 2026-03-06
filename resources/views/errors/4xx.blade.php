@@ -1,19 +1,19 @@
 @php
     $locale = app()->getLocale();
-    $homeUrl = \Illuminate\Support\Facades\Route::has('localized.home')
-        ? route('localized.home', ['locale' => $locale])
+    $homeUrl = \Illuminate\Support\Facades\Route::has('home')
+        ? route('home', [])
         : url('/');
     $supportUrl = \Illuminate\Support\Facades\Route::has('localized.support.index')
-        ? route('localized.support.index', ['locale' => $locale])
+        ? route('localized.support.index', [])
         : url('/support');
-    $contactUrl = \Illuminate\Support\Facades\Route::has('localized.contact.index')
-        ? route('localized.contact.index', ['locale' => $locale])
+    $contactUrl = \Illuminate\Support\Facades\Route::has('frontend.contact.index')
+        ? route('frontend.contact.index', [])
         : url('/contact');
     $productsUrl = \Illuminate\Support\Facades\Route::has('products.index')
-        ? route('products.index', ['locale' => $locale])
+        ? route('products.index', [])
         : url('/products');
     $statusUrl = \Illuminate\Support\Facades\Route::has('status.page')
-        ? route('status.page', ['locale' => $locale])
+        ? route('status.page', [])
         : url('/status');
 
     $supportTitle = $supportTitle ?? __('frontend.errors.4xx.support_title');
@@ -98,3 +98,5 @@
         ],
     ],
 ])
+
+

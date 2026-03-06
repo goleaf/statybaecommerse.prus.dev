@@ -66,11 +66,11 @@
 
 <div x-data="{ showFilters: false }" class="min-h-screen bg-slate-50">
     <div class="bg-dark text-sage">
-        <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <div class="mx-auto w-full max-w-8xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
             <nav class="mb-8 text-sm text-sage/80" aria-label="{{ __('ui.breadcrumb') }}">
                 <ol class="flex flex-wrap items-center gap-2">
                     <li>
-                        <a href="{{ route('localized.home', ['locale' => app()->getLocale()]) }}"
+                        <a href="{{ route('home', []) }}"
                            class="text-sage/80 transition-colors hover:text-sage">
                             {{ __('frontend.navigation.home') }}
                         </a>
@@ -78,7 +78,7 @@
                     <li class="text-sage/80">/</li>
                     @if (!$isIndex)
                         <li>
-                            <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                            <a href="{{ route('frontend.categories.index', []) }}"
                                class="text-sage/80 transition-colors hover:text-sage">
                                 {{ __('categories.index.meta_title') }}
                             </a>
@@ -92,8 +92,8 @@
             </nav>
 
             <div class="space-y-6">
-                <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-                    <div class="max-w-2xl space-y-4">
+                <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+                    <div class="space-y-4 lg:max-w-none">
                         <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
                             @if ($isIndex)
                                 {{ __('categories.index.badge') }}
@@ -111,11 +111,11 @@
                         </h1>
 
                         @if ($isIndex)
-                            <p class="text-base text-white/90 sm:text-lg">
+                            <p class="max-w-4xl text-base text-white/90 sm:text-lg">
                                 {{ __('categories.index.description') }}
                             </p>
                         @elseif (!empty($category->description))
-                            <p class="text-base text-white/90 sm:text-lg">
+                            <p class="max-w-4xl text-base text-white/90 sm:text-lg">
                                 {{ $category->description }}
                             </p>
                         @endif
@@ -124,32 +124,11 @@
                     <div class="flex flex-col items-start gap-2 sm:flex-row sm:items-end sm:gap-4">
                         @if ($isIndex)
                             @php
-                                $categories = $this->categories;
-                                $totalCategories = $categories->total();
-                                $from = $categories->firstItem();
-                                $to = $categories->lastItem();
-                                $activeFilterCount = collect([
-                                    !empty($search ?? ''),
-                                    $inStock ?? false,
-                                    $onSale ?? false,
-                                    $hasProducts ?? false,
-                                    filled($priceMin ?? null),
-                                    filled($priceMax ?? null),
-                                    !empty($selectedBrandIds ?? []),
-                                    !empty($selectedCollectionIds ?? []),
-                                    !empty($selectedCategoryIds ?? []),
-                                ])->filter()->count();
+                                $categoryRows = $this->categories;
+                                $totalCategories = $categoryRows->count();
+                                $from = $totalCategories > 0 ? 1 : null;
+                                $to = $totalCategories > 0 ? $totalCategories : null;
                             @endphp
-                            <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm font-semibold text-white shadow-sm">
-                                {{ __('categories.index.catalogue_count', ['count' => number_format($totalCategories)]) }}
-                            </div>
-                            <div class="rounded-2xl border border-sage/30 bg-sage/10 px-3 py-2 text-sm text-white/80 shadow-sm">
-                                @if ($activeFilterCount > 0)
-                                    {{ __('categories.index.filters_active', ['count' => $activeFilterCount]) }}
-                                @else
-                                    {{ __('categories.index.filters_none') }}
-                                @endif
-                            </div>
                             <button type="button"
                                     wire:click="$toggle('sidebarOpen')"
                                     wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
@@ -235,9 +214,10 @@
                 ->values();
         @endphp
 
-        <div class="grid gap-8 lg:grid-cols-12">
-            <aside class="hidden lg:col-span-3 lg:block lg:sticky lg:top-24 self-start">
-                <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
+        <div class="grid gap-8 lg:grid-cols-12 lg:items-start">
+            <aside class="hidden lg:col-span-3 lg:block">
+                <div class="lg:sticky lg:top-24 lg:self-start">
+                    <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
                     <div class="mb-6 space-y-2">
                         <span class="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-cyan-700">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -296,6 +276,7 @@
                         @endif
                     </div>
                 </div>
+            </div>
             </aside>
 
             <section class="lg:col-span-9 space-y-6">
@@ -305,9 +286,9 @@
                         <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                             <div class="flex flex-wrap items-center gap-3 text-sm text-slate-700">
                                 @if ($from && $to)
-                                    <span class="text-slate-500">{{ __('categories.index.showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
+                                    <span class="whitespace-nowrap text-slate-500">{{ __('categories.index.showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
                                 @else
-                                    <span class="text-slate-500">{{ __('categories.index.no_results') }}</span>
+                                    <span class="whitespace-nowrap text-slate-500">{{ __('categories.index.no_results') }}</span>
                                 @endif
                             </div>
 
@@ -368,7 +349,7 @@
 
                     @if ($isIndex)
                         {{-- Categories Display --}}
-                        @if ($categories->count() > 0)
+                        @if ($categoryRows->count() > 0)
                             <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
                                 <div class="overflow-x-auto">
                                     <table class="min-w-full text-sm">
@@ -389,8 +370,10 @@
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-200 bg-white">
-                                            @foreach ($categories as $category)
+                                            @foreach ($categoryRows as $row)
                                                 @php
+                                                    $category = $row['category'];
+                                                    $depth = (int) ($row['depth'] ?? 0);
                                                     $slug = method_exists($category, 'trans')
                                                         ? ($category->trans('slug') ?? $category->slug)
                                                         : ($category->slug ?? (is_string($category) ? $category : null));
@@ -406,10 +389,15 @@
 
                                                 <tr class="group transition-colors even:bg-slate-50/40 hover:bg-slate-50">
                                                     <td class="px-6 py-4 align-middle">
-                                                        <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
-                                                           class="font-semibold text-slate-900 transition group-hover:text-slate-700">
-                                                            {{ $name }}
-                                                        </a>
+                                                        <div class="flex items-center" style="padding-left: {{ $depth * 1.25 }}rem;">
+                                                            @if ($depth > 0)
+                                                                <span class="mr-2 text-xs text-slate-400">&gt;</span>
+                                                            @endif
+                                                            <a href="{{ route('frontend.categories.show', ['category' => $slug]) }}"
+                                                               class="font-semibold text-slate-900 transition group-hover:text-slate-700">
+                                                                {{ $name }}
+                                                            </a>
+                                                        </div>
                                                     </td>
                                                     <td class="px-6 py-4 align-middle">
                                                         @if ($description)
@@ -428,7 +416,7 @@
                                                         </span>
                                                     </td>
                                                     <td class="px-6 py-4 text-right align-middle">
-                                                        <a href="{{ route('localized.categories.show', ['locale' => $locale, 'category' => $slug]) }}"
+                                                        <a href="{{ route('frontend.categories.show', ['category' => $slug]) }}"
                                                            class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
                                                             {{ __('categories.index.view_category') }}
                                                         </a>
@@ -439,17 +427,13 @@
                                     </table>
                                 </div>
                             </div>
-
-                            <div class="mt-10">
-                                {{ $categories->links() }}
-                            </div>
                         @else
                             <x-shared.empty-state
                                 title="{{ __('categories.index.empty_title') }}"
                                 description="{{ __('categories.index.empty_description') }}"
                                 icon="heroicon-o-archive-box"
                                 :action-text="__('categories.index.reset_filters')"
-                                :action-url="route('localized.categories.index', ['locale' => $locale])"
+                                :action-url="route('frontend.categories.index', [])"
                             />
                         @endif
                     @else
@@ -557,14 +541,14 @@
                                                                     {{ __('categories.show.try_different_search') }}
                                                                 </p>
                                                                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                                                    <a href="{{ route('localized.categories.index', ['locale' => app()->getLocale()]) }}"
+                                                                    <a href="{{ route('frontend.categories.index', []) }}"
                                                                        class="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-slate-50 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-cyan-300 hover:bg-cyan-50 hover:text-cyan-700 shadow-sm">
                                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                                                         </svg>
                                                                         {{ __('categories.show.browse_categories') }}
                                                                     </a>
-                                                                    <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
+                                                                    <a href="{{ route('frontend.products.index', []) }}"
                                                                        class="inline-flex items-center gap-2 rounded-full bg-cyan-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-cyan-700 shadow-sm">
                                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>

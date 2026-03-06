@@ -38,13 +38,10 @@ final class SitemapService
      */
     public function getIndex(): array
     {
-        return collect($this->localeUrlGenerator->supportedLocales())
-            ->map(fn (string $locale) => [
-                'loc'     => route('sitemap.locale', ['locale' => $locale]),
-                'lastmod' => now()->toAtomString(),
-            ])
-            ->values()
-            ->all();
+        return [[
+            'loc'     => route('sitemap'),
+            'lastmod' => now()->toAtomString(),
+        ]];
     }
 
     /**
@@ -85,11 +82,11 @@ final class SitemapService
 
         // Always include the localized storefront home page as the first entry.
         $urls[] = $this->makeEntry(
-            $this->localeUrlGenerator->localizedRoute('localized.home', [], $locale) ?? url('/' . $locale),
+            $this->localeUrlGenerator->localizedRoute('home', [], $locale) ?? url('/'),
             now(),
             'daily',
             1.0,
-            $this->localeUrlGenerator->generateAlternates('localized.home', fn (string $loc) => [])
+            $this->localeUrlGenerator->generateAlternates('home', fn (string $loc) => [])
         );
 
         // Append catalog driven entries in order of importance so crawlers see
@@ -133,7 +130,7 @@ final class SitemapService
                         continue;
                     }
 
-                    $loc = $this->localeUrlGenerator->localizedRoute('localized.categories.show', ['category' => $slug], $locale);
+                    $loc = $this->localeUrlGenerator->localizedRoute('frontend.categories.show', ['category' => $slug], $locale);
                     if (! $loc) {
                         continue;
                     }
@@ -144,7 +141,7 @@ final class SitemapService
                         'weekly',
                         0.7,
                         $this->localeUrlGenerator->generateAlternates(
-                            'localized.categories.show',
+                            'frontend.categories.show',
                             fn (string $altLocale) => (
                                 ($altSlug = $this->localeUrlGenerator->translatedValue($category, $altLocale, 'getTranslatedSlug', 'slug', 'slug'))
                             ) ? ['category' => $altSlug] : null
@@ -174,7 +171,7 @@ final class SitemapService
                         continue;
                     }
 
-                    $loc = $this->localeUrlGenerator->localizedRoute('localized.collections.show', ['collection' => $slug], $locale);
+                    $loc = $this->localeUrlGenerator->localizedRoute('frontend.collections.show', ['collection' => $slug], $locale);
                     if (! $loc) {
                         continue;
                     }
@@ -185,7 +182,7 @@ final class SitemapService
                         'weekly',
                         0.75,
                         $this->localeUrlGenerator->generateAlternates(
-                            'localized.collections.show',
+                            'frontend.collections.show',
                             fn (string $altLocale) => (
                                 ($altSlug = $this->localeUrlGenerator->translatedValue($collection, $altLocale, 'getTranslatedSlug', 'slug', 'slug'))
                             ) ? ['collection' => $altSlug] : null
@@ -217,7 +214,7 @@ final class SitemapService
                         continue;
                     }
 
-                    $loc = $this->localeUrlGenerator->localizedRoute('localized.products.show', ['product' => $slug], $locale);
+                    $loc = $this->localeUrlGenerator->localizedRoute('frontend.products.show', ['product' => $slug], $locale);
                     if (! $loc) {
                         continue;
                     }
@@ -228,7 +225,7 @@ final class SitemapService
                         'weekly',
                         0.8,
                         $this->localeUrlGenerator->generateAlternates(
-                            'localized.products.show',
+                            'frontend.products.show',
                             fn (string $altLocale) => (
                                 ($altSlug = $this->localeUrlGenerator->translatedValue($product, $altLocale, 'getTranslatedSlug', 'slug', 'slug'))
                             ) ? ['product' => $altSlug] : null
@@ -304,7 +301,7 @@ final class SitemapService
                     // gracefully fall back to a manual URL if the named route
                     // has not been registered in the current context.
                     $loc = $this->localeUrlGenerator->localizedRoute('localized.legal.show', ['slug' => $slug], $locale)
-                        ?? url(sprintf('/%s/legal/%s', $locale, $slug));
+                        ?? url(sprintf('/legal/%s', $slug));
 
                     $alternates = $this->localeUrlGenerator->generateAlternates(
                         'localized.legal.show',
@@ -366,7 +363,7 @@ final class SitemapService
                 continue;
             }
 
-            $links[$altLocale] = url(sprintf('/%s/legal/%s', $altLocale, $altSlug));
+            $links[$altLocale] = url(sprintf('/legal/%s', $altSlug));
         }
 
         if ($links === []) {
@@ -388,3 +385,4 @@ final class SitemapService
         return Schema::hasTable($table);
     }
 }
+

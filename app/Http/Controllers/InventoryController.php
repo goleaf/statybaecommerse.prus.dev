@@ -220,6 +220,6 @@ final class InventoryController extends Controller
     {
         $product->load(['brand', 'categories', 'reviews', 'variants']);
 
-        return view('products.show', ['product' => $product]);
+        return view('frontend.products.show', ['product' => $product]);
     }
 }

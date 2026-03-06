@@ -8,7 +8,7 @@
                 if (!empty($item->route_name) && Route::has($item->route_name)) {
                     $href = route(
                         $item->route_name,
-                        array_merge($item->route_params ?? [], ['locale' => app()->getLocale()]),
+                        array_merge($item->route_params ?? [], []),
                     );
                 } elseif (!empty($item->url)) {
                     $href = $item->url;
@@ -34,7 +34,6 @@
                                             $childHref = route(
                                                 $child->route_name,
                                                 array_merge($child->route_params ?? [], [
-                                                    'locale' => app()->getLocale(),
                                                 ]),
                                             );
                                         } elseif (!empty($child->url)) {
@@ -56,3 +55,4 @@
         @endforeach
     </ul>
 @endif
+

@@ -6,13 +6,13 @@ namespace App\Support\Forms;
 
 use App\Support\Forms\Casts\MatrixBooleanStateCast;
 use App\Support\Forms\Components\BooleanMatrix;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Utilities\Get;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Collection;
 
 final class MatrixFactory

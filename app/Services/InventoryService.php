@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  *
  * Service class containing InventoryService business logic, external integrations, and complex operations with proper error handling and logging.
  */
-final class InventoryService
+class InventoryService
 {
     /**
      * Handle adjustProductStock functionality with proper error handling.

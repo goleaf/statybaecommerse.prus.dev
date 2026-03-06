@@ -63,10 +63,19 @@ trait HasNav
         bool $isAbsolute = true,
         ?string $panel = null,
         ?\Illuminate\Database\Eloquent\Model $tenant = null,
-        bool $shouldGuessMissingParameters = false
+        bool $shouldGuessMissingParameters = false,
+        ?string $configuration = null
     ): string {
         try {
-            return parent::getUrl($name, $parameters, $isAbsolute, $panel, $tenant, $shouldGuessMissingParameters);
+            return parent::getUrl(
+                $name,
+                $parameters,
+                $isAbsolute,
+                $panel,
+                $tenant,
+                $shouldGuessMissingParameters,
+                $configuration,
+            );
         } catch (Throwable) {
             return '#';
         }

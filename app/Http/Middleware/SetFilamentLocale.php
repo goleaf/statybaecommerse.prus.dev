@@ -14,25 +14,39 @@ final class SetFilamentLocale
     public function handle(Request $request, Closure $next): mixed
     {
         $isAdminContext = $this->isAdminContext($request);
-        $locale = $this->resolveLocale($request, $isAdminContext);
+        $this->enforceSingleLocaleConfiguration();
 
-        App::setLocale($locale);
+        if (! $isAdminContext) {
+            $routeLocale = strtolower((string) $request->route('locale', ''));
+            $routeName = (string) ($request->route()?->getName() ?? '');
 
-        // Persist the selection so Filament keeps the same language across page loads.
-        if ($isAdminContext) {
-            Session::put('admin_locale', $locale);
-        } else {
-            Session::put('locale', $locale);
-            cookie()->queue(cookie('app_locale', $locale, 60 * 24 * 30));
+            if (
+                $routeLocale !== ''
+                && $routeName !== 'language.switch'
+                && ! str_starts_with($routeName, 'admin.')
+            ) {
+                return redirect()->to($this->stripRouteLocale($request), 301);
+            }
         }
 
+        $locale = $this->singleLocale();
+
+        App::setLocale($locale);
+        Session::put('admin_locale', $locale);
+        Session::put('locale', $locale);
         Session::put('app.locale', $locale);
+        cookie()->queue(cookie('app_locale', $locale, 60 * 24 * 30));
 
         return $next($request);
     }
 
     private function isAdminContext(Request $request): bool
     {
+        $context = strtolower(trim((string) $request->input('context', '')));
+        if ($context === 'admin') {
+            return true;
+        }
+
         if ($request->is('admin') || $request->is('admin/*')) {
             return true;
         }
@@ -43,60 +57,64 @@ final class SetFilamentLocale
         }
 
         $referer = (string) $request->headers->get('referer', '');
-
-        return $referer !== '' && str_contains($referer, '/admin');
-    }
-
-    private function resolveLocale(Request $request, bool $isAdminContext): string
-    {
-        $supportedLocales = $this->supportedLocales();
-        $fallbackLocale = $isAdminContext ? 'en' : (string) config('app.locale', 'lt');
-
-        $requestedLocale = $request->query('locale', $request->input('locale'));
-        $requestedLocale = is_string($requestedLocale) ? strtolower(trim($requestedLocale)) : '';
-
-        $candidateLocales = array_filter([
-            $requestedLocale !== '' ? $requestedLocale : null,
-            $isAdminContext ? Session::get('admin_locale') : null,
-            Session::get('locale'),
-            Session::get('app.locale'),
-            $request->cookie('app_locale'),
-            ! $isAdminContext ? config('app.locale', 'lt') : null,
-        ], static fn ($candidate): bool => is_string($candidate) && trim($candidate) !== '');
-
-        foreach ($candidateLocales as $candidate) {
-            $normalizedCandidate = strtolower(trim((string) $candidate));
-
-            if (in_array($normalizedCandidate, $supportedLocales, true)) {
-                return $normalizedCandidate;
-            }
+        if ($referer === '' || ! str_contains($referer, '/admin')) {
+            return false;
         }
 
-        if (in_array($fallbackLocale, $supportedLocales, true)) {
-            return $fallbackLocale;
-        }
-
-        return $supportedLocales[0] ?? 'en';
+        return in_array($routeName, ['language.switch', 'locale.switch'], true)
+            || $request->is('lang/*')
+            || $request->is('locale');
     }
 
-    /**
-     * @return array<int, string>
-     */
-    private function supportedLocales(): array
+    private function singleLocale(): string
     {
-        $supported = config('app.supported_locales', ['lt', 'en']);
+        $configured = strtolower(trim((string) config('shared.localization.default_locale', 'lt')));
 
-        $rawLocales = is_array($supported)
-            ? $supported
-            : explode(',', (string) $supported);
+        return $configured !== '' ? $configured : 'lt';
+    }
 
-        $locales = array_values(array_unique(array_filter(array_map(
-            static fn ($locale): ?string => is_string($locale) && trim($locale) !== ''
-                ? strtolower(trim($locale))
-                : null,
-            $rawLocales
-        ))));
+    private function enforceSingleLocaleConfiguration(): void
+    {
+        $locale = $this->singleLocale();
+        $configuredLocales = config('app.locales', []);
+        $localeConfig = null;
 
-        return $locales;
+        if (is_array($configuredLocales) && isset($configuredLocales[$locale]) && is_array($configuredLocales[$locale])) {
+            $localeConfig = $configuredLocales[$locale];
+        }
+
+        if (! is_array($localeConfig)) {
+            $localeConfig = [
+                'name'      => strtoupper($locale),
+                'native'    => strtoupper($locale),
+                'direction' => 'ltr',
+            ];
+        }
+
+        config()->set('app.locale', $locale);
+        config()->set('app.fallback_locale', $locale);
+        config()->set('app.supported_locales', [$locale]);
+        config()->set('app.locales', [$locale => $localeConfig]);
+
+        if (is_array(config('shared.localization.supported_locales'))) {
+            config()->set('shared.localization.supported_locales', [$locale]);
+        }
+    }
+
+    private function stripRouteLocale(Request $request): string
+    {
+        $path = '/' . ltrim((string) $request->getPathInfo(), '/');
+        $segments = explode('/', ltrim($path, '/'));
+
+        if ($segments === [] || $segments[0] === '') {
+            return url('/');
+        }
+
+        array_shift($segments);
+        $normalizedPath = trim(implode('/', $segments), '/');
+
+        $queryString = (string) $request->getQueryString();
+
+        return url('/' . $normalizedPath) . ($queryString !== '' ? ('?' . $queryString) : '');
     }
 }

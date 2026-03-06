@@ -158,7 +158,12 @@
                     @foreach($results as $result)
                         <div class="result-item bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
                             <!-- Result Image -->
-                            @php($image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null))
+                            @php
+                                $image = $result['main_image'] ?? $result['thumbnail'] ?? ($result['image'] ?? null);
+                                if (($result['type'] ?? null) === 'product' && empty($image)) {
+                                    $image = asset('images/placeholder-product.jpg');
+                                }
+                            @endphp
                             @if(!empty($image))
                                 <div class="aspect-w-16 aspect-h-9">
                                     {{-- Render whichever media URL the API exposed for the search entry. --}}

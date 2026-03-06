@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Forms\Casts;
 
-use Filament\Forms\Components\StateCasts\Contracts\StateCast;
+use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 
 /**
  * Cast matrix field state into a predictable boolean map keyed by rows/columns.

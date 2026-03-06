@@ -1,12 +1,14 @@
 <article class="container mx-auto px-4 py-8 prose max-w-none">
     @php
-        $newsIndexUrl = \Illuminate\Support\Facades\Route::has('localized.news.index')
-            ? route('localized.news.index', ['locale' => app()->getLocale()])
-            : route('frontend.news.index');
+        $newsIndexUrl = \Illuminate\Support\Facades\Route::has('localized.news.index.lt')
+            ? route('localized.news.index.lt', [])
+            : (\Illuminate\Support\Facades\Route::has('localized.news.index')
+                ? route('localized.news.index', [])
+                : route('frontend.news.index'));
     @endphp
 
     <nav class="mb-6 text-sm text-gray-600">
-        <a href="{{ app()->getLocale() === 'lt' ? url('/lt/naujienos') : url('/en/news') }}"
+        <a href="{{ $newsIndexUrl }}"
            class="underline">{{ __('messages.frontend') }}</a>
         <span class="mx-2">/</span>
         <span>{{ $record->title ?? $record->trans('title') }}</span>
@@ -26,3 +28,4 @@
         </a>
     </div>
 </article>
+

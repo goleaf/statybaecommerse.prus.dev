@@ -39,17 +39,26 @@
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
                             @foreach($productRequests as $request)
+                                @php
+                                    $productShowRoute = Route::has('products.show')
+                                        ? route('products.show', $request->product)
+                                        : route('frontend.products.show', $request->product);
+                                @endphp
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="flex items-center">
                                             @if($request->product->getMainImage())
-                                                <img src="{{ $request->product->getMainImage() }}" 
-                                                     alt="{{ $request->product->trans('name') ?? $request->product->name }}" 
-                                                     class="w-10 h-10 object-cover rounded-lg mr-3">
+                                                <a href="{{ $productShowRoute }}" class="block mr-3">
+                                                    <img src="{{ $request->product->getMainImage() }}" 
+                                                         alt="{{ $request->product->trans('name') ?? $request->product->name }}" 
+                                                         class="w-10 h-10 object-cover rounded-lg">
+                                                </a>
                                             @endif
                                             <div>
                                                 <div class="text-sm font-medium text-gray-900">
-                                                    {{ $request->product->trans('name') ?? $request->product->name }}
+                                                    <a href="{{ $productShowRoute }}" class="hover:text-blue-600">
+                                                        {{ $request->product->trans('name') ?? $request->product->name }}
+                                                    </a>
                                                 </div>
                                                 <div class="text-sm text-gray-500">
                                                     {{ $request->product->sku }}

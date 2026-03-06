@@ -45,7 +45,7 @@
                             ->where('locale', app()->getLocale())
                             ->value('slug');
                     @endphp
-                    <a href="{{ app()->getLocale() === 'lt' ? url('/lt/naujienos/' . $slug) : url('/en/news/' . $slug) }}"
+                    <a href="{{ \Illuminate\Support\Facades\Route::has('localized.news.show.lt') ? route('localized.news.show.lt', ['slug' => $slug]) : route('frontend.news.show', ['slug' => $slug]) }}"
                        class="block p-4 border rounded hover:shadow">
                         <h2 class="text-lg font-medium">{{ $item->trans('title') }}</h2>
                         <p class="text-sm text-gray-600 mt-2">{{ $item->trans('summary') }}</p>

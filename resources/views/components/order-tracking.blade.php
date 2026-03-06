@@ -159,18 +159,21 @@
 
                 <div class="space-y-4">
                     @foreach ($order->items as $item)
+                        @php($productUrl = route('product.show', $item->product->slug ?? $item->product))
                         <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-xl">
                             {{-- Product Image --}}
                             <div class="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                <img src="{{ $item->product->getImageUrl('preview') ?? $item->product->thumbnail ?? product_placeholder_url('medium') }}"
-                                     alt="{{ $item->product->name }}"
-                                     class="w-full h-full object-cover">
+                                <a href="{{ $productUrl }}" class="block h-full w-full">
+                                    <img src="{{ $item->product->getImageUrl('preview') ?? $item->product->thumbnail ?? asset('images/placeholder-product.jpg') }}"
+                                         alt="{{ $item->product->name }}"
+                                         class="w-full h-full object-cover">
+                                </a>
                             </div>
 
                             {{-- Product Details --}}
                             <div class="flex-1 min-w-0">
                                 <h3 class="font-semibold text-gray-900 mb-1">
-                                    <a href="{{ route('product.show', $item->product->slug ?? $item->product) }}"
+                                    <a href="{{ $productUrl }}"
                                        class="hover:text-blue-600 transition-colors duration-200">
                                         {{ $item->product->name }}
                                     </a>

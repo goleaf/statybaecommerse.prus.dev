@@ -12,8 +12,6 @@
                     <livewire:home-slider />
                 </section>
 
-                <x-home.mission-loyalty />
-
                 <section class="relative">
                     <livewire:home.product-shelf
                         :preset="'featured'"

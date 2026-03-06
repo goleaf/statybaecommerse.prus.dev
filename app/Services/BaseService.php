@@ -54,6 +54,10 @@ abstract class BaseService
 
             $this->logPerformanceIfNeeded($startTime, 'transaction_success');
 
+            if ($result instanceof ServiceResponseData) {
+                return $result;
+            }
+
             return $this->success($result);
         } catch (Throwable $e) {
             $this->logPerformanceIfNeeded($startTime, 'transaction_failed');
@@ -73,6 +77,10 @@ abstract class BaseService
             $result = $callback();
 
             $this->logPerformanceIfNeeded($startTime, 'operation_success');
+
+            if ($result instanceof ServiceResponseData) {
+                return $result;
+            }
 
             return $this->success($result);
         } catch (Throwable $e) {
@@ -153,19 +161,24 @@ abstract class BaseService
      */
     protected function validateOwnership(Model $model, ?int $userId = null): bool
     {
-        $userId = $userId ?? $this->user?->id;
+        $userId = $userId ?? auth()->id() ?? $this->user?->id;
 
         if (! $userId) {
             return false;
         }
 
-        // Check if model has user_id or customer_id field
-        if ($model->hasAttribute('user_id')) {
+        // Prefer explicit user_id ownership when it is populated.
+        if ($model->hasAttribute('user_id') && $model->user_id !== null) {
             return $model->user_id === $userId;
         }
 
-        if ($model->hasAttribute('customer_id')) {
+        // Fall back to legacy customer_id ownership for backward compatibility.
+        if ($model->hasAttribute('customer_id') && $model->customer_id !== null) {
             return $model->customer_id === $userId;
+        }
+
+        if ($model->hasAttribute('user_id') || $model->hasAttribute('customer_id')) {
+            return false;
         }
 
         return true; // No ownership field found, allow operation

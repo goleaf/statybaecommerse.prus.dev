@@ -14,13 +14,13 @@
         ->values();
     $contactCta = is_array($contactCta ?? null) ? $contactCta : null;
     $locale = app()->getLocale();
-    $homeRoute = \Illuminate\Support\Facades\Route::has('localized.home')
-        ? route('localized.home', ['locale' => $locale])
+    $homeRoute = \Illuminate\Support\Facades\Route::has('home')
+        ? route('home', [])
         : (\Illuminate\Support\Facades\Route::has('home')
             ? route('home')
             : url('/'));
-    $searchRoute = \Illuminate\Support\Facades\Route::has('localized.search')
-        ? route('localized.search', ['locale' => $locale])
+    $searchRoute = \Illuminate\Support\Facades\Route::has('frontend.search.index')
+        ? route('frontend.search.index', [])
         : (\Illuminate\Support\Facades\Route::has('frontend.search.index')
             ? route('frontend.search.index')
             : (\Illuminate\Support\Facades\Route::has('search')
@@ -83,10 +83,10 @@
     $supportTitle = $supportTitle ?? __('frontend.errors.support.title');
     $supportDescription = $supportDescription ?? __('frontend.errors.support.description');
     $statusPageUrl = $statusPageUrl ?? (\Illuminate\Support\Facades\Route::has('status.page')
-        ? route('status.page', ['locale' => $locale])
+        ? route('status.page', [])
         : url('/status'));
     $supportPageUrl = $supportPageUrl ?? (\Illuminate\Support\Facades\Route::has('localized.support.index')
-        ? route('localized.support.index', ['locale' => $locale])
+        ? route('localized.support.index', [])
         : url('/support'));
 
     $iconLibrary = [
@@ -243,3 +243,5 @@
     </div>
 </div>
 @endsection
+
+

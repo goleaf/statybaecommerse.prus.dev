@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="color-scheme" content="light dark">
+    <meta name="color-scheme" content="light">
 
     @php
         /**
@@ -41,7 +41,10 @@
     @endif
 
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -78,7 +81,7 @@
     @stack('head')
 </head>
 
-<body class="font-sans antialiased h-full bg-gray-50 dark:bg-gray-900">
+<body class="h-full bg-slate-50 font-sans antialiased">
     <div class="min-h-screen">
         {{ $slot ?? '' }}
         @yield('content')

@@ -80,7 +80,8 @@ final class NewsResource extends BaseResource
         bool $isAbsolute = true,
         ?string $panel = null,
         ?Model $tenant = null,
-        bool $shouldGuessMissingParameters = false
+        bool $shouldGuessMissingParameters = false,
+        ?string $configuration = null
     ): string {
         if (($parameters['record'] ?? null) instanceof News) {
             $parameters['record'] = (string) $parameters['record']->getKey();
@@ -93,6 +94,7 @@ final class NewsResource extends BaseResource
             $panel,
             $tenant,
             $shouldGuessMissingParameters,
+            $configuration,
         );
     }
 

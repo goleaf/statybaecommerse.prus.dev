@@ -43,44 +43,51 @@
 @endphp
 <nav class="w-full relative z-40 overflow-visible">
     @php
-        $homeUrl = Route::has('localized.home')
-            ? route('localized.home', ['locale' => $locale])
+        $homeUrl = Route::has('home')
+            ? route('home', [])
             : (Route::has('home')
                 ? route('home')
                 : url('/'));
-        $newsTopbarUrl = Route::has('localized.news.index')
-            ? route('localized.news.index', ['locale' => $locale])
-            : (Route::has('frontend.news.index')
-                ? route('frontend.news.index')
-                : url('/news'));
+        $newsTopbarUrl = Route::has('localized.news.index.lt')
+            ? route('localized.news.index.lt', [])
+            : (Route::has('localized.news.index')
+                ? route('localized.news.index', [])
+                : (Route::has('frontend.news.index')
+                    ? route('frontend.news.index')
+                    : url('/naujienos')));
+        $consultationsTopbarUrl = Route::has('localized.contact.index')
+            ? route('localized.contact.index', [])
+            : (Route::has('frontend.contact.index')
+                ? route('frontend.contact.index')
+                : url('/contact'));
         $quickLinks = collect([
             [
                 'key' => 'categories',
                 'label' => __('messages.nav_categories'),
-                'url' => Route::has('localized.categories.index')
-                    ? route('localized.categories.index', ['locale' => $locale])
-                    : url('/' . $locale . '/categories'),
+                'url' => Route::has('frontend.categories.index')
+                    ? route('frontend.categories.index', [])
+                    : url('/categories'),
             ],
             [
                 'key' => 'collections',
                 'label' => __('messages.nav_collections'),
-                'url' => Route::has('localized.collections.index')
-                    ? route('localized.collections.index', ['locale' => $locale])
-                    : url('/' . $locale . '/collections'),
+                'url' => Route::has('frontend.collections.index')
+                    ? route('frontend.collections.index', [])
+                    : url('/collections'),
             ],
             [
                 'key' => 'brands',
                 'label' => __('messages.nav_brands'),
-                'url' => Route::has('localized.brands.index')
-                    ? route('localized.brands.index', ['locale' => $locale])
-                    : url('/' . $locale . '/brands'),
+                'url' => Route::has('frontend.brands.index')
+                    ? route('frontend.brands.index', [])
+                    : url('/brands'),
             ],
             [
                 'key' => 'downloads',
                 'label' => __('messages.nav_downloads'),
                 'url' => Route::has('localized.brochures.index')
-                    ? route('localized.brochures.index', ['locale' => $locale])
-                    : url('/' . $locale . '/brochures'),
+                    ? route('localized.brochures.index', [])
+                    : url('/brochures'),
             ],
             // Vendor catalogs menu item disabled by request.
             // Support center menu item disabled by request.
@@ -122,7 +129,7 @@
                     </svg>
                     <span class="hidden sm:block">{{ __('frontend.header.topbar.news') }}</span>
                 </a>
-                <a href="#" class="flex items-center group gap-2 hover:text-stone transition-colors">
+                <a href="{{ $consultationsTopbarUrl }}" class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M8 10h8M8 14h5M12 20l-3.5-2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2h-2" />
@@ -392,3 +399,4 @@
         </div>
     @endif
 </nav>
+

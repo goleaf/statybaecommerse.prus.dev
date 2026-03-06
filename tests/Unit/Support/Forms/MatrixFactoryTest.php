@@ -110,7 +110,7 @@ it('unit: renders a placeholder when no radio rows exist', function (): void {
         ->and($schema[0])
         ->toBeInstanceOf(Placeholder::class)
         ->and($schema[0]->getLabel())
-        ->toBe(__('No attributes available'));
+        ->toBe(__('messages.no_attributes_available'));
 });
 
 it('unit: builds a checkbox matrix using the Zeus component', function (): void {

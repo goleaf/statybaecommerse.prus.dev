@@ -24,13 +24,16 @@
         ->filter(static fn (string $locale): bool => $locale !== '')
         ->unique()
         ->when($supportedLocales->isNotEmpty(), static fn ($locales) => $locales->intersect($supportedLocales))
-        ->sort()->values();
+        ->sort()
+        ->values();
 
     if ($availableLocales->isEmpty() && $supportedLocales->isNotEmpty()) {
         $availableLocales = $supportedLocales;
     }
 
     $availableLocales = $availableLocales
+        ->map(static fn (mixed $locale): string => strtolower(trim((string) $locale)))
+        ->filter(static fn (string $locale): bool => $locale !== '' && preg_match('/^[a-z\-_]+$/i', $locale) === 1)
         ->reject(static fn (string $locale): bool => $hiddenAdminLocales->contains($locale))
         ->values();
 
@@ -55,7 +58,7 @@
     });
 @endphp
 
-@if ($availableLocales->isNotEmpty())
+@if ($availableLocales->count() > 1)
     <div class="fi-topbar-language-switcher ms-2">
         <x-filament::dropdown placement="bottom-end" teleport>
             <x-slot name="trigger">
@@ -67,17 +70,26 @@
             <x-filament::dropdown.list>
                 @foreach ($availableLocales as $locale)
                     @php
-                        $isActive = $locale === $currentLocale;
+                        $targetLocale = strtolower(trim((string) $locale));
                     @endphp
 
+                    @continue($targetLocale === '')
+
                     @php
-                        $switchUrl = \Illuminate\Support\Facades\Route::has('language.switch')
-                            ? route('language.switch', [
-                                'locale'      => $locale,
-                                'redirect_to' => url()->full(),
-                                'context'     => 'admin',
-                            ])
-                            : request()->fullUrlWithQuery(['locale' => $locale]);
+                        $isActive = $targetLocale === $currentLocale;
+                        $switchUrl = request()->fullUrlWithQuery([]);
+
+                        if (\Illuminate\Support\Facades\Route::has('language.switch')) {
+                            try {
+                                $switchUrl = route('language.switch', [
+                                    'locale' => $targetLocale,
+                                    'redirect_to' => url()->full(),
+                                    'context' => 'admin',
+                                ]);
+                            } catch (\Throwable) {
+                                $switchUrl = request()->fullUrlWithQuery([]);
+                            }
+                        }
                     @endphp
 
                     <x-filament::dropdown.list.item
@@ -85,7 +97,7 @@
                         :color="$isActive ? 'primary' : 'gray'"
                         tag="a"
                     >
-                        {{ $localeLabels[$locale] }} ({{ strtoupper($locale) }})
+                        {{ $localeLabels[$targetLocale] ?? strtoupper($targetLocale) }} ({{ strtoupper($targetLocale) }})
                     </x-filament::dropdown.list.item>
                 @endforeach
             </x-filament::dropdown.list>

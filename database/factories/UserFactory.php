@@ -40,35 +40,58 @@ class UserFactory extends Factory
 
         $phoneNumber = '+3706' . fake()->numberBetween(1000000, 9999999);
 
-        $state = [
-            'name'              => $firstName . ' ' . $lastName,
-            'email'             => $email,
-            'email_verified_at' => now(),
+        $state = [];
+
+        if ($this->hasUsersColumn('name')) {
+            $state['name'] = $firstName . ' ' . $lastName;
+        }
+
+        if ($this->hasUsersColumn('email')) {
+            $state['email'] = $email;
+        }
+
+        if ($this->hasUsersColumn('password')) {
             // Use a strong default so SecurePasswordHandling validates before hashing.
-            'password'         => static::$password ??= 'Admin123!',
-            'preferred_locale' => fake()->randomElement(['en', 'lt']),
-            'is_admin'         => false,
-            'remember_token'   => Str::random(10),
-            'phone_number'     => $phoneNumber,
-        ];
+            $state['password'] = static::$password ??= 'Admin123!';
+        }
+
+        if ($this->hasUsersColumn('preferred_locale')) {
+            $state['preferred_locale'] = fake()->randomElement(['en', 'lt']);
+        }
+
+        if ($this->hasUsersColumn('is_admin')) {
+            $state['is_admin'] = false;
+        }
+
+        if ($this->hasUsersColumn('remember_token')) {
+            $state['remember_token'] = Str::random(10);
+        }
+
+        if ($this->hasUsersColumn('phone_number')) {
+            $state['phone_number'] = $phoneNumber;
+        }
 
         // Store decomposed name parts only when the schema supports them.
-        if ($this->tableExists('users') && $this->tableHasColumn('users', 'first_name')) {
+        if ($this->hasUsersColumn('first_name')) {
             $state['first_name'] = $firstName;
         }
 
-        if ($this->tableExists('users') && $this->tableHasColumn('users', 'last_name')) {
+        if ($this->hasUsersColumn('last_name')) {
             $state['last_name'] = $lastName;
         }
 
         // Populate legacy phone field if present to keep data consistent.
-        if ($this->tableExists('users') && $this->tableHasColumn('users', 'phone')) {
+        if ($this->hasUsersColumn('phone')) {
             $state['phone'] = $phoneNumber;
         }
 
         // Some test runs (e.g. partial migrations, in-memory DBs) may not yet
         // include recently added columns. Only set optional flags when present.
-        if ($this->tableExists('users') && $this->tableHasColumn('users', 'is_active')) {
+        if ($this->hasUsersColumn('email_verified_at')) {
+            $state['email_verified_at'] = now();
+        }
+
+        if ($this->hasUsersColumn('is_active')) {
             $state['is_active'] = true;
         }
 
@@ -80,8 +103,14 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
+        $state = [];
+
+        if ($this->hasUsersColumn('email_verified_at')) {
+            $state['email_verified_at'] = null;
+        }
+
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+            ...$state,
         ]);
     }
 
@@ -90,12 +119,27 @@ class UserFactory extends Factory
      */
     public function admin(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'is_admin'          => true,
-            'email_verified_at' => now(),
-            'is_active'         => true,
+        $state = [];
+
+        if ($this->hasUsersColumn('is_admin')) {
+            $state['is_admin'] = true;
+        }
+
+        if ($this->hasUsersColumn('password')) {
             // Reuse the strong default so admin fixtures pass SecurePasswordHandling validation.
-            'password' => static::$password ??= 'Admin123!',
+            $state['password'] = static::$password ??= 'Admin123!';
+        }
+
+        if ($this->hasUsersColumn('email_verified_at')) {
+            $state['email_verified_at'] = now();
+        }
+
+        if ($this->hasUsersColumn('is_active')) {
+            $state['is_active'] = true;
+        }
+
+        return $this->state(fn (array $attributes) => [
+            ...$state,
         ]);
     }
 
@@ -146,5 +190,10 @@ class UserFactory extends Factory
         } catch (Throwable) {
             return false;
         }
+    }
+
+    private function hasUsersColumn(string $column): bool
+    {
+        return $this->tableExists('users') && $this->tableHasColumn('users', $column);
     }
 }

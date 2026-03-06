@@ -109,7 +109,7 @@
             recentSearches: JSON.parse(localStorage.getItem('recentSearches') || '[]'),
             showSuggestions: false,
             loading: false,
-            searchUrl: @js(route('localized.search', ['locale' => app()->getLocale()])),
+            searchUrl: @js(route('frontend.search.index', [])),
             suggestionsUrl: @js(route('frontend.search.suggestions')),
 
             async getSuggestions() {
@@ -151,3 +151,5 @@
         }
     }
 </script>
+
+

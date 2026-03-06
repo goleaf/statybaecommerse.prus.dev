@@ -7,13 +7,7 @@
         <article class="group flex flex-col rounded-xl bg-white/80 p-5 shadow-sm ring-1 ring-gray-100 transition hover:-translate-y-1 hover:shadow-md dark:bg-slate-900/70 dark:ring-slate-800">
             <a href="{{ route('frontend.products.show', $product) }}" class="flex flex-1 flex-col space-y-3">
                 <div class="aspect-video w-full overflow-hidden rounded-lg bg-gray-100 dark:bg-slate-800">
-                    @if ($product->thumbnail)
-                        <img src="{{ $product->thumbnail }}" alt="{{ $product->trans('name') ?? $product->name }}" class="h-full w-full object-cover">
-                    @else
-                        <div class="flex h-full items-center justify-center text-sm text-gray-400">
-                            {{ __('ui.image_coming_soon') }}
-                        </div>
-                    @endif
+                    <img src="{{ $product->thumbnail ?: asset('images/placeholder-product.jpg') }}" alt="{{ $product->trans('name') ?? $product->name }}" class="h-full w-full object-cover">
                 </div>
                 <div class="space-y-1">
                     <p class="text-xs uppercase tracking-wide text-blue-600 dark:text-blue-300">

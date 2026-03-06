@@ -17,7 +17,6 @@ use Livewire\Component;
  *
  * @property Product $product
  * @property int     $currentImageIndex
- * @property bool    $showLightbox
  * @property string  $imageSize
  */
 final class ProductImageGallery extends Component
@@ -25,8 +24,6 @@ final class ProductImageGallery extends Component
     public Product $product;
 
     public int $currentImageIndex = 0;
-
-    public bool $showLightbox = false;
 
     public string $imageSize = 'lg';
 
@@ -122,14 +119,6 @@ final class ProductImageGallery extends Component
         if (isset($this->images[$index])) {
             $this->currentImageIndex = $index;
         }
-    }
-
-    /**
-     * Handle toggleLightbox functionality with proper error handling.
-     */
-    public function toggleLightbox(): void
-    {
-        $this->showLightbox = ! $this->showLightbox;
     }
 
     #[On('variant.selected')]

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductVariantResource\Schemas;
 
+use App\Models\ProductVariant;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -24,6 +26,7 @@ class ProductVariantForm
                         Select::make('product_id')
                             ->label(__('messages.product'))
                             ->relationship('product', 'name')
+                            ->default(static fn (): ?int => request()->integer('product_id') ?: null)
                             ->required()
                             ->searchable(),
                         TextInput::make('sku')
@@ -36,6 +39,41 @@ class ProductVariantForm
                             ->label(__('messages.barcode'))
                             ->maxLength(255),
                     ])->columns(2),
+
+                Section::make(__('messages.attributes'))
+                    ->schema([
+                        Placeholder::make('attached_attributes')
+                            ->label(__('messages.attributes'))
+                            ->content(static function (?ProductVariant $record): string {
+                                if (! $record instanceof ProductVariant) {
+                                    return __('messages.no_attributes_available');
+                                }
+
+                                $attributes = $record->getVariantAttributes();
+
+                                if ($attributes === []) {
+                                    return __('messages.no_attributes_available');
+                                }
+
+                                $pairs = [];
+
+                                foreach ($attributes as $attributeName => $attributeValue) {
+                                    $normalizedName = trim((string) $attributeName);
+                                    $normalizedValue = trim((string) $attributeValue);
+
+                                    if ($normalizedName === '' || $normalizedValue === '') {
+                                        continue;
+                                    }
+
+                                    $pairs[] = ucfirst($normalizedName) . ': ' . $normalizedValue;
+                                }
+
+                                return $pairs === []
+                                    ? __('messages.no_attributes_available')
+                                    : implode(', ', $pairs);
+                            })
+                            ->columnSpanFull(),
+                    ]),
 
                 Section::make(__('admin.product_variants.pricing'))
                     ->schema([

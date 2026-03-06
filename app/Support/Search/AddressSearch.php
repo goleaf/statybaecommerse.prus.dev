@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Search;
 
 use App\Models\Address;
+use App\Models\City;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 

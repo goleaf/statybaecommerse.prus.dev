@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Users\RelationManagers;
 
+use App\Filament\RelationManagers\Concerns\ResolvesOwnerPageRedirect;
 use App\Filament\Resources\CouponUsageResource;
+use App\Filament\Resources\UserResource;
 use App\Models\CouponUsage;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -21,6 +23,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CouponUsagesRelationManager extends RelationManager
 {
+    use ResolvesOwnerPageRedirect;
+
     protected static string $relationship = 'couponUsages';
 
     public function form(Schema $schema): Schema
@@ -88,7 +92,7 @@ class CouponUsagesRelationManager extends RelationManager
                     ->icon('heroicon-m-plus')
                     ->url(fn (): string => CouponUsageResource::getUrl('create', [
                         'user_id'  => $this->getOwnerRecord()->getKey(),
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
             ])
             ->recordActions([
@@ -96,13 +100,13 @@ class CouponUsagesRelationManager extends RelationManager
                     ->icon('heroicon-m-eye')
                     ->url(fn (CouponUsage $record): string => CouponUsageResource::getUrl('view', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 Action::make('edit')
                     ->icon('heroicon-m-pencil-square')
                     ->url(fn (CouponUsage $record): string => CouponUsageResource::getUrl('edit', [
                         'record'   => $record,
-                        'redirect' => request()->fullUrl(),
+                        'redirect' => $this->resolveOwnerPageRedirectUrl(UserResource::class),
                     ])),
                 DeleteAction::make(),
             ])
@@ -114,7 +118,7 @@ class CouponUsagesRelationManager extends RelationManager
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed> $data
      * @return array<string, mixed>
      */
     private function normalizeUsagePayload(array $data): array
@@ -132,4 +136,3 @@ class CouponUsagesRelationManager extends RelationManager
         return $data;
     }
 }
-

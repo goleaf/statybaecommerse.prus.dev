@@ -89,16 +89,16 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($collection->products as $product)
                             <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
-                                @if($product->getImageUrl('preview'))
-                                    <div class="aspect-w-16 aspect-h-9 mb-4">
-                                        <img src="{{ $product->getImageUrl('preview') }}" 
-                                             alt="{{ $product->getTranslatedName() }}"
-                                             class="w-full h-32 object-cover rounded">
-                                    </div>
-                                @endif
+                                <a href="{{ route('products.show', $product) }}" class="block aspect-w-16 aspect-h-9 mb-4">
+                                    <img src="{{ $product->getImageUrl('preview') ?: asset('images/placeholder-product.jpg') }}" 
+                                         alt="{{ $product->getTranslatedName() }}"
+                                         class="w-full h-32 object-cover rounded">
+                                </a>
 
                                 <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                                    {{ $product->getTranslatedName() }}
+                                    <a href="{{ route('products.show', $product) }}" class="hover:text-blue-600">
+                                        {{ $product->getTranslatedName() }}
+                                    </a>
                                 </h3>
 
                                 @if($product->getTranslatedDescription())

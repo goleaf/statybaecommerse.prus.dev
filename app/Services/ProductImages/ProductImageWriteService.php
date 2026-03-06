@@ -17,7 +17,7 @@ use Throwable;
 final class ProductImageWriteService
 {
     /**
-     * @param  array<string, mixed>  $payload
+     * @param array<string, mixed> $payload
      */
     public function create(Product $product, array $payload): ProductImage
     {
@@ -37,7 +37,7 @@ final class ProductImageWriteService
     }
 
     /**
-     * @param  array<string, mixed>  $payload
+     * @param array<string, mixed> $payload
      */
     public function update(ProductImage $image, array $payload): ProductImage
     {
@@ -65,7 +65,7 @@ final class ProductImageWriteService
     }
 
     /**
-     * @param  array<string, mixed>  $overrides
+     * @param array<string, mixed> $overrides
      */
     public function cloneAttach(Product $targetProduct, ProductImage $sourceImage, array $overrides = []): ProductImage
     {
@@ -73,8 +73,8 @@ final class ProductImageWriteService
 
         $payload = [
             'product_id' => (int) $targetProduct->getKey(),
-            'path' => (string) ($overrides['path'] ?? $sourceImage->path),
-            'alt_text' => array_key_exists('alt_text', $overrides)
+            'path'       => (string) ($overrides['path'] ?? $sourceImage->path),
+            'alt_text'   => array_key_exists('alt_text', $overrides)
                 ? $overrides['alt_text']
                 : $sourceImage->alt_text,
             'sort_order' => array_key_exists('sort_order', $overrides)
@@ -96,7 +96,7 @@ final class ProductImageWriteService
     }
 
     /**
-     * @param  array<int, mixed>  $paths
+     * @param  array<int, mixed>        $paths
      * @return array<int, ProductImage>
      */
     public function appendPaths(Product $product, array $paths, ?string $altText = null): array
@@ -130,11 +130,11 @@ final class ProductImageWriteService
 
             $image = ProductImage::query()->create([
                 'product_id' => (int) $product->getKey(),
-                'path' => $storedPath,
-                'alt_text' => $altText,
+                'path'       => $storedPath,
+                'alt_text'   => $altText,
                 'sort_order' => $nextSortOrder,
                 'is_default' => $shouldMarkDefault,
-                'is_active' => true,
+                'is_active'  => true,
             ]);
 
             $created[] = $image;
@@ -174,11 +174,11 @@ final class ProductImageWriteService
 
         $image = ProductImage::query()->create([
             'product_id' => (int) $product->getKey(),
-            'path' => $normalizedPath,
-            'alt_text' => $altText,
+            'path'       => $normalizedPath,
+            'alt_text'   => $altText,
             'sort_order' => 0,
             'is_default' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         foreach ($existingPaths as $existingPath) {
@@ -202,7 +202,7 @@ final class ProductImageWriteService
     }
 
     /**
-     * @param  iterable<int, ProductImage>  $images
+     * @param iterable<int, ProductImage> $images
      */
     public function deleteMany(iterable $images): void
     {
@@ -265,49 +265,93 @@ final class ProductImageWriteService
         try {
             $product->clearMediaCollection('images');
 
-            $primaryImage = $product->images()
+            $orderedImages = $product->images()
                 ->withoutGlobalScopes()
                 ->orderByDesc('is_default')
                 ->orderBy('sort_order')
                 ->orderBy('id')
-                ->first();
+                ->get();
 
-            if (! $primaryImage instanceof ProductImage) {
-                return;
-            }
+            if ($orderedImages->isEmpty()) {
+                $product->clearMediaCollection('thumbnail');
+                $product->clearMediaCollection('product_images');
 
-            $path = $this->normalizeStoragePath((string) $primaryImage->path);
-
-            if (! $this->isLocalProductImagePath($path)) {
                 return;
             }
 
             $disk = Storage::disk('public');
+            $syncable = [];
 
-            if (! method_exists($disk, 'path') || ! $disk->exists($path)) {
+            foreach ($orderedImages as $image) {
+                if (! $image instanceof ProductImage) {
+                    continue;
+                }
+
+                $path = $this->normalizeStoragePath((string) $image->path);
+
+                if (! $this->isLocalProductImagePath($path)) {
+                    continue;
+                }
+
+                if (! $disk->exists($path)) {
+                    continue;
+                }
+
+                $syncable[] = [
+                    'path'       => $path,
+                    'name'       => trim((string) ($image->alt_text ?? '')),
+                    'is_default' => (bool) ($image->is_default ?? false),
+                ];
+            }
+
+            if ($syncable === []) {
                 return;
             }
 
-            $absolutePath = $disk->path($path);
+            $product->clearMediaCollection('thumbnail');
+            $product->clearMediaCollection('product_images');
 
-            if (! is_string($absolutePath) || $absolutePath === '' || ! is_file($absolutePath)) {
-                return;
-            }
-
-            $product
-                ->addMedia($absolutePath)
-                ->usingName(basename($path))
-                ->usingFileName(basename($path))
-                ->preservingOriginal()
-                ->withCustomProperties([
-                    'product_image_path' => $path,
+            foreach ($syncable as $index => $item) {
+                $path = (string) $item['path'];
+                $fileName = basename($path);
+                $name = (string) $item['name'];
+                $label = $name !== '' ? $name : $fileName;
+                $properties = [
+                    'product_image_path'           => $path,
                     'mirrored_from_product_images' => true,
-                ])
-                ->toMediaCollection('images');
+                    'is_default'                   => (bool) $item['is_default'],
+                ];
+
+                if ($index === 0) {
+                    $product
+                        ->addMediaFromDisk($path, 'public')
+                        ->usingName($label)
+                        ->usingFileName($fileName)
+                        ->preservingOriginal()
+                        ->withCustomProperties($properties)
+                        ->toMediaCollection('images');
+
+                    $product
+                        ->addMediaFromDisk($path, 'public')
+                        ->usingName($label)
+                        ->usingFileName($fileName)
+                        ->preservingOriginal()
+                        ->withCustomProperties($properties)
+                        ->toMediaCollection('thumbnail');
+                }
+
+                $product
+                    ->addMediaFromDisk($path, 'public')
+                    ->usingName($label)
+                    ->usingFileName($fileName)
+                    ->preservingOriginal()
+                    ->withCustomProperties($properties)
+                    ->toMediaCollection('product_images');
+            }
         } catch (Throwable $exception) {
             Log::warning('Failed to sync legacy media from product_images', [
                 'product_id' => $product->getKey(),
-                'error' => $exception->getMessage(),
+                'error'      => $exception->getMessage(),
             ]);
         }
     }
@@ -322,7 +366,7 @@ final class ProductImageWriteService
     }
 
     /**
-     * @param  array<string, mixed>  $payload
+     * @param array<string, mixed> $payload
      */
     private function isSortOrderProvided(array $payload): bool
     {
@@ -375,10 +419,10 @@ final class ProductImageWriteService
 
         $mime = strtolower($matches[1] ?? 'image/jpeg');
         $extension = match ($mime) {
-            'image/png' => 'png',
+            'image/png'  => 'png',
             'image/webp' => 'webp',
-            'image/gif' => 'gif',
-            default => 'jpg',
+            'image/gif'  => 'gif',
+            default      => 'jpg',
         };
 
         $contents = base64_decode($matches[2] ?? '', true);

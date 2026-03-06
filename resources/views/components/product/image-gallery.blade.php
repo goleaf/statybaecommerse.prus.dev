@@ -14,8 +14,7 @@
 
 <div class="product-image-gallery" x-data="{ 
     currentImage: 0,
-    images: @js($images),
-    showLightbox: false 
+    images: @js($images)
 }">
     {{-- Main Image Display --}}
     <div class="main-image-container {{ $aspectRatio }} overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 relative group">
@@ -25,9 +24,8 @@
                 x-bind:srcset="images[currentImage] ? `${images[currentImage].xs} 150w, ${images[currentImage].sm} 300w, ${images[currentImage].md} 500w, ${images[currentImage].lg} 800w, ${images[currentImage].xl} 1200w` : ''"
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
                 x-bind:alt="images[currentImage]?.alt || '{{ $product->name }}'"
-                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 cursor-zoom-in"
+                class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
-                @click="showLightbox = true"
             />
             
             {{-- Image Navigation Arrows --}}
@@ -91,76 +89,4 @@
         </div>
     @endif
 
-    {{-- Lightbox Modal --}}
-    <div 
-        x-show="showLightbox" 
-        x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0"
-        x-transition:enter-end="opacity-100"
-        x-transition:leave="transition ease-in duration-200"
-        x-transition:leave-start="opacity-100"
-        x-transition:leave-end="opacity-0"
-        class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
-        @click="showLightbox = false"
-        @keydown.escape.window="showLightbox = false"
-        x-cloak
-    >
-        <div class="relative max-w-4xl max-h-full" @click.stop>
-            <img 
-                x-bind:src="images[currentImage]?.xl || images[currentImage]?.original"
-                x-bind:alt="images[currentImage]?.alt"
-                class="max-w-full max-h-full object-contain"
-            />
-            
-            {{-- Close Button --}}
-            <button 
-                @click="showLightbox = false"
-                class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full"
-            >
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-
-            {{-- Navigation in Lightbox --}}
-            @if(count($images) > 1)
-                <button 
-                    @click="currentImage = currentImage > 0 ? currentImage - 1 : images.length - 1"
-                    class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full"
-                >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                </button>
-                
-                <button 
-                    @click="currentImage = currentImage < images.length - 1 ? currentImage + 1 : 0"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full"
-                >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </button>
-            @endif
-        </div>
-    </div>
 </div>
-
-@push('scripts')
-<script>
-    // Keyboard navigation for lightbox
-    document.addEventListener('keydown', function(e) {
-        if (document.querySelector('[x-data*="showLightbox"]').__x?.$data?.showLightbox) {
-            if (e.key === 'ArrowLeft') {
-                document.querySelector('[x-data*="showLightbox"]').__x?.$data?.currentImage > 0 
-                    ? document.querySelector('[x-data*="showLightbox"]').__x.$data.currentImage--
-                    : document.querySelector('[x-data*="showLightbox"]').__x.$data.currentImage = document.querySelector('[x-data*="showLightbox"]').__x.$data.images.length - 1;
-            } else if (e.key === 'ArrowRight') {
-                document.querySelector('[x-data*="showLightbox"]').__x?.$data?.currentImage < document.querySelector('[x-data*="showLightbox"]').__x.$data.images.length - 1
-                    ? document.querySelector('[x-data*="showLightbox"]').__x.$data.currentImage++
-                    : document.querySelector('[x-data*="showLightbox"]').__x.$data.currentImage = 0;
-            }
-        }
-    });
-</script>
-@endpush

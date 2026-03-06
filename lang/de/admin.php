@@ -45,7 +45,7 @@ return [
         'referred_user'                         => 'Geworbener Benutzer',
         'role'                                  => 'Rolle',
         'similar_product'                       => 'Ähnliches Produkt',
-        'size_type'                             => 'Größentyp',
+        'size_type'                             => 'Größenvariante',
         'sku'                                   => 'SKU',
         'standard_invoice_template_for_billing' => 'Standardrechnungsvorlage für Abrechnung',
         'stock_status'                          => 'Lagerstatus',

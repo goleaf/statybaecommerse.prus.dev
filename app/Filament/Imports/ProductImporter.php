@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Imports;
 
+use App\Models\Attribute;
+use App\Models\AttributeValue;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\Supplier;
+use App\Models\VariantAttributeValue;
 use App\Services\ProductImages\ProductImageWriteService;
+use Carbon\CarbonInterface;
 use Filament\Actions\Imports\Exceptions\RowImportFailedException;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Models\Import;
@@ -30,9 +35,23 @@ class ProductImporter extends BaseImporter
 {
     protected static ?string $model = Product::class;
 
+    private const FRONTEND_OPTION_FIELDS = [
+        'color',
+        'size',
+        'size_type',
+        'pack_size',
+        'pack_size_type',
+        'weight',
+        'length',
+        'width',
+        'height',
+    ];
+
     private ?string $pendingImageUrl = null;
 
     private mixed $pendingImageState = null;
+
+    private mixed $pendingCategoriesState = null;
 
     /**
      * @var array<string, mixed>
@@ -54,6 +73,10 @@ class ProductImporter extends BaseImporter
         'color',
         'pack_size',
         'pack_size_type',
+        'weight',
+        'length',
+        'width',
+        'height',
         'volume',
         'material',
     ];
@@ -147,6 +170,7 @@ class ProductImporter extends BaseImporter
         $this->pendingImageUrl = is_string($rawImageUrl) ? trim($rawImageUrl) : null;
 
         $this->pendingImageState = $this->data['image'] ?? null;
+        $this->pendingCategoriesState = $this->data['categories'] ?? null;
         $this->pendingVariantState = $this->data;
 
         if ($this->pendingImageUrl === '') {
@@ -154,10 +178,13 @@ class ProductImporter extends BaseImporter
         }
 
         unset($this->data['image_url'], $this->data['image'], $this->data['volume'], $this->data['material']);
+        unset($this->data['supplier'], $this->data['categories']);
 
         if ($this->record && ! $this->record->exists) {
             $this->applyVisibilityDefaults();
         }
+
+        $this->applyPublishedAtFallbackForVisibleStatuses();
 
         $slug = $this->data['slug'] ?? null;
         $name = $this->data['name'] ?? null;
@@ -191,6 +218,32 @@ class ProductImporter extends BaseImporter
                 $this->data[$field] = $value;
             }
         }
+    }
+
+    private function applyPublishedAtFallbackForVisibleStatuses(): void
+    {
+        $status = $this->toNullableString($this->data['status'] ?? null)
+            ?? $this->toNullableString($this->record?->status);
+
+        if ($status === null || ! in_array(Str::lower($status), ['published', 'active'], true)) {
+            return;
+        }
+
+        $incomingPublishedAt = $this->data['published_at'] ?? null;
+
+        if ($incomingPublishedAt instanceof CarbonInterface) {
+            return;
+        }
+
+        if (is_string($incomingPublishedAt) && trim($incomingPublishedAt) !== '') {
+            return;
+        }
+
+        if ($this->record?->published_at instanceof CarbonInterface) {
+            return;
+        }
+
+        $this->data['published_at'] = now();
     }
 
     private function fillMissingSyncValues(): void
@@ -252,15 +305,19 @@ class ProductImporter extends BaseImporter
                 ->rules(['nullable', 'integer']),
             ImportColumn::make('weight')
                 ->numeric()
+                ->castStateUsing(static fn (mixed $originalState, mixed $state): ?float => self::normalizeImportedNumericState($originalState, $state))
                 ->rules(['nullable', 'numeric']),
             ImportColumn::make('length')
                 ->numeric()
+                ->castStateUsing(static fn (mixed $originalState, mixed $state): ?float => self::normalizeImportedNumericState($originalState, $state))
                 ->rules(['nullable', 'numeric']),
             ImportColumn::make('width')
                 ->numeric()
+                ->castStateUsing(static fn (mixed $originalState, mixed $state): ?float => self::normalizeImportedNumericState($originalState, $state))
                 ->rules(['nullable', 'numeric']),
             ImportColumn::make('height')
                 ->numeric()
+                ->castStateUsing(static fn (mixed $originalState, mixed $state): ?float => self::normalizeImportedNumericState($originalState, $state))
                 ->rules(['nullable', 'numeric']),
             ImportColumn::make('size')
                 ->label(__('messages.size'))
@@ -299,19 +356,24 @@ class ProductImporter extends BaseImporter
                 ->ignoreBlankState()
                 ->rules(['nullable', 'boolean']),
             ImportColumn::make('published_at')
+                ->ignoreBlankState()
                 ->rules(['nullable', 'date']),
+            ImportColumn::make('seo_title'),
+            ImportColumn::make('seo_description'),
             ImportColumn::make('brand')
                 ->relationship(resolveUsing: static function (string $state): ?Brand {
                     return static::resolveBrandFromState($state);
                 })
                 ->ignoreBlankState(),
             ImportColumn::make('categories')
-                ->relationship(resolveUsing: static function (array $state): EloquentCollection {
-                    return static::resolveCategoriesFromState($state);
-                })
-                ->multiple(';')
                 ->guess(['category', 'categories', 'kategorija', 'kategorijos'])
-                ->ignoreBlankState(),
+                ->ignoreBlankState()
+                ->fillRecordUsing(static function (mixed $state): void {}),
+            ImportColumn::make('supplier')
+                ->label(__('admin.suppliers.model_label'))
+                ->guess(['supplier', 'supplier_name', 'suppliers', 'tiekejas', 'tiekejai'])
+                ->ignoreBlankState()
+                ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('is_requestable')
                 ->boolean()
                 ->ignoreBlankState()
@@ -325,6 +387,9 @@ class ProductImporter extends BaseImporter
                 ->ignoreBlankState()
                 ->rules(['nullable', 'boolean']),
             ImportColumn::make('request_message'),
+            ImportColumn::make('meta_title'),
+            ImportColumn::make('meta_description'),
+            ImportColumn::make('meta_keywords'),
             ImportColumn::make('barcode'),
             ImportColumn::make('track_inventory')
                 ->boolean()
@@ -352,17 +417,21 @@ class ProductImporter extends BaseImporter
                 ->label(__('admin.labels.image_url'))
                 ->ignoreBlankState()
                 ->rules(['nullable', 'url:http,https']),
-            ImportColumn::make('image')
-                ->label(__('admin.labels.image'))
-                ->ignoreBlankState()
-                ->rules(['nullable', 'url:http,https']),
         ];
     }
 
     public function resolveRecord(): Product
     {
-        if ($this->shouldSync() && ($syncRecord = $this->resolveRecordFromSyncKeys())) {
-            return $syncRecord;
+        if ($this->shouldSync()) {
+            $syncRecord = $this->resolveRecordFromSyncKeys();
+
+            if ($syncRecord instanceof Product) {
+                return $syncRecord;
+            }
+
+            if ($this->requiresExistingSyncMatch()) {
+                throw new RowImportFailedException('No existing product matched configured sync keys.');
+            }
         }
 
         if ($nameRecord = $this->resolveRecordFromName()) {
@@ -430,6 +499,7 @@ class ProductImporter extends BaseImporter
             'Relations' => [
                 'brand',
                 'categories',
+                'supplier',
                 'collection',
             ],
             'Other' => [
@@ -451,7 +521,9 @@ class ProductImporter extends BaseImporter
             return;
         }
 
+        $this->syncCategoriesForCurrentRow($this->record);
         $this->upsertVariantForCurrentRow($this->record);
+        $this->syncSupplierForCurrentRow($this->record);
 
         $imageUrl = $this->pendingImageUrl;
 
@@ -471,7 +543,13 @@ class ProductImporter extends BaseImporter
             return;
         }
 
-        $this->attachImages($this->record, $paths);
+        $resolvedPaths = $this->resolveAttachableImagePaths($this->record, $paths);
+
+        if ($resolvedPaths === []) {
+            return;
+        }
+
+        $this->attachImages($this->record, $resolvedPaths);
     }
 
     private function resolveRecordFromName(): ?Product
@@ -574,9 +652,48 @@ class ProductImporter extends BaseImporter
         return $name !== '' ? $name : null;
     }
 
+    /**
+     * @param  array<int, string> $paths
+     * @return array<int, string>
+     */
+    private function resolveAttachableImagePaths(Product $product, array $paths): array
+    {
+        $resolved = [];
+
+        foreach ($paths as $path) {
+            $normalizedPath = trim($path);
+
+            if ($normalizedPath === '') {
+                continue;
+            }
+
+            if ($this->isRemoteImageUrl($normalizedPath)) {
+                $storedPath = $this->downloadAndStoreProductImageFromUrl($product, $normalizedPath);
+
+                $resolved[] = $storedPath ?? $normalizedPath;
+
+                continue;
+            }
+
+            $resolved[] = $normalizedPath;
+        }
+
+        return array_values(array_unique($resolved));
+    }
+
+    private function isRemoteImageUrl(string $path): bool
+    {
+        return str_starts_with($path, 'http://') || str_starts_with($path, 'https://');
+    }
+
     private function shouldSync(): bool
     {
         return (bool) ($this->options['should_sync'] ?? false);
+    }
+
+    private function requiresExistingSyncMatch(): bool
+    {
+        return (bool) ($this->options['require_existing_sync_match'] ?? false);
     }
 
     private function upsertVariantForCurrentRow(Product $product): void
@@ -588,11 +705,26 @@ class ProductImporter extends BaseImporter
         $sku = $this->toNullableString($this->variantStateValue('sku'));
         $barcode = $this->toNullableString($this->variantStateValue('barcode'));
         $size = $this->toNullableString($this->variantStateValue('size'));
+        $sizeType = $this->toNullableString($this->variantStateValue('size_type'));
+        $packSize = $this->toNullableString($this->variantStateValue('pack_size'));
+        $packSizeType = $this->toNullableString($this->variantStateValue('pack_size_type'));
+        $color = $this->toNullableString($this->variantStateValue('color'));
         $price = $this->toNullableFloat($this->variantStateValue('price'))
             ?? $this->toNullableFloat($product->price)
             ?? 0.0;
         $costPrice = $this->toNullableFloat($this->variantStateValue('cost_price'));
-        $weight = $this->toNullableFloat($this->variantStateValue('weight'));
+        $weightState = $this->variantStateValue('weight');
+        $lengthState = $this->variantStateValue('length');
+        $widthState = $this->variantStateValue('width');
+        $heightState = $this->variantStateValue('height');
+        $weight = $this->toNullableFloat($weightState);
+        $length = $this->toNullableFloat($lengthState);
+        $width = $this->toNullableFloat($widthState);
+        $height = $this->toNullableFloat($heightState);
+        $weightIdentity = $this->normalizeVariantNumericIdentityValue($weightState, $weight);
+        $lengthIdentity = $this->normalizeVariantNumericIdentityValue($lengthState, $length);
+        $widthIdentity = $this->normalizeVariantNumericIdentityValue($widthState, $width);
+        $heightIdentity = $this->normalizeVariantNumericIdentityValue($heightState, $height);
         $stockQuantity = $this->toNullableInteger($this->variantStateValue('stock_quantity'))
             ?? $this->toNullableInteger($this->variantStateValue('stock'))
             ?? 0;
@@ -607,27 +739,69 @@ class ProductImporter extends BaseImporter
         $lowStockThreshold = $this->toNullableInteger($this->variantStateValue('low_stock_threshold')) ?? 0;
 
         $attributes = $this->extractVariantAttributes();
+        $variantAttributeMatrix = $this->buildVariantAttributeMatrix(
+            sku: $sku,
+            barcode: $barcode,
+            size: $size,
+            sizeType: $sizeType,
+            packSize: $packSize,
+            packSizeType: $packSizeType,
+            color: $color,
+            weight: $weightIdentity,
+            length: $lengthIdentity,
+            width: $widthIdentity,
+            height: $heightIdentity,
+        );
+        $variantCombinationHash = $this->buildVariantCombinationHash($variantAttributeMatrix);
         $variantName = $this->buildVariantName($product, $attributes, $size, $sku);
 
-        $variantQuery = ProductVariant::query()
+        $baseVariantQuery = ProductVariant::query()
             ->withoutGlobalScopes()
             ->where('product_id', $product->getKey());
 
-        if ($sku !== null) {
-            $variantQuery->where('sku', $sku);
-        } elseif ($barcode !== null) {
-            $variantQuery->where('barcode', $barcode);
-        } else {
-            $variantQuery->where('name', $variantName);
+        $variant = null;
+
+        if ($variantCombinationHash !== null) {
+            $variant = (clone $baseVariantQuery)
+                ->where('variant_combination_hash', $variantCombinationHash)
+                ->first();
+        }
+
+        if (! $variant instanceof ProductVariant && $sku !== null && $variantCombinationHash === null) {
+            $skuMatchQuery = (clone $baseVariantQuery)->where('sku', $sku);
+
+            if ($barcode !== null) {
+                $skuMatchQuery->where('barcode', $barcode);
+            }
 
             if ($size !== null) {
-                $variantQuery->where('size', $size);
-            } else {
-                $variantQuery->whereNull('size');
+                $skuMatchQuery->where('size', $size);
+            }
+
+            $skuMatches = $skuMatchQuery->limit(2)->get();
+
+            if ($skuMatches->count() === 1) {
+                $variant = $skuMatches->first();
             }
         }
 
-        $variant = $variantQuery->first();
+        if (! $variant instanceof ProductVariant && $variantCombinationHash === null && $barcode !== null) {
+            $variant = (clone $baseVariantQuery)
+                ->where('barcode', $barcode)
+                ->first();
+        }
+
+        if (! $variant instanceof ProductVariant && $variantCombinationHash === null && $sku === null && $barcode === null) {
+            $fallbackQuery = (clone $baseVariantQuery)->where('name', $variantName);
+
+            if ($size !== null) {
+                $fallbackQuery->where('size', $size);
+            } else {
+                $fallbackQuery->whereNull('size');
+            }
+
+            $variant = $fallbackQuery->first();
+        }
         $isNewVariant = ! $variant instanceof ProductVariant;
 
         if (! $variant instanceof ProductVariant) {
@@ -644,24 +818,69 @@ class ProductImporter extends BaseImporter
         }
 
         $variant->fill([
-            'product_id'          => $product->getKey(),
-            'name'                => $variantName,
-            'sku'                 => $sku,
-            'barcode'             => $barcode,
-            'price'               => $price,
-            'cost_price'          => $costPrice,
-            'stock_quantity'      => $stockQuantity,
-            'weight'              => $weight,
-            'track_inventory'     => $trackInventory,
-            'allow_backorder'     => $allowBackorder,
-            'low_stock_threshold' => $lowStockThreshold,
-            'size'                => $size,
-            'is_enabled'          => $isEnabled,
-            'attributes'          => $attributes !== [] ? $attributes : null,
+            'product_id'               => $product->getKey(),
+            'name'                     => $variantName,
+            'sku'                      => $sku,
+            'barcode'                  => $barcode,
+            'price'                    => $price,
+            'cost_price'               => $costPrice,
+            'stock_quantity'           => $stockQuantity,
+            'weight'                   => $weight,
+            'track_inventory'          => $trackInventory,
+            'allow_backorder'          => $allowBackorder,
+            'low_stock_threshold'      => $lowStockThreshold,
+            'size'                     => $size,
+            'is_enabled'               => $isEnabled,
+            'attributes'               => $attributes !== [] ? $attributes : null,
+            'variant_attribute_matrix' => $variantAttributeMatrix !== [] ? $variantAttributeMatrix : null,
+            'variant_combination_hash' => $variantCombinationHash,
         ]);
+
+        if (Schema::hasColumn('product_variants', 'size_type')) {
+            $variant->setAttribute('size_type', $sizeType);
+        }
+
+        if (Schema::hasColumn('product_variants', 'size')) {
+            $variant->setAttribute('size', $size);
+        }
+
+        if (Schema::hasColumn('product_variants', 'pack_size')) {
+            $variant->setAttribute('pack_size', $packSize);
+        }
+
+        if (Schema::hasColumn('product_variants', 'pack_size_type')) {
+            $variant->setAttribute('pack_size_type', $packSizeType);
+        }
+
+        if (Schema::hasColumn('product_variants', 'color')) {
+            $variant->setAttribute('color', $color);
+        }
+
+        if (Schema::hasColumn('product_variants', 'length')) {
+            $variant->setAttribute('length', $length);
+        }
+
+        if (Schema::hasColumn('product_variants', 'width')) {
+            $variant->setAttribute('width', $width);
+        }
+
+        if (Schema::hasColumn('product_variants', 'height')) {
+            $variant->setAttribute('height', $height);
+        }
 
         $variant->save();
         $this->attachVariantToProduct($product, $variant);
+        $this->syncVariantOptionAttributes($variant, [
+            'color'          => $color,
+            'size'           => $size,
+            'size_type'      => $sizeType,
+            'pack_size'      => $packSize,
+            'pack_size_type' => $packSizeType,
+            'weight'         => $this->toNullableString($weightState),
+            'length'         => $this->toNullableString($lengthState),
+            'width'          => $this->toNullableString($widthState),
+            'height'         => $this->toNullableString($heightState),
+        ]);
 
         $this->syncParentProductVariantSnapshot($product, $variant, $isNewVariant);
     }
@@ -669,18 +888,32 @@ class ProductImporter extends BaseImporter
     private function shouldCreateVariant(): bool
     {
         $sku = $this->toNullableString($this->variantStateValue('sku'));
+        $barcode = $this->toNullableString($this->variantStateValue('barcode'));
         $size = $this->toNullableString($this->variantStateValue('size'));
+        $sizeType = $this->toNullableString($this->variantStateValue('size_type'));
         $color = $this->toNullableString($this->variantStateValue('color'));
         $packSize = $this->toNullableString($this->variantStateValue('pack_size'));
+        $packSizeType = $this->toNullableString($this->variantStateValue('pack_size_type'));
+        $weight = $this->toNullableFloat($this->variantStateValue('weight'));
+        $length = $this->toNullableFloat($this->variantStateValue('length'));
+        $width = $this->toNullableFloat($this->variantStateValue('width'));
+        $height = $this->toNullableFloat($this->variantStateValue('height'));
         $volume = $this->toNullableString($this->variantStateValue('volume'));
         $price = $this->toNullableFloat($this->variantStateValue('price'));
         $stockQuantity = $this->toNullableInteger($this->variantStateValue('stock_quantity'))
             ?? $this->toNullableInteger($this->variantStateValue('stock'));
 
         return $sku !== null
+            || $barcode !== null
             || $size !== null
+            || $sizeType !== null
             || $color !== null
             || $packSize !== null
+            || $packSizeType !== null
+            || $weight !== null
+            || $length !== null
+            || $width !== null
+            || $height !== null
             || $volume !== null
             || $price !== null
             || $stockQuantity !== null;
@@ -707,13 +940,104 @@ class ProductImporter extends BaseImporter
     }
 
     /**
+     * @return array<string, string|float>
+     */
+    private function buildVariantAttributeMatrix(
+        ?string $sku,
+        ?string $barcode,
+        ?string $size,
+        ?string $sizeType,
+        ?string $packSize,
+        ?string $packSizeType,
+        ?string $color,
+        string|float|null $weight,
+        string|float|null $length,
+        string|float|null $width,
+        string|float|null $height
+    ): array {
+        $matrix = [];
+
+        if ($color !== null) {
+            $matrix['color'] = $color;
+        }
+
+        if ($packSizeType !== null) {
+            $matrix['pack_size_type'] = $packSizeType;
+        }
+
+        if ($packSize !== null) {
+            $matrix['pack_size'] = $packSize;
+        }
+
+        if ($sizeType !== null) {
+            $matrix['size_type'] = $sizeType;
+        }
+
+        if ($size !== null) {
+            $matrix['size'] = $size;
+        }
+
+        if ($weight !== null) {
+            $matrix['weight'] = $weight;
+        }
+
+        if ($length !== null) {
+            $matrix['length'] = $length;
+        }
+
+        if ($width !== null) {
+            $matrix['width'] = $width;
+        }
+
+        if ($height !== null) {
+            $matrix['height'] = $height;
+        }
+
+        if ($barcode !== null) {
+            $matrix['barcode'] = $barcode;
+        }
+
+        if ($sku !== null) {
+            $matrix['sku'] = $sku;
+        }
+
+        return $matrix;
+    }
+
+    /**
+     * @param array<string, string|float> $matrix
+     */
+    private function buildVariantCombinationHash(array $matrix): ?string
+    {
+        if ($matrix === []) {
+            return null;
+        }
+
+        $normalized = [];
+
+        foreach ($matrix as $key => $value) {
+            if (is_float($value)) {
+                $normalized[$key] = rtrim(rtrim(number_format($value, 6, '.', ''), '0'), '.');
+
+                continue;
+            }
+
+            $normalized[$key] = Str::lower(Str::squish($value));
+        }
+
+        ksort($normalized);
+
+        return hash('sha256', http_build_query($normalized, '', '&', PHP_QUERY_RFC3986));
+    }
+
+    /**
      * @param array<string, string> $attributes
      */
     private function buildVariantName(Product $product, array $attributes, ?string $size, ?string $sku): string
     {
         $parts = [];
 
-        foreach (['color', 'size', 'pack_size', 'volume', 'material'] as $field) {
+        foreach (['color', 'size_type', 'size', 'pack_size', 'pack_size_type', 'weight', 'length', 'width', 'height', 'volume', 'material'] as $field) {
             if ($field === 'size' && $size !== null) {
                 $parts[] = $size;
 
@@ -796,6 +1120,278 @@ class ProductImporter extends BaseImporter
         return $this->pendingVariantState[$key] ?? null;
     }
 
+    private function syncCategoriesForCurrentRow(Product $product): void
+    {
+        if (! Schema::hasTable('categories') || ! Schema::hasTable('product_categories')) {
+            return;
+        }
+
+        $categories = static::resolveCategoriesFromState($this->pendingCategoriesState);
+
+        if ($categories->isEmpty()) {
+            return;
+        }
+
+        $categoryIds = $categories
+            ->pluck('id')
+            ->filter(static fn ($id): bool => is_numeric($id))
+            ->map(static fn ($id): int => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($categoryIds === []) {
+            return;
+        }
+
+        $product->categories()->syncWithoutDetaching($categoryIds);
+    }
+
+    private function syncSupplierForCurrentRow(Product $product): void
+    {
+        if (! Schema::hasTable('suppliers') || ! Schema::hasTable('product_supplier')) {
+            return;
+        }
+
+        $supplierState = $this->variantStateValue('supplier');
+        $supplier = static::resolveSupplierFromState($supplierState);
+
+        if (! $supplier instanceof Supplier) {
+            return;
+        }
+
+        $product->suppliers()->syncWithoutDetaching([$supplier->getKey()]);
+    }
+
+    /**
+     * @param array<string, ?string> $optionValues
+     */
+    private function syncVariantOptionAttributes(ProductVariant $variant, array $optionValues): void
+    {
+        if (
+            ! Schema::hasTable('variant_attribute_values')
+            || ! Schema::hasTable('attributes')
+            || ! Schema::hasTable('attribute_values')
+        ) {
+            return;
+        }
+
+        foreach (self::FRONTEND_OPTION_FIELDS as $field) {
+            try {
+                $value = $optionValues[$field] ?? null;
+
+                if ($value === null) {
+                    continue;
+                }
+
+                $attribute = $this->resolveOrCreateVariantOptionAttribute($field);
+
+                if (! $attribute instanceof Attribute) {
+                    continue;
+                }
+
+                $this->resolveOrCreateVariantOptionValue($attribute, $value);
+
+                $payload = [
+                    'attribute_name'  => $attribute->name,
+                    'attribute_value' => $value,
+                ];
+
+                if (Schema::hasColumn('variant_attribute_values', 'attribute_value_display')) {
+                    $payload['attribute_value_display'] = $value;
+                }
+
+                if (Schema::hasColumn('variant_attribute_values', 'attribute_value_lt')) {
+                    $payload['attribute_value_lt'] = $value;
+                }
+
+                if (Schema::hasColumn('variant_attribute_values', 'attribute_value_en')) {
+                    $payload['attribute_value_en'] = $value;
+                }
+
+                if (Schema::hasColumn('variant_attribute_values', 'attribute_value_slug')) {
+                    $payload['attribute_value_slug'] = $this->normalizeAttributeValueSlug($value);
+                }
+
+                if (Schema::hasColumn('variant_attribute_values', 'sort_order')) {
+                    $payload['sort_order'] = array_search($field, self::FRONTEND_OPTION_FIELDS, true) ?: 0;
+                }
+
+                if (Schema::hasColumn('variant_attribute_values', 'is_filterable')) {
+                    $payload['is_filterable'] = true;
+                }
+
+                if (Schema::hasColumn('variant_attribute_values', 'is_searchable')) {
+                    $payload['is_searchable'] = true;
+                }
+
+                VariantAttributeValue::query()
+                    ->withoutGlobalScopes()
+                    ->updateOrCreate(
+                        [
+                            'variant_id'   => $variant->getKey(),
+                            'attribute_id' => $attribute->getKey(),
+                        ],
+                        $payload,
+                    );
+            } catch (Throwable $exception) {
+                // Best-effort enrichment: attribute sync errors should not fail the product row import.
+                report($exception);
+
+                continue;
+            }
+        }
+    }
+
+    private function resolveOrCreateVariantOptionAttribute(string $field): ?Attribute
+    {
+        $query = Attribute::query()->withoutGlobalScopes();
+
+        if (Schema::hasColumn('attributes', 'slug')) {
+            $query->where('slug', $field);
+        } else {
+            $query->where('name', Str::headline($field));
+        }
+
+        $attribute = $query->first();
+
+        if ($attribute instanceof Attribute) {
+            return $attribute;
+        }
+
+        $createPayload = $this->filterExistingTableColumns('attributes', [
+            'name'          => Str::headline($field),
+            'slug'          => $field,
+            'type'          => 'select',
+            'is_required'   => false,
+            'is_filterable' => true,
+            'is_searchable' => true,
+            'is_visible'    => true,
+            'is_editable'   => true,
+            'is_sortable'   => true,
+            'is_enabled'    => true,
+            'is_active'     => true,
+            'sort_order'    => 0,
+        ]);
+
+        if (! array_key_exists('name', $createPayload)) {
+            return null;
+        }
+
+        return Attribute::query()
+            ->withoutGlobalScopes()
+            ->create($createPayload);
+    }
+
+    private function resolveOrCreateVariantOptionValue(Attribute $attribute, string $value): ?AttributeValue
+    {
+        $slug = $this->normalizeAttributeValueSlug($value);
+
+        $lookupQuery = AttributeValue::query()
+            ->withoutGlobalScopes()
+            ->where('attribute_id', $attribute->getKey());
+
+        if (Schema::hasColumn('attribute_values', 'slug')) {
+            $lookupQuery->where('slug', $slug);
+        } else {
+            $lookupQuery->where('value', $value);
+        }
+
+        $attributeValue = $lookupQuery->first();
+
+        if (! $attributeValue instanceof AttributeValue) {
+            $createPayload = $this->filterExistingTableColumns('attribute_values', [
+                'attribute_id'         => $attribute->getKey(),
+                'value'                => $value,
+                'display_value'        => $value,
+                'slug'                 => $slug,
+                'is_enabled'           => true,
+                'is_active'            => true,
+                'is_searchable'        => true,
+                'sort_order'           => 0,
+                'is_default'           => false,
+                'hex_color'            => null,
+                'metadata'             => null,
+                'color_code'           => null,
+                'attribute_value_type' => 'text',
+                'valueable_type'       => null,
+                'valueable_id'         => null,
+                'image'                => null,
+                'description'          => null,
+            ]);
+
+            if (! array_key_exists('attribute_id', $createPayload) || ! array_key_exists('value', $createPayload)) {
+                return null;
+            }
+
+            $attributeValue = AttributeValue::query()
+                ->withoutGlobalScopes()
+                ->create($createPayload);
+        }
+
+        if ($attributeValue->value !== $value || $attributeValue->display_value !== $value) {
+            $attributeValue->forceFill([
+                'value'         => $value,
+                'display_value' => $value,
+            ])->saveQuietly();
+        }
+
+        return $attributeValue;
+    }
+
+    private function normalizeAttributeValueSlug(string $value): string
+    {
+        $slug = Str::slug($value);
+
+        if ($slug !== '') {
+            return $slug;
+        }
+
+        $asciiSlug = Str::slug(Str::ascii($value));
+
+        return $asciiSlug !== '' ? $asciiSlug : Str::lower(Str::random(12));
+    }
+
+    private function normalizeVariantNumericIdentityValue(mixed $rawValue, ?float $numericValue): string|float|null
+    {
+        if ($numericValue !== null) {
+            return $numericValue;
+        }
+
+        $rawString = $this->toNullableString($rawValue);
+
+        if ($rawString === null) {
+            return null;
+        }
+
+        $normalizedNumericString = str_replace(',', '.', $rawString);
+
+        if (is_numeric($normalizedNumericString)) {
+            return (float) $normalizedNumericString;
+        }
+
+        return Str::squish($rawString);
+    }
+
+    /**
+     * @param  array<string, mixed> $values
+     * @return array<string, mixed>
+     */
+    private function filterExistingTableColumns(string $table, array $values): array
+    {
+        $filtered = [];
+
+        foreach ($values as $column => $value) {
+            if (! Schema::hasColumn($table, $column)) {
+                continue;
+            }
+
+            $filtered[$column] = $value;
+        }
+
+        return $filtered;
+    }
+
     private function toNullableString(mixed $value): ?string
     {
         if (is_string($value)) {
@@ -813,15 +1409,7 @@ class ProductImporter extends BaseImporter
 
     private function toNullableFloat(mixed $value): ?float
     {
-        if ($value === null || $value === '') {
-            return null;
-        }
-
-        if (! is_numeric($value)) {
-            return null;
-        }
-
-        return (float) $value;
+        return self::toNullableLocalizedFloat($value);
     }
 
     private function toNullableInteger(mixed $value): ?int
@@ -862,6 +1450,66 @@ class ProductImporter extends BaseImporter
             '0', 'false', 'no', 'n' => false,
             default => null,
         };
+    }
+
+    private static function normalizeImportedNumericState(mixed $originalState, mixed $state): ?float
+    {
+        $normalizedFromOriginal = self::toNullableLocalizedFloat($originalState);
+
+        if ($normalizedFromOriginal !== null) {
+            return $normalizedFromOriginal;
+        }
+
+        return self::toNullableLocalizedFloat($state);
+    }
+
+    private static function toNullableLocalizedFloat(mixed $value): ?float
+    {
+        if (is_int($value) || is_float($value)) {
+            return (float) $value;
+        }
+
+        if (! is_string($value)) {
+            return null;
+        }
+
+        $normalized = trim($value);
+
+        if ($normalized === '') {
+            return null;
+        }
+
+        $normalized = str_replace("\xc2\xa0", ' ', $normalized);
+        $normalized = preg_replace('/\s+/u', '', $normalized) ?? $normalized;
+
+        if (str_contains($normalized, ',') && str_contains($normalized, '.')) {
+            $lastComma = strrpos($normalized, ',');
+            $lastDot = strrpos($normalized, '.');
+
+            if ($lastComma !== false && $lastDot !== false && $lastComma > $lastDot) {
+                $normalized = str_replace('.', '', $normalized);
+                $normalized = str_replace(',', '.', $normalized);
+            } else {
+                $normalized = str_replace(',', '', $normalized);
+            }
+        } elseif (str_contains($normalized, ',')) {
+            $isDecimalComma = preg_match('/^-?\d+,\d+$/', $normalized) === 1;
+            $normalized = $isDecimalComma
+                ? str_replace(',', '.', $normalized)
+                : str_replace(',', '', $normalized);
+        }
+
+        $normalized = preg_replace('/[^0-9.\-]/', '', $normalized) ?? $normalized;
+
+        if ($normalized === '' || $normalized === '-' || $normalized === '.' || $normalized === '-.') {
+            return null;
+        }
+
+        if (! is_numeric($normalized)) {
+            return null;
+        }
+
+        return (float) $normalized;
     }
 
     private function resolveRecordFromSyncKeys(): ?Product
@@ -1017,12 +1665,53 @@ class ProductImporter extends BaseImporter
         ]);
     }
 
-    /**
-     * @param array<int, mixed> $state
-     */
-    private static function resolveCategoriesFromState(array $state): EloquentCollection
+    private static function resolveSupplierFromState(mixed $state): ?Supplier
     {
-        $names = collect($state)
+        if ($state === null) {
+            return null;
+        }
+
+        $raw = is_string($state) ? trim($state) : $state;
+
+        if ($raw === '' || $raw === null) {
+            return null;
+        }
+
+        if (is_numeric($raw)) {
+            $supplier = Supplier::query()->find((int) $raw);
+
+            if ($supplier instanceof Supplier) {
+                return $supplier;
+            }
+        }
+
+        $name = is_string($raw) ? trim($raw) : trim((string) $raw);
+
+        if ($name === '') {
+            return null;
+        }
+
+        $normalizedName = Str::lower(Str::squish($name));
+
+        $supplier = Supplier::query()
+            ->whereRaw('LOWER(TRIM(name)) = ?', [$normalizedName])
+            ->first();
+
+        if ($supplier instanceof Supplier) {
+            return $supplier;
+        }
+
+        return Supplier::query()->create([
+            'name'       => $name,
+            'is_enabled' => true,
+        ]);
+    }
+
+    private static function resolveCategoriesFromState(mixed $state): EloquentCollection
+    {
+        $items = is_array($state) ? $state : [$state];
+
+        $names = collect($items)
             ->flatMap(function ($value): array {
                 if (! is_string($value)) {
                     return [$value];
@@ -1134,24 +1823,38 @@ class ProductImporter extends BaseImporter
         }
 
         try {
-            $contents = $this->downloadImageContents($imageUrl);
+            $path = $this->downloadAndStoreProductImageFromUrl($this->record, $imageUrl);
 
-            // Don't fail the row if the image can't be downloaded: import the product without an image.
-            if ($contents === null) {
+            if ($path === null) {
                 return;
             }
-
-            $extension = $this->resolveImageExtension($imageUrl, $contents['content_type'] ?? null);
-            $path = 'product-images/' . $this->record->getKey() . '/import-' . Str::uuid() . '.' . $extension;
-
-            $resizedImageContents = $this->resizeImageContents($contents['body'], $extension);
-
-            Storage::disk('public')->put($path, $resizedImageContents);
 
             $this->imageWriteService()->replaceWithPath($this->record, $path, $this->record->name);
         } catch (Throwable) {
             // Best-effort image import. Ignore errors so the product row still imports successfully.
             return;
+        }
+    }
+
+    private function downloadAndStoreProductImageFromUrl(Product $product, string $imageUrl): ?string
+    {
+        try {
+            $contents = $this->downloadImageContents($imageUrl);
+
+            // Don't fail the row if the image can't be downloaded: import the product without an image.
+            if ($contents === null) {
+                return null;
+            }
+
+            $sourceExtension = $this->resolveImageExtension($imageUrl, $contents['content_type'] ?? null);
+            $converted = $this->convertAndResizeImageContents($contents['body'], $sourceExtension);
+            $path = 'product-images/' . $product->getKey() . '/import-' . Str::uuid() . '.' . $converted['extension'];
+
+            Storage::disk('public')->put($path, $converted['body']);
+
+            return $path;
+        } catch (Throwable) {
+            return null;
         }
     }
 
@@ -1194,6 +1897,9 @@ class ProductImporter extends BaseImporter
                 str_contains($normalized, 'png')  => 'png',
                 str_contains($normalized, 'webp') => 'webp',
                 str_contains($normalized, 'gif')  => 'gif',
+                str_contains($normalized, 'avif') => 'avif',
+                str_contains($normalized, 'svg')  => 'svg',
+                str_contains($normalized, 'bmp')  => 'bmp',
                 str_contains($normalized, 'jpeg'), str_contains($normalized, 'jpg') => 'jpg',
                 default => 'jpg',
             };
@@ -1211,11 +1917,83 @@ class ProductImporter extends BaseImporter
 
         $extension = Str::lower(pathinfo($path, PATHINFO_EXTENSION));
 
-        if (! in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
+        if (! in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'avif', 'svg', 'bmp'], true)) {
             return 'jpg';
         }
 
         return $extension === 'jpeg' ? 'jpg' : $extension;
+    }
+
+    /**
+     * @return array{body:string, extension:string}
+     */
+    private function convertAndResizeImageContents(string $imageContents, string $sourceExtension): array
+    {
+        $normalizedSourceExtension = $this->normalizeImageExtension($sourceExtension);
+
+        if (! function_exists('imagecreatefromstring')) {
+            return [
+                'body'      => $imageContents,
+                'extension' => $normalizedSourceExtension,
+            ];
+        }
+
+        $sourceImage = @imagecreatefromstring($imageContents);
+
+        if ($sourceImage === false) {
+            return [
+                'body'      => $imageContents,
+                'extension' => $normalizedSourceExtension,
+            ];
+        }
+
+        $targetExtension = $this->resolveTargetImageExtension($normalizedSourceExtension);
+        $convertedBody = $this->resizeImageContents($imageContents, $targetExtension);
+        imagedestroy($sourceImage);
+
+        if ($convertedBody === '') {
+            return [
+                'body'      => $imageContents,
+                'extension' => $normalizedSourceExtension,
+            ];
+        }
+
+        return [
+            'body'      => $convertedBody,
+            'extension' => $targetExtension,
+        ];
+    }
+
+    private function resolveTargetImageExtension(string $sourceExtension): string
+    {
+        if ($sourceExtension === 'svg') {
+            return 'svg';
+        }
+
+        if ($sourceExtension === 'gif') {
+            return 'gif';
+        }
+
+        if (function_exists('imagewebp')) {
+            return 'webp';
+        }
+
+        return match ($sourceExtension) {
+            'png'   => 'png',
+            'bmp'   => function_exists('imagebmp') ? 'bmp' : 'jpg',
+            default => 'jpg',
+        };
+    }
+
+    private function normalizeImageExtension(string $extension): string
+    {
+        $normalized = Str::lower(trim($extension));
+
+        return match ($normalized) {
+            'jpeg'  => 'jpg',
+            'tif'   => 'tiff',
+            default => $normalized !== '' ? $normalized : 'jpg',
+        };
     }
 
     private function resizeImageContents(string $imageContents, string $extension): string
@@ -1281,6 +2059,7 @@ class ProductImporter extends BaseImporter
             'png'   => imagepng($targetImage, null, 6),
             'gif'   => imagegif($targetImage),
             'webp'  => function_exists('imagewebp') ? imagewebp($targetImage, null, self::IMPORT_IMAGE_QUALITY) : imagejpeg($targetImage, null, self::IMPORT_IMAGE_QUALITY),
+            'bmp'   => function_exists('imagebmp') ? imagebmp($targetImage) : imagejpeg($targetImage, null, self::IMPORT_IMAGE_QUALITY),
             default => imagejpeg($targetImage, null, self::IMPORT_IMAGE_QUALITY),
         };
 

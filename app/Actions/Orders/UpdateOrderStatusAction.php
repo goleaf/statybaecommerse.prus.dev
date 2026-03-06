@@ -9,7 +9,7 @@ use App\Models\Order;
 /**
  * Single responsibility action for updating order status
  */
-final readonly class UpdateOrderStatusAction
+class UpdateOrderStatusAction
 {
     public function execute(Order $order, string $newStatus, ?string $notes = null): Order
     {

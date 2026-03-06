@@ -110,9 +110,9 @@ final class ProductBreadcrumbBuilder
             return null;
         }
 
-        return route('localized.categories.show', [
-            'locale'   => app()->getLocale(),
+        return route('frontend.categories.show', [
             'category' => $slug,
         ]);
     }
 }
+

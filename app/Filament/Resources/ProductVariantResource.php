@@ -14,7 +14,6 @@ use App\Filament\Resources\ProductVariantResource\RelationManagers\PricesRelatio
 use App\Filament\Resources\ProductVariantResource\RelationManagers\ProductsRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\SimilaritiesRelationManager;
 use App\Filament\Resources\ProductVariantResource\RelationManagers\StockMovementsRelationManager;
-use App\Filament\Resources\ProductVariantResource\RelationManagers\VariantCombinationsRelationManager;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantForm;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantInfolist;
 use App\Models\ProductVariant;
@@ -148,7 +147,6 @@ final class ProductVariantResource extends BaseResource
             OrdersRelationManager::class,
             StockMovementsRelationManager::class,
             SimilaritiesRelationManager::class,
-            VariantCombinationsRelationManager::class,
         ];
 
         if (SchemaFacade::hasTable('discounts') && SchemaFacade::hasTable('discount_products')) {

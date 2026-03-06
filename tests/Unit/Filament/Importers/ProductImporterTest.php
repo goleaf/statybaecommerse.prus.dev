@@ -24,6 +24,7 @@ it('has required columns', function () {
         ->toContain('price')
         ->toContain('manage_stock')
         ->toContain('stock_quantity')
+        ->toContain('supplier')
         ->toContain('image_url')
         ->toContain('image');
 });
@@ -42,5 +43,6 @@ it('includes image columns in grouped mapping', function () {
     $groups = ProductImporter::getColumnGroups();
 
     expect($groups['Other'] ?? [])->toContain('image_url')
-        ->toContain('image');
+        ->toContain('image')
+        ->and($groups['Relations'] ?? [])->toContain('supplier');
 });

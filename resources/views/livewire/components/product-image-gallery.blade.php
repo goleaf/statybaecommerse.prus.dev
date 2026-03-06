@@ -2,9 +2,6 @@
     @if ($this->hasImages)
         @php
             $currentImage = $this->currentImage;
-            $imageWidth = (int) ($currentImage['width'] ?? 0);
-            $imageHeight = (int) ($currentImage['height'] ?? 0);
-            $isLowResolution = max($imageWidth, $imageHeight) > 0 && max($imageWidth, $imageHeight) < 400;
         @endphp
 
         {{-- Main Image Display --}}
@@ -15,10 +12,8 @@
                      srcset="{{ $currentImage['xs'] }} 150w, {{ $currentImage['sm'] }} 300w, {{ $currentImage['md'] }} 500w, {{ $currentImage['lg'] }} 800w, {{ $currentImage['xl'] }} 1200w"
                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 800px"
                      alt="{{ $currentImage['alt'] }}"
-                     class="{{ $isLowResolution ? 'max-h-full max-w-full object-contain' : 'h-full w-full object-cover transition-transform duration-300 group-hover:scale-105' }} cursor-zoom-in"
-                     loading="lazy"
-                     wire:click="toggleLightbox" 
-                     wire:confirm="{{ __('translations.confirm_toggle_lightbox') }}" />
+                     class="h-auto w-auto max-h-full max-w-full object-contain"
+                     loading="lazy" />
 
                 {{-- Image Navigation Arrows --}}
                 @if (count($this->images) > 1)
@@ -59,71 +54,17 @@
                 @foreach ($this->images as $index => $image)
                     <button
                             wire:click="selectImage({{ $index }})"
-                            class="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors duration-200 {{ $this->currentImageIndex === $index ? 'border-blue-500' : 'border-gray-200 hover:border-gray-300' }}">
+                            class="flex-shrink-0 flex w-16 h-16 items-center justify-center rounded-md overflow-hidden border-2 transition-colors duration-200 {{ $this->currentImageIndex === $index ? 'border-blue-500' : 'border-gray-200 hover:border-gray-300' }}">
                         <img
                              src="{{ $image['xs'] }}"
                              alt="{{ $image['alt'] }}"
-                             class="w-full h-full object-cover"
+                             class="h-auto w-auto max-h-full max-w-full object-contain"
                              loading="lazy" />
                     </button>
                 @endforeach
             </div>
         @endif
 
-        {{-- Lightbox Modal --}}
-        @if ($showLightbox && $this->currentImage)
-            <div
-                 class="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4 transition-opacity duration-200"
-                 wire:click="toggleLightbox"
-                 wire:confirm="{{ __('translations.confirm_toggle_lightbox') }}"
-                 wire:keydown.escape="toggleLightbox"
-                 wire:keydown.arrow-left="previousImage"
-                 wire:keydown.arrow-right="nextImage"
-                 tabindex="0"
-                 role="dialog"
-                 aria-modal="true"
-                 x-data
-                 x-init="$nextTick(() => $el.focus())">
-                <div class="relative max-w-4xl max-h-full transform transition-transform duration-200 ease-out" wire:click.stop>
-                    <img
-                         src="{{ $this->currentImage['xl'] ?? $this->currentImage['original'] }}"
-                         alt="{{ $this->currentImage['alt'] }}"
-                         class="max-w-full max-h-full object-contain" />
-
-                    {{-- Close Button --}}
-                    <button
-                            wire:click="toggleLightbox"
-                            wire:confirm="{{ __('translations.confirm_toggle_lightbox') }}"
-                            class="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-
-                    {{-- Navigation in Lightbox --}}
-                    @if (count($this->images) > 1)
-                        <button
-                                wire:click="previousImage"
-                                class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M15 19l-7-7 7-7"></path>
-                            </svg>
-                        </button>
-
-                        <button
-                                wire:click="nextImage"
-                                class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-3 rounded-full">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                                </path>
-                            </svg>
-                        </button>
-                    @endif
-                </div>
-            </div>
-        @endif
     @else
         {{-- No Images State with placeholder --}}
         <div class="aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 relative">

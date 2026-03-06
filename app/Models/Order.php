@@ -768,6 +768,22 @@ final class Order extends Model
     {
         $attributes = $order->getAttributes();
 
+        // Preserve compatibility with legacy factories/tests that still provide
+        // customer_id when the schema now stores the relationship in user_id.
+        if (array_key_exists('customer_id', $attributes)) {
+            if (! array_key_exists('user_id', $attributes) || $attributes['user_id'] === null) {
+                $customerId = $attributes['customer_id'];
+
+                if (is_numeric($customerId)) {
+                    $order->user_id = (int) $customerId;
+                }
+            }
+
+            if (! Schema::hasColumn($order->getTable(), 'customer_id')) {
+                unset($order->attributes['customer_id']);
+            }
+        }
+
         $order->status = self::normalizeOrderStatusValue($attributes['status'] ?? null);
         $order->payment_status = self::normalizePaymentStatusValue($attributes['payment_status'] ?? null);
         $order->payment_state = self::normalizePaymentStateValue($attributes['payment_state'] ?? null);

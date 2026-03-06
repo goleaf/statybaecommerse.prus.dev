@@ -18,7 +18,7 @@ final class CurrencyEnumTest extends TestCase
         self::assertSame(CurrencyEnum::EUR, CurrencyEnum::tryFrom('EUR'));
         self::assertNull(CurrencyEnum::tryFrom('USD'));
         self::assertSame('€', CurrencyEnum::EUR->getSymbol());
-        self::assertSame('Euro (€)', CurrencyEnum::EUR->getLabel());
+        self::assertSame(__('enums.currency.eur'), CurrencyEnum::EUR->getLabel());
     }
 
     #[Test]

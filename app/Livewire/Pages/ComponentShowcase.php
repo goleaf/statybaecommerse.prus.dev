@@ -186,8 +186,7 @@ final class ComponentShowcase extends Component
                             'name' => $name,
                             'slug' => $slug,
                             'url'  => route('localized.brands.show', [
-                                'locale' => $locale,
-                                'brand'  => $slug !== '' ? $slug : $brand->getKey(),
+                                'slug' => $slug !== '' ? $slug : $brand->getKey(),
                             ]),
                             'logo_url' => $logoUrl !== '' ? $logoUrl : null,
                         ];

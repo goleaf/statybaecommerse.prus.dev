@@ -45,6 +45,10 @@ final class Supplier extends Model implements HasMedia
 
     protected static function booted(): void
     {
+        self::creating(static function (Supplier $supplier): void {
+            $supplier->code = $supplier->generateUniqueCode();
+        });
+
         self::saving(static function (Supplier $supplier): void {
             if (trim((string) $supplier->code) === '') {
                 $supplier->code = $supplier->generateUniqueCode();

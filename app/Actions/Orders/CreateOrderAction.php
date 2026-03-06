@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 /**
  * Single responsibility action for creating orders
  */
-final readonly class CreateOrderAction
+class CreateOrderAction
 {
     public function __construct(
         private PriceCalculator $priceCalculator

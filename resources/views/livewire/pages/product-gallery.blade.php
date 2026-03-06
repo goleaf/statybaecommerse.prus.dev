@@ -65,43 +65,46 @@
         @if($this->products->count() > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 @foreach($this->products as $product)
+                    @php($productUrl = route('product.show', $product))
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
                         {{-- Product Image Gallery --}}
                         <div class="aspect-square bg-gray-100 dark:bg-gray-700 relative">
-                            @if($product->hasImages())
-                                @php 
-                                    $images = $product->getGalleryImages();
-                                    $mainImage = $images[0];
-                                @endphp
-                                <img 
-                                    src="{{ $mainImage['md'] }}"
-                                    srcset="{{ $mainImage['xs'] }} 150w, {{ $mainImage['sm'] }} 300w, {{ $mainImage['md'] }} 500w"
-                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
-                                    alt="{{ $mainImage['alt'] }}"
-                                    class="w-full h-full object-cover"
-                                    loading="lazy"
-                                />
-                                
-                                {{-- Image Count Badge --}}
-                                @if(count($images) > 1)
-                                    <div class="absolute top-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs">
-                                        {{ count($images) }} {{ __('translations.images') }}
+                            <a href="{{ $productUrl }}" class="block h-full w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
+                                @if($product->hasImages())
+                                    @php 
+                                        $images = $product->getGalleryImages();
+                                        $mainImage = $images[0];
+                                    @endphp
+                                    <img 
+                                        src="{{ $mainImage['md'] }}"
+                                        srcset="{{ $mainImage['xs'] }} 150w, {{ $mainImage['sm'] }} 300w, {{ $mainImage['md'] }} 500w"
+                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 300px"
+                                        alt="{{ $mainImage['alt'] }}"
+                                        class="w-full h-full object-cover"
+                                        loading="lazy"
+                                    />
+                                    
+                                    {{-- Image Count Badge --}}
+                                    @if(count($images) > 1)
+                                        <div class="absolute top-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs">
+                                            {{ count($images) }} {{ __('translations.images') }}
+                                        </div>
+                                    @endif
+
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center">
+                                        <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
                                     </div>
                                 @endif
-
-                            @else
-                                <div class="w-full h-full flex items-center justify-center">
-                                    <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                    </svg>
-                                </div>
-                            @endif
+                            </a>
                         </div>
 
                         {{-- Product Info --}}
                         <div class="p-4">
                             <h3 class="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">
-                                <a href="{{ route('product.show', $product) }}" 
+                                <a href="{{ $productUrl }}" 
                                    class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
                                     {{ $product->name }}
                                 </a>

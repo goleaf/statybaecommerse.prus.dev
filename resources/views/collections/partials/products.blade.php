@@ -3,19 +3,11 @@
         @foreach($products as $product)
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                 <!-- Product Image -->
-                <div class="aspect-w-1 aspect-h-1 bg-gray-200">
-                    @if($product->image)
-                        <img src="{{ $product->getImageUrl('md') }}" 
-                             alt="{{ $product->name }}"
-                             class="w-full h-48 object-cover">
-                    @else
-                        <div class="w-full h-48 bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
-                            <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"/>
-                            </svg>
-                        </div>
-                    @endif
-                </div>
+                <a href="{{ route('products.show', $product) }}" class="block aspect-w-1 aspect-h-1 bg-gray-200">
+                    <img src="{{ $product->getImageUrl('md') ?: asset('images/placeholder-product.jpg') }}" 
+                         alt="{{ $product->name }}"
+                         class="w-full h-48 object-cover">
+                </a>
 
                 <!-- Product Content -->
                 <div class="p-4">

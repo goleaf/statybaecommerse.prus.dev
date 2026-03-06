@@ -111,9 +111,9 @@
 
         <p class="text-center text-xs text-slate-500">
             {{ __('auth.ui.register.terms_agreement') }}
-            <x-link href="{{ route('frontend.legal.terms') }}" class="text-dark hover:text-stone">{{ __('auth.ui.common.terms_of_use') }}</x-link>
+            <x-link href="{{ \Illuminate\Support\Facades\Route::has('localized.legal.terms') ? route('localized.legal.terms') : url('/legal/terms') }}" class="text-dark hover:text-stone">{{ __('auth.ui.common.terms_of_use') }}</x-link>
             {{ __('auth.ui.common.and') }}
-            <x-link href="#" class="text-dark hover:text-stone">{{ __('auth.ui.common.privacy_policy') }}</x-link>.
+            <x-link href="{{ \Illuminate\Support\Facades\Route::has('localized.legal.privacy') ? route('localized.legal.privacy') : url('/legal/privacy') }}" class="text-dark hover:text-stone">{{ __('auth.ui.common.privacy_policy') }}</x-link>.
         </p>
     </div>
 </x-auth-page>

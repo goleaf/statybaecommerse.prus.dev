@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Actions\Orders\CancelOrderAction;
 use App\Actions\Orders\CreateOrderAction;
 use App\Actions\Orders\UpdateOrderStatusAction;
+use App\Data\Common\ServiceResponseData;
 use App\Data\Orders\CreateOrderData;
 use App\Data\Orders\OrderItemData;
 use App\Models\Order;
@@ -43,7 +44,7 @@ test('creates order successfully with valid data', function () {
         paymentMethodId: 1,
         paymentMethod: 'Credit Card',
         subtotal: 100.00,
-        items: DataCollection::wrap([
+        items: new DataCollection(OrderItemData::class, [
             new OrderItemData(
                 productId: 1,
                 quantity: 2,
@@ -61,7 +62,7 @@ test('creates order successfully with valid data', function () {
         ->shouldReceive('validateAvailability')
         ->once()
         ->with($orderData->items)
-        ->andReturn(app(\App\Data\Common\ServiceResponseData::class)::success());
+        ->andReturn(ServiceResponseData::success());
 
     $this->createOrderAction
         ->shouldReceive('execute')
@@ -99,7 +100,7 @@ test('fails to create order when inventory unavailable', function () {
         paymentMethodId: 1,
         paymentMethod: 'Credit Card',
         subtotal: 100.00,
-        items: DataCollection::wrap([
+        items: new DataCollection(OrderItemData::class, [
             new OrderItemData(
                 productId: 1,
                 quantity: 2,
@@ -115,7 +116,7 @@ test('fails to create order when inventory unavailable', function () {
         ->shouldReceive('validateAvailability')
         ->once()
         ->with($orderData->items)
-        ->andReturn(app(\App\Data\Common\ServiceResponseData::class)::error('Insufficient stock'));
+        ->andReturn(ServiceResponseData::error('Insufficient stock'));
 
     // Act
     $result = $this->service->createOrder($orderData);
@@ -136,7 +137,7 @@ test('updates order status with valid transition', function () {
     ]);
 
     $updatedOrder = $order->replicate();
-    $updatedOrder->status = 'confirmed';
+    $updatedOrder->status = 'processing';
 
     $this->updateStatusAction
         ->shouldReceive('execute')
@@ -157,7 +158,10 @@ test('updates order status with valid transition', function () {
 
     // Assert
     expect($result->isSuccess())->toBeTrue();
-    expect($result->data->status)->toBe('confirmed');
+    $status = $result->data->status instanceof \BackedEnum
+        ? $result->data->status->value
+        : (string) $result->data->status;
+    expect($status)->toBe('processing');
 });
 
 test('fails to update order status with invalid transition', function () {
@@ -210,7 +214,10 @@ test('cancels order successfully', function () {
 
     // Assert
     expect($result->isSuccess())->toBeTrue();
-    expect($result->data->status)->toBe('cancelled');
+    $status = $result->data->status instanceof \BackedEnum
+        ? $result->data->status->value
+        : (string) $result->data->status;
+    expect($status)->toBe('cancelled');
 });
 
 test('fails to cancel non-cancellable order', function () {
