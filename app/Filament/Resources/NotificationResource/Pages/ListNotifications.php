@@ -19,4 +19,3 @@ class ListNotifications extends ListRecords
         ];
     }
 }
-

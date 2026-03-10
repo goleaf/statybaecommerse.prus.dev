@@ -23,14 +23,14 @@ it('shows generated invoices in account order detail page', function (): void {
 
     foreach ($invoiceTypes as $index => $type) {
         OrderInvoice::factory()->create([
-            'order_id'      => $order->getKey(),
-            'invoice_type'  => $type,
-            'full_number'   => strtoupper($type) . '-00' . ($index + 1),
-            'status'        => OrderInvoice::STATUS_READY,
-            'is_current'    => $type === 'kpsf',
-            'generated_at'  => now()->subMinutes($index),
-            'created_at'    => now()->subMinutes($index),
-            'updated_at'    => now()->subMinutes($index),
+            'order_id'     => $order->getKey(),
+            'invoice_type' => $type,
+            'full_number'  => strtoupper($type) . '-00' . ($index + 1),
+            'status'       => OrderInvoice::STATUS_READY,
+            'is_current'   => $type === 'kpsf',
+            'generated_at' => now()->subMinutes($index),
+            'created_at'   => now()->subMinutes($index),
+            'updated_at'   => now()->subMinutes($index),
         ]);
     }
 

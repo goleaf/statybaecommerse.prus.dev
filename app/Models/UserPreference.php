@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\UserOwnedScope;
 use Database\Factories\UserPreferenceFactory;
+use DateTimeInterface;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,7 +17,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\CarbonInterface;
-use DateTimeInterface;
 use JsonException;
 use JsonSerializable;
 
@@ -87,7 +87,7 @@ final class UserPreference extends Model
 
     protected static function booted(): void
     {
-        static::saving(static function (self $preference): void {
+        self::saving(static function (self $preference): void {
             $type = $preference->getAttribute('preference_type');
             $key = $preference->getAttribute('preference_key');
 

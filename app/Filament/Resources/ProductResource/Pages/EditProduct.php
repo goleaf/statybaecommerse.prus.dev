@@ -86,4 +86,3 @@ class EditProduct extends EditRecord
         return '#';
     }
 }
-

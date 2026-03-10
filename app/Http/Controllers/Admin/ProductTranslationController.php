@@ -64,16 +64,16 @@ final class ProductTranslationController extends Controller
 
         // Validate incoming data to prevent mass-assignment vulnerabilities and ensure data quality.
         $validated = $request->validate([
-            'name'              => ['required', 'string', 'max:255'],
-            'slug'              => ['nullable', 'string', 'max:255'],
-            'description'       => ['nullable', 'string'],
+            'name'                 => ['required', 'string', 'max:255'],
+            'slug'                 => ['nullable', 'string', 'max:255'],
+            'description'          => ['nullable', 'string'],
             'detailed_description' => ['nullable', 'string'],
-            'short_description' => ['nullable', 'string'],
-            'seo_title'         => ['nullable', 'string', 'max:255'],
-            'seo_description'   => ['nullable', 'string'],
-            'meta_keywords'     => ['nullable', 'array'],
-            'meta_keywords.*'   => ['nullable', 'string'],
-            'alt_text'          => ['nullable', 'string', 'max:255'],
+            'short_description'    => ['nullable', 'string'],
+            'seo_title'            => ['nullable', 'string', 'max:255'],
+            'seo_description'      => ['nullable', 'string'],
+            'meta_keywords'        => ['nullable', 'array'],
+            'meta_keywords.*'      => ['nullable', 'string'],
+            'alt_text'             => ['nullable', 'string', 'max:255'],
         ]);
 
         // Trim the required name field once more so UI level trimming discrepancies never persist to storage.
@@ -121,15 +121,15 @@ final class ProductTranslationController extends Controller
                 'locale'     => $targetLocale,
             ],
             [
-                'name'              => $name,
-                'slug'              => $slug,
-                'description'       => $optionalText($validated['description'] ?? null),
+                'name'                 => $name,
+                'slug'                 => $slug,
+                'description'          => $optionalText($validated['description'] ?? null),
                 'detailed_description' => $optionalText($validated['detailed_description'] ?? null),
-                'short_description' => $optionalText($validated['short_description'] ?? null),
-                'seo_title'         => $optionalText($validated['seo_title'] ?? null),
-                'seo_description'   => $optionalText($validated['seo_description'] ?? null),
-                'meta_keywords'     => $metaKeywords,
-                'alt_text'          => $optionalText($validated['alt_text'] ?? null),
+                'short_description'    => $optionalText($validated['short_description'] ?? null),
+                'seo_title'            => $optionalText($validated['seo_title'] ?? null),
+                'seo_description'      => $optionalText($validated['seo_description'] ?? null),
+                'meta_keywords'        => $metaKeywords,
+                'alt_text'             => $optionalText($validated['alt_text'] ?? null),
             ],
         );
 

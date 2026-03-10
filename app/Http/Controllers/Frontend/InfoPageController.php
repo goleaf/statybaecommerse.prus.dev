@@ -19,10 +19,10 @@ final class InfoPageController extends Controller
         abort_unless($pageData !== null, 404);
 
         return view('frontend.info.show', [
-            'page' => $pageData,
-            'pageKey' => $page,
+            'page'         => $pageData,
+            'pageKey'      => $page,
             'relatedPages' => InfoPages::resolveRelatedPages($pageData['related_pages'] ?? []),
-            'actions' => InfoPages::resolveActions($pageData['actions'] ?? []),
+            'actions'      => InfoPages::resolveActions($pageData['actions'] ?? []),
         ]);
     }
 }

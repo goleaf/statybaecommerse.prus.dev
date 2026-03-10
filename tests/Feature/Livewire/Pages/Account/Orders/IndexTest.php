@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Livewire\Pages\Account\Orders;
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\OrderInvoice;
+use App\Models\OrderItem;
 use App\Models\User;
 use Livewire\Livewire;
 

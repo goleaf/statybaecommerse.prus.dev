@@ -24,4 +24,3 @@ final class BrandDuplicateLocaleRedirectTest extends TestCase
             ->assertRedirect('/lt/brands/sample-brand');
     }
 }
-

@@ -1,12 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Livewire\Components\PriceBreakdownTest" file="tests\Feature\Livewire\Components\PriceBreakdownTest.php" tests="7" assertions="13" errors="0" failures="0" skipped="0" time="14.467246">
-    <testcase name="price breakdown component renders correctly" file="tests\Feature\Livewire\Components\PriceBreakdownTest.php::price breakdown component renders correctly" class="Tests\Feature\Livewire\Components\PriceBreakdownTest" classname="Tests.Feature.Livewire.Components.PriceBreakdownTest" assertions="2" time="13.350825"/>
-    <testcase name="price breakdown shows all sections by default" file="tests\Feature\Livewire\Components\PriceBreakdownTest.php::price breakdown shows all sections by default" class="Tests\Feature\Livewire\Components\PriceBreakdownTest" classname="Tests.Feature.Livewire.Components.PriceBreakdownTest" assertions="4" time="0.220726"/>
-    <testcase name="price breakdown can hide specific sections" file="tests\Feature\Livewire\Components\PriceBreakdownTest.php::price breakdown can hide specific sections" class="Tests\Feature\Livewire\Components\PriceBreakdownTest" classname="Tests.Feature.Livewire.Components.PriceBreakdownTest" assertions="3" time="0.169881"/>
-    <testcase name="price breakdown supports mobile variant" file="tests\Feature\Livewire\Components\PriceBreakdownTest.php::price breakdown supports mobile variant" class="Tests\Feature\Livewire\Components\PriceBreakdownTest" classname="Tests.Feature.Livewire.Components.PriceBreakdownTest" assertions="1" time="0.177746"/>
-    <testcase name="price breakdown returns zero subtotal when cart is empty" file="tests\Feature\Livewire\Components\PriceBreakdownTest.php::price breakdown returns zero subtotal when cart is empty" class="Tests\Feature\Livewire\Components\PriceBreakdownTest" classname="Tests.Feature.Livewire.Components.PriceBreakdownTest" assertions="1" time="0.167789"/>
-    <testcase name="price breakdown responds to cart updates" file="tests\Feature\Livewire\Components\PriceBreakdownTest.php::price breakdown responds to cart updates" class="Tests\Feature\Livewire\Components\PriceBreakdownTest" classname="Tests.Feature.Livewire.Components.PriceBreakdownTest" assertions="1" time="0.201432"/>
-    <testcase name="price breakdown responds to coupon updates" file="tests\Feature\Livewire\Components\PriceBreakdownTest.php::price breakdown responds to coupon updates" class="Tests\Feature\Livewire\Components\PriceBreakdownTest" classname="Tests.Feature.Livewire.Components.PriceBreakdownTest" assertions="1" time="0.178848"/>
+  <testsuite name="Tests\Feature\Frontend\CartTest" file="Cart (Tests\Feature\Frontend\Cart)" tests="2" assertions="2" errors="1" failures="1" skipped="0" time="16.727075">
+    <testcase name="Guest can clear cart" file="Cart (Tests\Feature\Frontend\Cart)::Guest can clear cart" class="Tests\Feature\Frontend\CartTest" classname="Tests.Feature.Frontend.CartTest" assertions="2" time="16.499891">
+      <failure type="PHPUnit\Framework\ExpectationFailedException">Guest can clear cartUnable to find JSON: &#13;
+&#13;
+[{
+    "success": true,
+    "message": "Cart cleared successfully."
+}]&#13;
+&#13;
+within response JSON:&#13;
+&#13;
+[{
+    "success": true,
+    "message": "Krepšelis sėkmingai išvalytas.",
+    "cart": {
+        "item_count": 0,
+        "items": [],
+        "totals": {
+            "subtotal": 0,
+            "tax": 0,
+            "shipping": 0,
+            "discount": 0,
+            "total": 0
+        }
+    },
+    "summary": {
+        "item_count": 0,
+        "subtotal": 0,
+        "tax": 0,
+        "shipping": 0,
+        "discount": 0,
+        "total": 0
+    }
+}].&#13;
+&#13;
+
+Failed asserting that an array has the subset Array &amp;0 [
+    'success' =&gt; true,
+    'message' =&gt; 'Cart cleared successfully.',
+].&#13;
+at vendor\laravel\framework\src\Illuminate\Testing\Constraints\ArraySubset.php:80
+at vendor\laravel\framework\src\Illuminate\Testing\Assert.php:36
+at vendor\laravel\framework\src\Illuminate\Testing\AssertableJsonString.php:319
+at vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:856
+at tests\Feature\Frontend\CartTest.php:47</failure>
+    </testcase>
+    <testcase name="Authenticated user can clear cart" file="Cart (Tests\Feature\Frontend\Cart)::Authenticated user can clear cart" class="Tests\Feature\Frontend\CartTest" classname="Tests.Feature.Frontend.CartTest" assertions="0" time="0.227184">
+      <error type="ValueError">Authenticated user can clear cartValueError: Unknown format specifier "i"&#13;
+at database\factories\UserFactory.php:34
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:550
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:529
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:513
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:157
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:512
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:429
+at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:318
+at tests\Feature\Frontend\CartTest.php:61</error>
+    </testcase>
   </testsuite>
 </testsuites>

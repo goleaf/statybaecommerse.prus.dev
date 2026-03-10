@@ -154,8 +154,8 @@ class EditProductVariants extends EditRecord
         $resolvedValues = [
             'variant_name_lt' => self::normalizeNullableString($product->getTranslatedName('lt')),
             'variant_name_en' => self::normalizeNullableString($product->getTranslatedName('en')),
-            'description_lt' => self::normalizeNullableString($product->getTranslatedDescription('lt')),
-            'description_en' => self::normalizeNullableString($product->getTranslatedDescription('en')),
+            'description_lt'  => self::normalizeNullableString($product->getTranslatedDescription('lt')),
+            'description_en'  => self::normalizeNullableString($product->getTranslatedDescription('en')),
         ];
 
         foreach ($availableColumns as $column) {

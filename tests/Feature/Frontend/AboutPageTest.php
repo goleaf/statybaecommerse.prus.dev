@@ -16,4 +16,3 @@ final class AboutPageTest extends TestCase
             ->assertSee('Metų patirtis');
     }
 }
-

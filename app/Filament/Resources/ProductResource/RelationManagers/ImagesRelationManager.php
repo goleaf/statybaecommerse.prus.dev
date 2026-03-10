@@ -24,6 +24,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use RuntimeException;
 
 class ImagesRelationManager extends RelationManager
 {
@@ -136,7 +137,7 @@ class ImagesRelationManager extends RelationManager
                         $owner = $this->getOwnerRecord();
 
                         if (! $owner instanceof Product) {
-                            throw new \RuntimeException('Owner record must be a product.');
+                            throw new RuntimeException('Owner record must be a product.');
                         }
 
                         return $this->imageWriteService()->create($owner, $data);

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Pages\Account;
 
 use App\Models\OrderInvoice;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;

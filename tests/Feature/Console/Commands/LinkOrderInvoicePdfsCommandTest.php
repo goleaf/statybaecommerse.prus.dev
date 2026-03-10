@@ -11,9 +11,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\File as FileSystem;
 use Illuminate\Support\Facades\Storage;
-use Tests\Support\PdfFixture;
 
 use function Pest\Laravel\artisan;
+
+use Tests\Support\PdfFixture;
 
 uses(RefreshDatabase::class);
 

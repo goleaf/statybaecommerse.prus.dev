@@ -5,110 +5,110 @@ declare(strict_types=1);
 return [
     'shared' => [
         'need_help_description' => 'Jei reikia patikslinti užsakymo eigą, pristatymą ar prekių parinkimą, susisiekite su mūsų komanda. Padėsime pasirinkti aiškiausią sprendimą jūsų projektui.',
-        'need_help_title' => 'Reikia pagalbos?',
-        'on_this_page' => 'Šiame puslapyje',
-        'quick_actions' => 'Greiti veiksmai',
-        'related_pages' => 'Susiję puslapiai',
+        'need_help_title'       => 'Reikia pagalbos?',
+        'on_this_page'          => 'Šiame puslapyje',
+        'quick_actions'         => 'Greiti veiksmai',
+        'related_pages'         => 'Susiję puslapiai',
     ],
     'pages' => [
         'faq' => [
-            'section' => 'Pagalba ir informacija',
-            'title' => 'DUK (dažniausiai užduodami klausimai)',
+            'section'     => 'Pagalba ir informacija',
+            'title'       => 'DUK (dažniausiai užduodami klausimai)',
             'description' => 'Trumpi ir aiškūs atsakymai apie pirkimą, pristatymą, apmokėjimą, grąžinimą ir pagalbą po užsakymo.',
-            'summary' => 'Šį puslapį parengėme pagal didžiųjų statybos prekių e. parduotuvių pagalbos centrų logiką: pirmiausia pateikiame užsakymo eigą, tada apmokėjimą, pristatymą ir veiksmus po pirkimo. Taip greičiau rasite aktualų atsakymą, nesvarbu, ar užsakymą dar tik planuojate, ar jau laukiate siuntos.',
-            'highlights' => [
+            'summary'     => 'Šį puslapį parengėme pagal didžiųjų statybos prekių e. parduotuvių pagalbos centrų logiką: pirmiausia pateikiame užsakymo eigą, tada apmokėjimą, pristatymą ir veiksmus po pirkimo. Taip greičiau rasite aktualų atsakymą, nesvarbu, ar užsakymą dar tik planuojate, ar jau laukiate siuntos.',
+            'highlights'  => [
                 [
-                    'title' => 'Prieš pirkimą',
+                    'title'       => 'Prieš pirkimą',
                     'description' => 'Paaiškiname, kaip pasirinkti prekes, patikrinti jų prieinamumą ir suplanuoti visą užsakymą.',
                 ],
                 [
-                    'title' => 'Pirkimo metu',
+                    'title'       => 'Pirkimo metu',
                     'description' => 'Vienoje vietoje rasite informaciją apie apmokėjimą, pristatymo būdus ir užsakymo patvirtinimą.',
                 ],
                 [
-                    'title' => 'Po pirkimo',
+                    'title'       => 'Po pirkimo',
                     'description' => 'Aptariame grąžinimą, garantinius atvejus ir kaip greičiausiai susisiekti su pagalbos komanda.',
                 ],
             ],
             'faqs' => [
                 [
                     'question' => 'Kaip sužinoti, ar prekė yra sandėlyje?',
-                    'answer' => 'Prekės kortelėje rodome aktualų prieinamumą. Jei reikia didesnio kiekio projektui, susisiekite su mumis ir patikslinsime tiekimo terminą bei rezervavimo galimybes.',
+                    'answer'   => 'Prekės kortelėje rodome aktualų prieinamumą. Jei reikia didesnio kiekio projektui, susisiekite su mumis ir patikslinsime tiekimo terminą bei rezervavimo galimybes.',
                 ],
                 [
                     'question' => 'Kada užsakymas laikomas patvirtintu?',
-                    'answer' => 'Užsakymas pradedamas vykdyti tuomet, kai sistema užfiksuoja sėkmingą apmokėjimą arba kai suderinamas išankstinis mokėjimas pagal pateiktą informaciją užsakymo lange.',
+                    'answer'   => 'Užsakymas pradedamas vykdyti tuomet, kai sistema užfiksuoja sėkmingą apmokėjimą arba kai suderinamas išankstinis mokėjimas pagal pateiktą informaciją užsakymo lange.',
                 ],
                 [
                     'question' => 'Ar galima rinktis pristatymą į objektą arba atsiėmimą?',
-                    'answer' => 'Taip. Atsižvelgiant į prekių pobūdį ir sandėlio likučius, galite pasirinkti pristatymą nurodytu adresu arba atsiėmimą sutartoje vietoje.',
+                    'answer'   => 'Taip. Atsižvelgiant į prekių pobūdį ir sandėlio likučius, galite pasirinkti pristatymą nurodytu adresu arba atsiėmimą sutartoje vietoje.',
                 ],
                 [
                     'question' => 'Kokie apmokėjimo būdai dažniausiai naudojami?',
-                    'answer' => 'Dažniausiai pasirenkama internetinė bankininkystė, mokėjimo kortelės arba išankstinis bankinis pavedimas. Tikslius būdus rasite atskirame apmokėjimo informacijos puslapyje.',
+                    'answer'   => 'Dažniausiai pasirenkama internetinė bankininkystė, mokėjimo kortelės arba išankstinis bankinis pavedimas. Tikslius būdus rasite atskirame apmokėjimo informacijos puslapyje.',
                 ],
                 [
                     'question' => 'Kaip elgtis gavus pažeistą siuntą?',
-                    'answer' => 'Priėmimo metu įvertinkite pakuotę ir prekių būklę. Pastebėję akivaizdų pažeidimą, kuo greičiau užfiksuokite informaciją ir susisiekite su mūsų komanda, kad galėtume pradėti sprendimą nedelsdami.',
+                    'answer'   => 'Priėmimo metu įvertinkite pakuotę ir prekių būklę. Pastebėję akivaizdų pažeidimą, kuo greičiau užfiksuokite informaciją ir susisiekite su mūsų komanda, kad galėtume pradėti sprendimą nedelsdami.',
                 ],
                 [
                     'question' => 'Ar galima grąžinti nepanaudotą prekę?',
-                    'answer' => 'Daugeliu atvejų taip, jei prekė išlaikė prekinę išvaizdą ir yra grąžinama pagal taikomas taisykles. Detalios sąlygos pateiktos grąžinimo ir garantijos puslapyje.',
+                    'answer'   => 'Daugeliu atvejų taip, jei prekė išlaikė prekinę išvaizdą ir yra grąžinama pagal taikomas taisykles. Detalios sąlygos pateiktos grąžinimo ir garantijos puslapyje.',
                 ],
                 [
                     'question' => 'Kaip vyksta garantinis aptarnavimas?',
-                    'answer' => 'Garantiniais atvejais įvertiname gedimo pobūdį, patikriname įsigijimo informaciją ir pasiūlome taisymą, keitimą arba kitą taikomą sprendimą pagal prekės kategoriją.',
+                    'answer'   => 'Garantiniais atvejais įvertiname gedimo pobūdį, patikriname įsigijimo informaciją ir pasiūlome taisymą, keitimą arba kitą taikomą sprendimą pagal prekės kategoriją.',
                 ],
                 [
                     'question' => 'Kur kreiptis, jei reikia pagalbos renkantis medžiagas?',
-                    'answer' => 'Jei reikalinga konsultacija dėl produkto paskirties, kiekio ar suderinamumo, susisiekite su mūsų komanda. Padėsime susikomplektuoti užsakymą pagal darbų etapą.',
+                    'answer'   => 'Jei reikalinga konsultacija dėl produkto paskirties, kiekio ar suderinamumo, susisiekite su mūsų komanda. Padėsime susikomplektuoti užsakymą pagal darbų etapą.',
                 ],
             ],
             'actions' => [
                 [
                     'label' => 'Peržiūrėti pristatymo informaciją',
-                    'type' => 'page',
-                    'page' => 'shipping',
+                    'type'  => 'page',
+                    'page'  => 'shipping',
                     'style' => 'primary',
                 ],
                 [
-                    'label' => 'Susisiekti su komanda',
-                    'type' => 'route',
+                    'label'  => 'Susisiekti su komanda',
+                    'type'   => 'route',
                     'routes' => ['localized.contact.index', 'frontend.contact.index'],
-                    'style' => 'secondary',
+                    'style'  => 'secondary',
                 ],
             ],
             'related_pages' => ['payment-methods', 'shipping', 'returns'],
         ],
         'payment-methods' => [
-            'section' => 'Pagalba ir informacija',
-            'title' => 'Apmokėjimo būdai',
+            'section'     => 'Pagalba ir informacija',
+            'title'       => 'Apmokėjimo būdai',
             'description' => 'Informacija apie dažniausiai naudojamus atsiskaitymo būdus, mokėjimo patvirtinimą ir veiksmus, jei apmokėjimas nepavyko.',
-            'summary' => 'Apmokėjimo informacijos puslapį suformavome taip, kaip tai daro didesnės e. prekybos platformos: pirmiausia paaiškinami galimi būdai, po to aprašoma užsakymo būsena ir ką daryti iškilus mokėjimo nesklandumams. Taip lengviau suprasti, kada užsakymas jau vykdomas ir kada reikia papildomo veiksmo.',
-            'highlights' => [
+            'summary'     => 'Apmokėjimo informacijos puslapį suformavome taip, kaip tai daro didesnės e. prekybos platformos: pirmiausia paaiškinami galimi būdai, po to aprašoma užsakymo būsena ir ką daryti iškilus mokėjimo nesklandumams. Taip lengviau suprasti, kada užsakymas jau vykdomas ir kada reikia papildomo veiksmo.',
+            'highlights'  => [
                 [
-                    'title' => 'Mokėjimo pasirinkimas',
+                    'title'       => 'Mokėjimo pasirinkimas',
                     'description' => 'Aiškiai atskiriame momentinį atsiskaitymą, kortelių mokėjimus ir išankstinį pavedimą.',
                 ],
                 [
-                    'title' => 'Patvirtinimas',
+                    'title'       => 'Patvirtinimas',
                     'description' => 'Paaiškiname, kada sistema užfiksuoja mokėjimą ir kaip apie tai informuojamas pirkėjas.',
                 ],
                 [
-                    'title' => 'Nesklandumų sprendimas',
+                    'title'       => 'Nesklandumų sprendimas',
                     'description' => 'Jei mokėjimas nutrūksta ar neužsifiksuoja, turite aiškią veiksmų seką be papildomų spėlionių.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Galimi atsiskaitymo būdai',
+                    'title'      => 'Galimi atsiskaitymo būdai',
                     'paragraphs' => [
                         'Atsiskaitymui internetu paprastai siūlome mokėjimo korteles, internetinę bankininkystę arba bankinį pavedimą, kai užsakymas apmokamas iš anksto pagal pateiktą informaciją.',
                         'Galutinį būdų sąrašą matysite atsiskaitymo žingsnyje, nes dalis variantų gali priklausyti nuo užsakymo sumos, pristatymo tipo ar konkrečios prekės.',
                     ],
                 ],
                 [
-                    'title' => 'Kada mokėjimas laikomas gautu',
+                    'title'      => 'Kada mokėjimas laikomas gautu',
                     'paragraphs' => [
                         'Momentinio atsiskaitymo atveju užsakymo būsena dažniausiai atsinaujina iš karto po sėkmingo mokėjimo patvirtinimo.',
                         'Jei pasirenkamas išankstinis pavedimas, užsakymo vykdymas pradedamas gavus lėšas ir patvirtinus apmokėjimą sistemoje.',
@@ -120,7 +120,7 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Jei mokėjimas nepavyko',
+                    'title'      => 'Jei mokėjimas nepavyko',
                     'paragraphs' => [
                         'Kartais mokėjimo procesą nutraukia banko autorizacija, per ilga sesija ar ryšio trikdžiai. Tokiais atvejais verta pirmiausia patikrinti, ar užsakymas tikrai nebuvo apmokėtas.',
                     ],
@@ -131,7 +131,7 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Sąskaitos ir mokėjimo dokumentai',
+                    'title'      => 'Sąskaitos ir mokėjimo dokumentai',
                     'paragraphs' => [
                         'Po sėkmingo užsakymo patvirtinimo parengiami reikalingi dokumentai pagal jūsų pasirinktą pirkėjo tipą ir nurodytus rekvizitus.',
                         'Jei perkate projektui ar įmonei, verta iš karto pateikti tikslius rekvizitus, kad sąskaitos paruošimas vyktų sklandžiai.',
@@ -141,48 +141,48 @@ return [
             'actions' => [
                 [
                     'label' => 'Peržiūrėti DUK',
-                    'type' => 'page',
-                    'page' => 'faq',
+                    'type'  => 'page',
+                    'page'  => 'faq',
                     'style' => 'primary',
                 ],
                 [
-                    'label' => 'Susisiekti dėl apmokėjimo',
-                    'type' => 'route',
+                    'label'  => 'Susisiekti dėl apmokėjimo',
+                    'type'   => 'route',
                     'routes' => ['localized.contact.index', 'frontend.contact.index'],
-                    'style' => 'secondary',
+                    'style'  => 'secondary',
                 ],
             ],
             'related_pages' => ['faq', 'shipping', 'terms'],
         ],
         'popular-products' => [
-            'section' => 'Prekių katalogas ir paslaugos',
-            'title' => 'Populiariausios prekės',
+            'section'     => 'Prekių katalogas ir paslaugos',
+            'title'       => 'Populiariausios prekės',
             'description' => 'Dažniausiai perkamos statybų, remonto ir aplinkos priežiūros prekės vienoje aiškioje apžvalgoje.',
-            'summary' => 'Populiariausių prekių puslapį modeliavome pagal didžiųjų statybinių prekių e. parduotuvių katalogo logiką: aiškiai atskiriamos dažnai pasirenkamos produktų grupės, sezoniškumas ir sprendimai, kurie padeda greitai papildyti projektui reikalingus kiekius. Tai orientacinė apžvalga, padedanti greitai pradėti paiešką.',
-            'highlights' => [
+            'summary'     => 'Populiariausių prekių puslapį modeliavome pagal didžiųjų statybinių prekių e. parduotuvių katalogo logiką: aiškiai atskiriamos dažnai pasirenkamos produktų grupės, sezoniškumas ir sprendimai, kurie padeda greitai papildyti projektui reikalingus kiekius. Tai orientacinė apžvalga, padedanti greitai pradėti paiešką.',
+            'highlights'  => [
                 [
-                    'title' => 'Dažniausi pasirinkimai',
+                    'title'       => 'Dažniausi pasirinkimai',
                     'description' => 'Įtraukėme produktų grupes, kurios dažniausiai naudojamos tiek smulkiam remontui, tiek didesniems darbams.',
                 ],
                 [
-                    'title' => 'Sezoninis aktualumas',
+                    'title'       => 'Sezoninis aktualumas',
                     'description' => 'Akcentuojame prekes, kurių poreikis dažniausiai išauga konkrečiu statybų ar sodo darbų laikotarpiu.',
                 ],
                 [
-                    'title' => 'Greita pradžia',
+                    'title'       => 'Greita pradžia',
                     'description' => 'Užuot pradėjus nuo viso katalogo, lengviau atsispirti nuo labiausiai ieškomų sprendimų.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Mišiniai, tvirtinimo detalės ir izoliacija',
+                    'title'      => 'Mišiniai, tvirtinimo detalės ir izoliacija',
                     'paragraphs' => [
                         'Tarp populiariausių pasirinkimų dažniausiai patenka sausieji mišiniai, klijai, sandarinimo priemonės, tvirtinimo detalės ir pagrindinės šiltinimo medžiagos.',
                         'Tai grupės, kurios reikalingos tiek naujai statybai, tiek renovacijai, todėl jos dažnai tampa pirmuoju pirkimo tašku ruošiant objekto sąmatą.',
                     ],
                 ],
                 [
-                    'title' => 'Įrankiai kasdieniams darbams',
+                    'title'      => 'Įrankiai kasdieniams darbams',
                     'paragraphs' => [
                         'Didelė paklausa išlieka akumuliatoriniams gręžtuvams, pjovimo įrankiams, matavimo priemonėms, kopėčioms ir darbo saugos prekėms.',
                     ],
@@ -193,7 +193,7 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Sodo ir aplinkos tvarkymo prekės',
+                    'title'      => 'Sodo ir aplinkos tvarkymo prekės',
                     'paragraphs' => [
                         'Šiltuoju sezonu tarp dažniausiai perkamų prekių patenka laistymo sprendimai, vejos priežiūros technika, lauko dangos ir teritorijos tvarkymo smulkioji įranga.',
                     ],
@@ -202,48 +202,48 @@ return [
             ],
             'actions' => [
                 [
-                    'label' => 'Naršyti kategorijas',
-                    'type' => 'route',
+                    'label'  => 'Naršyti kategorijas',
+                    'type'   => 'route',
                     'routes' => ['localized.categories.index', 'frontend.categories.index'],
-                    'style' => 'primary',
+                    'style'  => 'primary',
                 ],
                 [
                     'label' => 'Peržiūrėti specialius pasiūlymus',
-                    'type' => 'page',
-                    'page' => 'special-offers',
+                    'type'  => 'page',
+                    'page'  => 'special-offers',
                     'style' => 'secondary',
                 ],
             ],
             'related_pages' => ['building-materials', 'tools-equipment', 'special-offers'],
         ],
         'building-materials' => [
-            'section' => 'Prekių katalogas ir paslaugos',
-            'title' => 'Statybinės medžiagos',
+            'section'     => 'Prekių katalogas ir paslaugos',
+            'title'       => 'Statybinės medžiagos',
             'description' => 'Pagrindinės medžiagų grupės, jų paskirtis ir orientaciniai pasirinkimo principai įvairiems statybos darbų etapams.',
-            'summary' => 'Šiame puslapyje statybines medžiagas suskirstėme taip, kaip įprasta didesniuose statybos prekių kataloguose: nuo konstrukcinių sprendimų ir šiltinimo iki vidaus apdailos. Tokia struktūra padeda greitai pereiti nuo bendro projekto poreikio prie konkrečių produktų grupių.',
-            'highlights' => [
+            'summary'     => 'Šiame puslapyje statybines medžiagas suskirstėme taip, kaip įprasta didesniuose statybos prekių kataloguose: nuo konstrukcinių sprendimų ir šiltinimo iki vidaus apdailos. Tokia struktūra padeda greitai pereiti nuo bendro projekto poreikio prie konkrečių produktų grupių.',
+            'highlights'  => [
                 [
-                    'title' => 'Darbų etapais',
+                    'title'       => 'Darbų etapais',
                     'description' => 'Lengviau pasirinkti, kai medžiagos pateikiamos pagal darbų seką, o ne tik pagal techninius pavadinimus.',
                 ],
                 [
-                    'title' => 'Suderinamumas',
+                    'title'       => 'Suderinamumas',
                     'description' => 'Svarbu vertinti ne vien pavienę prekę, bet ir visos sistemos suderinamumą objekte.',
                 ],
                 [
-                    'title' => 'Tiekimo planavimas',
+                    'title'       => 'Tiekimo planavimas',
                     'description' => 'Didelių kiekių ar specifinių medžiagų užsakymus verta planuoti iš anksto, kad nebūtų darbų pertraukų.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Pamatai, mūras ir konstrukciniai sprendimai',
+                    'title'      => 'Pamatai, mūras ir konstrukciniai sprendimai',
                     'paragraphs' => [
                         'Pradinių statybos etapų pirkiniuose dažniausiai dominuoja mūro blokai, betono produktai, armavimo sprendimai ir medžiagos, reikalingos konstrukcijų formavimui bei tvirtinimui.',
                     ],
                 ],
                 [
-                    'title' => 'Šiltinimas, sandarinimas ir apsauga',
+                    'title'      => 'Šiltinimas, sandarinimas ir apsauga',
                     'paragraphs' => [
                         'Šiltinimo medžiagos, sandarinimo priemonės, hidroizoliacija ir garo izoliacijos sprendimai turi būti derinami pagal konkrečią konstrukciją ir eksploatavimo sąlygas.',
                     ],
@@ -254,7 +254,7 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Vidaus apdaila ir užbaigimo darbai',
+                    'title'      => 'Vidaus apdaila ir užbaigimo darbai',
                     'paragraphs' => [
                         'Vėlesniuose etapuose aktualūs glaistai, tinkai, gruntai, dažymo paruošimo medžiagos, plokštės ir kitos apdailos grupės.',
                         'Svarbu vertinti ne tik kainą, bet ir tai, kaip medžiaga tinka konkrečiam pagrindui bei darbo intensyvumui.',
@@ -263,48 +263,48 @@ return [
             ],
             'actions' => [
                 [
-                    'label' => 'Atverti kategorijų katalogą',
-                    'type' => 'route',
+                    'label'  => 'Atverti kategorijų katalogą',
+                    'type'   => 'route',
                     'routes' => ['localized.categories.index', 'frontend.categories.index'],
-                    'style' => 'primary',
+                    'style'  => 'primary',
                 ],
                 [
-                    'label' => 'Gauti konsultaciją',
-                    'type' => 'route',
+                    'label'  => 'Gauti konsultaciją',
+                    'type'   => 'route',
                     'routes' => ['localized.contact.index', 'frontend.contact.index'],
-                    'style' => 'secondary',
+                    'style'  => 'secondary',
                 ],
             ],
             'related_pages' => ['popular-products', 'tools-equipment', 'services-for-craftsmen'],
         ],
         'tools-equipment' => [
-            'section' => 'Prekių katalogas ir paslaugos',
-            'title' => 'Įrankiai ir įranga',
+            'section'     => 'Prekių katalogas ir paslaugos',
+            'title'       => 'Įrankiai ir įranga',
             'description' => 'Elektriniai, akumuliatoriniai ir rankiniai įrankiai, matavimo priemonės bei pagalbinė įranga kasdieniams darbams.',
-            'summary' => 'Įrankių puslapį sudėjome pagal aiškią darbo logiką: gręžimas ir tvirtinimas, pjovimas ir šlifavimas, matavimas ir sauga. Tai leidžia greitai orientuotis tiek profesionalui, kuris ieško konkretaus sprendimo, tiek pirkėjui, kuris tik komplektuoja darbų krepšelį.',
-            'highlights' => [
+            'summary'     => 'Įrankių puslapį sudėjome pagal aiškią darbo logiką: gręžimas ir tvirtinimas, pjovimas ir šlifavimas, matavimas ir sauga. Tai leidžia greitai orientuotis tiek profesionalui, kuris ieško konkretaus sprendimo, tiek pirkėjui, kuris tik komplektuoja darbų krepšelį.',
+            'highlights'  => [
                 [
-                    'title' => 'Kasdieniams darbams',
+                    'title'       => 'Kasdieniams darbams',
                     'description' => 'Akcentuojame universalius įrankius, kurie dažniausiai pasirenkami remonto ir montavimo užduotims.',
                 ],
                 [
-                    'title' => 'Tikslumui ir kontrolei',
+                    'title'       => 'Tikslumui ir kontrolei',
                     'description' => 'Matavimo bei ženklinimo priemonės padeda išvengti klaidų ir taupo darbo laiką.',
                 ],
                 [
-                    'title' => 'Saugiam darbui',
+                    'title'       => 'Saugiam darbui',
                     'description' => 'Atskiriame apsaugos ir pagalbinės įrangos grupes, kurios reikalingos ne mažiau nei pats įrankis.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Elektriniai ir akumuliatoriniai įrankiai',
+                    'title'      => 'Elektriniai ir akumuliatoriniai įrankiai',
                     'paragraphs' => [
                         'Dažniausiai ieškomi sprendimai šioje grupėje yra gręžtuvai, suktuvai, perforatoriai, kampiniai šlifuokliai, pjūklai ir kita įranga, skirta montavimo bei pjovimo darbams.',
                     ],
                 ],
                 [
-                    'title' => 'Rankiniai įrankiai ir dirbtuvių komplektacija',
+                    'title'      => 'Rankiniai įrankiai ir dirbtuvių komplektacija',
                     'paragraphs' => [
                         'Replės, veržliarakčiai, atsuktuvai, plaktukai, pjūkleliai ir įrankių laikymo sprendimai išlieka svarbia bazinės komplektacijos dalimi tiek namų meistrui, tiek profesionalui.',
                     ],
@@ -315,7 +315,7 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Matavimo, žymėjimo ir darbo saugos priemonės',
+                    'title'      => 'Matavimo, žymėjimo ir darbo saugos priemonės',
                     'paragraphs' => [
                         'Lazeriniai matuokliai, gulsčiukai, kampainiai, apsauginės pirštinės, akiniai, kvėpavimo priemonės ir kita apsauga padeda dirbti tiksliai ir saugiai.',
                     ],
@@ -324,48 +324,48 @@ return [
             ],
             'actions' => [
                 [
-                    'label' => 'Peržiūrėti katalogą',
-                    'type' => 'route',
+                    'label'  => 'Peržiūrėti katalogą',
+                    'type'   => 'route',
                     'routes' => ['localized.categories.index', 'frontend.categories.index'],
-                    'style' => 'primary',
+                    'style'  => 'primary',
                 ],
                 [
                     'label' => 'Paslaugos meistrams',
-                    'type' => 'page',
-                    'page' => 'services-for-craftsmen',
+                    'type'  => 'page',
+                    'page'  => 'services-for-craftsmen',
                     'style' => 'secondary',
                 ],
             ],
             'related_pages' => ['popular-products', 'building-materials', 'services-for-craftsmen'],
         ],
         'special-offers' => [
-            'section' => 'Prekių katalogas ir paslaugos',
-            'title' => 'Specialūs pasiūlymai ir akcijos',
+            'section'     => 'Prekių katalogas ir paslaugos',
+            'title'       => 'Specialūs pasiūlymai ir akcijos',
             'description' => 'Kaip orientuotis akciniuose pasiūlymuose, planuoti pirkinius pagal sezoną ir greitai rasti aktualias nuolaidas.',
-            'summary' => 'Specialių pasiūlymų puslapį sudėliojome ne kaip atsitiktinių nuolaidų sąrašą, o kaip orientacinį vadovą: kokių tipų akcijos dažniausiai pasitaiko, kada verta planuoti didesnį pirkimą ir kaip vertinti pasiūlymų aktualumą. Tokiu modeliu vadovaujasi ir didesni statybinių prekių e. prekybos katalogai.',
-            'highlights' => [
+            'summary'     => 'Specialių pasiūlymų puslapį sudėliojome ne kaip atsitiktinių nuolaidų sąrašą, o kaip orientacinį vadovą: kokių tipų akcijos dažniausiai pasitaiko, kada verta planuoti didesnį pirkimą ir kaip vertinti pasiūlymų aktualumą. Tokiu modeliu vadovaujasi ir didesni statybinių prekių e. prekybos katalogai.',
+            'highlights'  => [
                 [
-                    'title' => 'Trumpalaikės akcijos',
+                    'title'       => 'Trumpalaikės akcijos',
                     'description' => 'Kai kurie pasiūlymai galioja ribotą laiką arba iki konkretaus likučio išpardavimo.',
                 ],
                 [
-                    'title' => 'Sezoniniai ciklai',
+                    'title'       => 'Sezoniniai ciklai',
                     'description' => 'Dalis nuolaidų sutampa su statybų sezono pradžia, sodo darbų laikotarpiu ar metų pabaigos išpardavimais.',
                 ],
                 [
-                    'title' => 'Kompleksiniai pirkimai',
+                    'title'       => 'Kompleksiniai pirkimai',
                     'description' => 'Planuojant kelių grupių užsakymą verta vertinti ne vien vienetinę kainą, bet ir visą bendrą krepšelį.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Kaip greitai atsirinkti aktualius pasiūlymus',
+                    'title'      => 'Kaip greitai atsirinkti aktualius pasiūlymus',
                     'paragraphs' => [
                         'Akcijose paprastai verta pradėti nuo prekių, kurias jau esate numatę projekte, o ne nuo atsitiktinių nuolaidų. Taip lengviau įvertinsite realią naudą ir nepersipildysite nereikalingais pirkiniais.',
                     ],
                 ],
                 [
-                    'title' => 'Kada verta planuoti didesnį užsakymą',
+                    'title'      => 'Kada verta planuoti didesnį užsakymą',
                     'paragraphs' => [
                         'Jei projektui reikia kelių susijusių grupių, naudinga stebėti sezoninius pasiūlymus ir suplanuoti užsakymą vienu metu, kai palankios kainos taikomos medžiagoms, įrankiams ar pristatymui.',
                     ],
@@ -376,7 +376,7 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Ką verta pasitikrinti prieš perkant',
+                    'title'      => 'Ką verta pasitikrinti prieš perkant',
                     'paragraphs' => [
                         'Net ir akcinių pasiūlymų atveju verta peržiūrėti techninius parametrus, suderinamumą su kitomis medžiagomis, likučių prieinamumą ir pristatymo terminus.',
                     ],
@@ -384,48 +384,48 @@ return [
             ],
             'actions' => [
                 [
-                    'label' => 'Atverti nuolaidų puslapį',
-                    'type' => 'route',
+                    'label'  => 'Atverti nuolaidų puslapį',
+                    'type'   => 'route',
                     'routes' => ['frontend.discounts.index'],
-                    'style' => 'primary',
+                    'style'  => 'primary',
                 ],
                 [
                     'label' => 'Peržiūrėti populiariausias prekes',
-                    'type' => 'page',
-                    'page' => 'popular-products',
+                    'type'  => 'page',
+                    'page'  => 'popular-products',
                     'style' => 'secondary',
                 ],
             ],
             'related_pages' => ['popular-products', 'payment-methods', 'faq'],
         ],
         'services-for-craftsmen' => [
-            'section' => 'Prekių katalogas ir paslaugos',
-            'title' => 'Paslaugos meistrams',
+            'section'     => 'Prekių katalogas ir paslaugos',
+            'title'       => 'Paslaugos meistrams',
             'description' => 'Paslaugų ir bendradarbiavimo principų apžvalga specialistams, kurie planuoja nuolatinius ar didesnius užsakymus.',
-            'summary' => 'Paslaugų meistrams puslapį suformavome pagal B2B ir profesionalų aptarnavimo logiką: aiškiai atskiriamas medžiagų parinkimas, užsakymų komplektavimas, pristatymo planavimas ir individuali konsultacija. Tokia struktūra padeda greičiau susitarti dėl darbų ritmo ir tiekimo poreikio.',
-            'highlights' => [
+            'summary'     => 'Paslaugų meistrams puslapį suformavome pagal B2B ir profesionalų aptarnavimo logiką: aiškiai atskiriamas medžiagų parinkimas, užsakymų komplektavimas, pristatymo planavimas ir individuali konsultacija. Tokia struktūra padeda greičiau susitarti dėl darbų ritmo ir tiekimo poreikio.',
+            'highlights'  => [
                 [
-                    'title' => 'Projektinis planavimas',
+                    'title'       => 'Projektinis planavimas',
                     'description' => 'Padedame susidėlioti pirkinius pagal darbų etapus ir objekto prioritetus.',
                 ],
                 [
-                    'title' => 'Konsultacijos',
+                    'title'       => 'Konsultacijos',
                     'description' => 'Galite kreiptis dėl suderinamumo, kiekių, pristatymo ar pasiūlymų alternatyvų.',
                 ],
                 [
-                    'title' => 'Sklandus tiekimas',
+                    'title'       => 'Sklandus tiekimas',
                     'description' => 'Svarbu ne tik kaina, bet ir tai, kad prekės pasiektų objektą tinkamu laiku.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Medžiagų ir prekių parinkimas',
+                    'title'      => 'Medžiagų ir prekių parinkimas',
                     'paragraphs' => [
                         'Kai projektui reikia kelių tarpusavyje susijusių grupių, naudinga iš karto derinti ne tik pagrindines medžiagas, bet ir eksploatacinius bei montavimo priedus.',
                     ],
                 ],
                 [
-                    'title' => 'Užsakymo komplektavimas pagal darbų eigą',
+                    'title'      => 'Užsakymo komplektavimas pagal darbų eigą',
                     'paragraphs' => [
                         'Profesionalams dažnai svarbu, kad užsakymas būtų sudėliotas pagal objekto etapus, o ne vien pagal bendrą prekių sąrašą. Tai leidžia patogiau planuoti priėmimą ir sandėliavimą.',
                     ],
@@ -436,7 +436,7 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Pristatymo ir atsiėmimo derinimas',
+                    'title'      => 'Pristatymo ir atsiėmimo derinimas',
                     'paragraphs' => [
                         'Jei darbai vyksta pagal grafiką, pristatymo laikas tampa tiek pat svarbus kaip ir pati prekių kaina. Todėl iš anksto suderintas tiekimo modelis padeda išvengti prastovų objekte.',
                     ],
@@ -445,60 +445,60 @@ return [
             ],
             'actions' => [
                 [
-                    'label' => 'Susisiekti dėl bendradarbiavimo',
-                    'type' => 'route',
+                    'label'  => 'Susisiekti dėl bendradarbiavimo',
+                    'type'   => 'route',
                     'routes' => ['localized.contact.index', 'frontend.contact.index'],
-                    'style' => 'primary',
+                    'style'  => 'primary',
                 ],
                 [
                     'label' => 'Peržiūrėti statybines medžiagas',
-                    'type' => 'page',
-                    'page' => 'building-materials',
+                    'type'  => 'page',
+                    'page'  => 'building-materials',
                     'style' => 'secondary',
                 ],
             ],
             'related_pages' => ['building-materials', 'tools-equipment', 'shipping'],
         ],
         'privacy' => [
-            'section' => 'Pagalba ir informacija',
-            'title' => 'Privatumo politika',
+            'section'     => 'Pagalba ir informacija',
+            'title'       => 'Privatumo politika',
             'description' => 'Kaip tvarkome asmens duomenis, kokiu tikslu juos naudojame ir kokias teises turite jūs kaip klientas.',
-            'summary' => 'Privatumo politikos išdėstymą suformavome aiškiai ir paprastai: pirmiausia nurodome, kokius duomenis gauname, tada paaiškiname, kam jie naudojami, kaip ilgai saugomi ir kokiais atvejais galite kreiptis dėl savo teisių įgyvendinimo.',
-            'highlights' => [
+            'summary'     => 'Privatumo politikos išdėstymą suformavome aiškiai ir paprastai: pirmiausia nurodome, kokius duomenis gauname, tada paaiškiname, kam jie naudojami, kaip ilgai saugomi ir kokiais atvejais galite kreiptis dėl savo teisių įgyvendinimo.',
+            'highlights'  => [
                 [
-                    'title' => 'Duomenų apimtis',
+                    'title'       => 'Duomenų apimtis',
                     'description' => 'Tvarkome tik tuos duomenis, kurie reikalingi užsakymo vykdymui, ryšiui su klientu ir paslaugų kokybei užtikrinti.',
                 ],
                 [
-                    'title' => 'Naudojimo tikslai',
+                    'title'       => 'Naudojimo tikslai',
                     'description' => 'Duomenys naudojami užsakymų administravimui, pristatymui, atsiskaitymams ir klientų aptarnavimui.',
                 ],
                 [
-                    'title' => 'Kliento teisės',
+                    'title'       => 'Kliento teisės',
                     'description' => 'Galite prašyti susipažinti su duomenimis, juos tikslinti ar gauti daugiau informacijos apie tvarkymo pagrindą.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Kokius duomenis galime gauti',
+                    'title'      => 'Kokius duomenis galime gauti',
                     'paragraphs' => [
                         'Paprastai tai yra užsakymo vykdymui reikalingi kontaktiniai duomenys, pristatymo informacija, įmonės rekvizitai ir techniniai duomenys, susiję su svetainės naudojimu.',
                     ],
                 ],
                 [
-                    'title' => 'Kam naudojame duomenis',
+                    'title'      => 'Kam naudojame duomenis',
                     'paragraphs' => [
                         'Duomenys reikalingi tam, kad galėtume priimti užsakymą, suorganizuoti pristatymą ar atsiėmimą, pateikti mokėjimo informaciją ir atsakyti į užklausas.',
                     ],
                 ],
                 [
-                    'title' => 'Saugumas ir saugojimo terminas',
+                    'title'      => 'Saugumas ir saugojimo terminas',
                     'paragraphs' => [
                         'Duomenis saugome tiek, kiek reikia teisėtiems tvarkymo tikslams, apskaitai, klientų aptarnavimui ir teisinių prievolių vykdymui.',
                     ],
                 ],
                 [
-                    'title' => 'Jūsų teisės',
+                    'title'      => 'Jūsų teisės',
                     'paragraphs' => [
                         'Jei norite patikslinti duomenis, sužinoti apie jų naudojimą ar pateikti kitą su privatumu susijusį prašymą, susisiekite su mūsų komanda ir pateikite kuo tikslesnę užklausos informaciją.',
                     ],
@@ -506,60 +506,60 @@ return [
             ],
             'actions' => [
                 [
-                    'label' => 'Susisiekti dėl privatumo',
-                    'type' => 'route',
+                    'label'  => 'Susisiekti dėl privatumo',
+                    'type'   => 'route',
                     'routes' => ['localized.contact.index', 'frontend.contact.index'],
-                    'style' => 'primary',
+                    'style'  => 'primary',
                 ],
                 [
                     'label' => 'Pirkimo-pardavimo taisyklės',
-                    'type' => 'page',
-                    'page' => 'terms',
+                    'type'  => 'page',
+                    'page'  => 'terms',
                     'style' => 'secondary',
                 ],
             ],
             'related_pages' => ['terms', 'shipping', 'returns'],
         ],
         'terms' => [
-            'section' => 'Pagalba ir informacija',
-            'title' => 'Pirkimo-pardavimo taisyklės',
+            'section'     => 'Pagalba ir informacija',
+            'title'       => 'Pirkimo-pardavimo taisyklės',
             'description' => 'Pagrindinės nuostatos apie užsakymo sudarymą, kainas, atsiskaitymą, pristatymą ir šalių atsakomybes.',
-            'summary' => 'Taisyklių puslapį suformavome taip, kad svarbiausi punktai būtų matomi iškart: bendros nuostatos, užsakymo sudarymas, kainų ir mokėjimo tvarka, pristatymas bei ginčų sprendimo principai. Tokia seka atitinka tai, ko klientai paprastai ieško pirmiausia.',
-            'highlights' => [
+            'summary'     => 'Taisyklių puslapį suformavome taip, kad svarbiausi punktai būtų matomi iškart: bendros nuostatos, užsakymo sudarymas, kainų ir mokėjimo tvarka, pristatymas bei ginčų sprendimo principai. Tokia seka atitinka tai, ko klientai paprastai ieško pirmiausia.',
+            'highlights'  => [
                 [
-                    'title' => 'Aiškios sąlygos',
+                    'title'       => 'Aiškios sąlygos',
                     'description' => 'Svarbiausios pirkimo nuostatos pateikiamos be perteklinio teisinio sudėtingumo.',
                 ],
                 [
-                    'title' => 'Užsakymo eiga',
+                    'title'       => 'Užsakymo eiga',
                     'description' => 'Akcentuojame momentą, kada užsakymas tampa vykdomas ir kokią įtaką tam turi atsiskaitymas.',
                 ],
                 [
-                    'title' => 'Praktinis pritaikymas',
+                    'title'       => 'Praktinis pritaikymas',
                     'description' => 'Taisyklės apima ne tik dokumentinę, bet ir realią užsakymo vykdymo logiką.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Bendrosios nuostatos',
+                    'title'      => 'Bendrosios nuostatos',
                     'paragraphs' => [
                         'Pirkimo-pardavimo taisyklės apibrėžia užsakymo sudarymo, apmokėjimo, pristatymo, grąžinimo ir kitų su pirkimu susijusių procesų principus.',
                     ],
                 ],
                 [
-                    'title' => 'Užsakymo sudarymas',
+                    'title'      => 'Užsakymo sudarymas',
                     'paragraphs' => [
                         'Užsakymas laikomas pateiktu tuomet, kai pirkėjas suformuoja prekių krepšelį, pateikia reikiamus duomenis ir patvirtina pasirinktą apmokėjimo bei pristatymo būdą.',
                     ],
                 ],
                 [
-                    'title' => 'Kainos ir atsiskaitymas',
+                    'title'      => 'Kainos ir atsiskaitymas',
                     'paragraphs' => [
                         'Kainos bei galimos nuolaidos nurodomos užsakymo metu. Užsakymo vykdymas paprastai pradedamas po sėkmingo apmokėjimo arba kai kitaip suderinamos atsiskaitymo sąlygos.',
                     ],
                 ],
                 [
-                    'title' => 'Atsakomybė ir ginčų sprendimas',
+                    'title'      => 'Atsakomybė ir ginčų sprendimas',
                     'paragraphs' => [
                         'Jei kyla klausimų dėl užsakymo vykdymo, pirmiausia siekiame sprendimą rasti tiesiogiai su klientu, aiškiai įvertinant konkrečias užsakymo aplinkybes.',
                     ],
@@ -568,41 +568,41 @@ return [
             'actions' => [
                 [
                     'label' => 'Peržiūrėti apmokėjimo būdus',
-                    'type' => 'page',
-                    'page' => 'payment-methods',
+                    'type'  => 'page',
+                    'page'  => 'payment-methods',
                     'style' => 'primary',
                 ],
                 [
-                    'label' => 'Susisiekti dėl užsakymo',
-                    'type' => 'route',
+                    'label'  => 'Susisiekti dėl užsakymo',
+                    'type'   => 'route',
                     'routes' => ['localized.contact.index', 'frontend.contact.index'],
-                    'style' => 'secondary',
+                    'style'  => 'secondary',
                 ],
             ],
             'related_pages' => ['payment-methods', 'shipping', 'returns'],
         ],
         'shipping' => [
-            'section' => 'Pagalba ir informacija',
-            'title' => 'Pristatymas ir atsiėmimas',
+            'section'     => 'Pagalba ir informacija',
+            'title'       => 'Pristatymas ir atsiėmimas',
             'description' => 'Aiški pristatymo ir atsiėmimo tvarka: parduotuvė, paštomatai, pristatymas į namus, užnešimo paslauga ir veiksmai gavus siuntą.',
-            'summary' => 'Šiame puslapyje pateikiame praktinę informaciją, kuri padeda greitai pasirinkti tinkamą pristatymo būdą pagal užsakymo dydį, svorį ir terminą.',
-            'highlights' => [
+            'summary'     => 'Šiame puslapyje pateikiame praktinę informaciją, kuri padeda greitai pasirinkti tinkamą pristatymo būdą pagal užsakymo dydį, svorį ir terminą.',
+            'highlights'  => [
                 [
-                    'title' => 'Atsiėmimas parduotuvėje',
+                    'title'       => 'Atsiėmimas parduotuvėje',
                     'description' => 'Matysite, kuriose parduotuvėse galima atsiimti visą krepšelį ir kada užsakymas bus paruoštas.',
                 ],
                 [
-                    'title' => 'Paštomatai ir kurjeris',
+                    'title'       => 'Paštomatai ir kurjeris',
                     'description' => 'Pristatymo būdas priklauso nuo prekių matmenų, svorio ir konkretaus produkto prieinamumo.',
                 ],
                 [
-                    'title' => 'Sunkiasvorių prekių tvarka',
+                    'title'       => 'Sunkiasvorių prekių tvarka',
                     'description' => 'Virš 30 kg siuntoms taikoma atskira pristatymo logika, o užnešimą reikia užsakyti papildomai.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Atsiėmimas parduotuvėje',
+                    'title'      => 'Atsiėmimas parduotuvėje',
                     'paragraphs' => [
                         'Prie kiekvienos prekės pateikiame, ar galimas atsiėmimas parduotuvėje ir kuriose lokacijose galima atsiimti užsakymą.',
                         'Užsakymams, pasirenkamiems atsiėmimui parduotuvėje, gali būti taikomas užsakymo paruošimo mokestis (šiuo metu 0,38 €).',
@@ -614,14 +614,14 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Skubus atsiėmimas',
+                    'title'      => 'Skubus atsiėmimas',
                     'paragraphs' => [
                         'Kai pasirinktame atsiėmimo taške yra pakankamas likutis ir užsakymas atitinka svorio ribas, gali būti siūlomas skubus paruošimas atsiėmimui.',
                         'Pateikus ir apmokėjus užsakymą darbo dienomis, paruošimo terminas gali būti trumpesnis nei įprastai.',
                     ],
                 ],
                 [
-                    'title' => 'Pristatymas į paštomatus',
+                    'title'      => 'Pristatymas į paštomatus',
                     'paragraphs' => [
                         'Paštomatų pristatymas galimas toms prekėms, kurios atitinka siuntų operatorių taikomus matmenų ir svorio apribojimus.',
                         'Galimi LP Express, Omniva, DPD ir Itella paštomatai. Tikslūs terminai ir kaina visada pateikiami atsiskaitymo metu.',
@@ -632,7 +632,7 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Pristatymas į namus',
+                    'title'      => 'Pristatymas į namus',
                     'paragraphs' => [
                         'Pristatymo terminas nurodomas prekių krepšelyje. Užsakius kelias prekes, jos gali būti pristatytos atskirai iš skirtingų sandėlių, netaikant papildomo transporto mokesčio.',
                         'Didžiuosiuose miestuose kurjerių darbo intervalas paprastai ilgesnis nei kituose regionuose; apie tikslesnį laiką informuoja kurjerių tarnyba.',
@@ -645,7 +645,7 @@ return [
                     'note' => 'Atskiroms teritorijoms gali būti taikomas papildomas pristatymo mokestis.',
                 ],
                 [
-                    'title' => 'Užnešimo / krovos paslauga',
+                    'title'      => 'Užnešimo / krovos paslauga',
                     'paragraphs' => [
                         'Užnešimo paslaugą reikia užsakyti atsiskaitymo metu, iki užsakymo apmokėjimo.',
                         'Paslauga taikoma, kai vienos prekės svoris yra nuo 30 iki 80 kg, o bendras krepšelio svoris neviršija nustatytos ribos (dažniausiai iki 300 kg).',
@@ -653,7 +653,7 @@ return [
                     'note' => 'Paslaugos kaina apskaičiuojama pagal bendrą svorį ir rodoma atsiskaitymo žingsnyje.',
                 ],
                 [
-                    'title' => 'Tos pačios dienos pristatymas',
+                    'title'      => 'Tos pačios dienos pristatymas',
                     'paragraphs' => [
                         'Kai kuriose teritorijose darbo dienomis gali būti siūlomas tos pačios dienos pristatymas į namus.',
                         'Ši paslauga taikoma tik riboto dydžio ir svorio siuntoms, todėl jos prieinamumas priklauso nuo konkretaus krepšelio.',
@@ -664,7 +664,7 @@ return [
                     ],
                 ],
                 [
-                    'title' => 'Siuntos priėmimas ir neatitikimai',
+                    'title'      => 'Siuntos priėmimas ir neatitikimai',
                     'paragraphs' => [
                         'Priimdami siuntą patikrinkite pakuotės būklę, prekių kiekį ir akivaizdžius pažeidimus.',
                         'Jei pastebite trūkumų ar pažeidimų, juos užfiksuokite ir nedelsdami susisiekite su klientų aptarnavimu.',
@@ -680,59 +680,59 @@ return [
             'actions' => [
                 [
                     'label' => 'Peržiūrėti DUK',
-                    'type' => 'page',
-                    'page' => 'faq',
+                    'type'  => 'page',
+                    'page'  => 'faq',
                     'style' => 'primary',
                 ],
                 [
                     'label' => 'Apmokėjimo būdai',
-                    'type' => 'page',
-                    'page' => 'payment-methods',
+                    'type'  => 'page',
+                    'page'  => 'payment-methods',
                     'style' => 'secondary',
                 ],
             ],
             'related_pages' => ['faq', 'payment-methods', 'returns'],
         ],
         'returns' => [
-            'section' => 'Pagalba ir informacija',
-            'title' => 'Prekių grąžinimas ir garantija',
+            'section'     => 'Pagalba ir informacija',
+            'title'       => 'Prekių grąžinimas ir garantija',
             'description' => 'Kada galima grąžinti prekes, kaip vyksta garantinių atvejų vertinimas ir ką svarbu paruošti kreipiantis.',
-            'summary' => 'Grąžinimo ir garantijos puslapį išdėstėme taip, kad klientui nereikėtų ieškoti atskirų informacijos gabalų: vienoje vietoje matomi bendri grąžinimo principai, pasiruošimas grąžinimui, garantinių atvejų eiga ir pinigų grąžinimo ar keitimo sprendimų logika.',
-            'highlights' => [
+            'summary'     => 'Grąžinimo ir garantijos puslapį išdėstėme taip, kad klientui nereikėtų ieškoti atskirų informacijos gabalų: vienoje vietoje matomi bendri grąžinimo principai, pasiruošimas grąžinimui, garantinių atvejų eiga ir pinigų grąžinimo ar keitimo sprendimų logika.',
+            'highlights'  => [
                 [
-                    'title' => 'Grąžinimo eiga',
+                    'title'       => 'Grąžinimo eiga',
                     'description' => 'Svarbiausia aiškiai įvardyti užsakymą, prekę ir grąžinimo priežastį.',
                 ],
                 [
-                    'title' => 'Garantiniai atvejai',
+                    'title'       => 'Garantiniai atvejai',
                     'description' => 'Gedimo ar defekto vertinimas vykdomas pagal prekės tipą ir pateiktas aplinkybes.',
                 ],
                 [
-                    'title' => 'Sprendimo terminas',
+                    'title'       => 'Sprendimo terminas',
                     'description' => 'Kuo tikslesnė informacija pateikiama iš karto, tuo greičiau galima priimti sprendimą dėl keitimo, taisymo ar kompensavimo.',
                 ],
             ],
             'sections' => [
                 [
-                    'title' => 'Kada prekė gali būti grąžinama',
+                    'title'      => 'Kada prekė gali būti grąžinama',
                     'paragraphs' => [
                         'Grąžinimas galimas tuomet, kai laikomasi taikomų sąlygų, prekė nėra praradusi prekinės išvaizdos ir jos būklė leidžia įvertinti grąžinimo aplinkybes.',
                     ],
                 ],
                 [
-                    'title' => 'Kaip pasiruošti grąžinimui',
+                    'title'      => 'Kaip pasiruošti grąžinimui',
                     'paragraphs' => [
                         'Prieš kreipiantis verta turėti užsakymo numerį, pirkimo dokumentą ir trumpą situacijos aprašymą. Jei tai garantinis atvejis, naudinga pateikti ir defekto požymius arba nuotraukas.',
                     ],
                 ],
                 [
-                    'title' => 'Garantinių atvejų vertinimas',
+                    'title'      => 'Garantinių atvejų vertinimas',
                     'paragraphs' => [
                         'Garantinis aptarnavimas vertinamas pagal prekės pobūdį, naudojimo aplinkybes ir pateiktą informaciją. Atsižvelgiant į situaciją, gali būti siūlomas taisymas, keitimas ar kitas tinkamas sprendimas.',
                     ],
                 ],
                 [
-                    'title' => 'Pinigų grąžinimas arba keitimas',
+                    'title'      => 'Pinigų grąžinimas arba keitimas',
                     'paragraphs' => [
                         'Jei grąžinimas patvirtinamas, sprendimas dėl kompensavimo, keitimo ar kito tęstinio veiksmo įgyvendinamas pagal konkretaus atvejo aplinkybes ir taikomą tvarką.',
                     ],
@@ -740,15 +740,15 @@ return [
             ],
             'actions' => [
                 [
-                    'label' => 'Susisiekti dėl grąžinimo',
-                    'type' => 'route',
+                    'label'  => 'Susisiekti dėl grąžinimo',
+                    'type'   => 'route',
                     'routes' => ['localized.contact.index', 'frontend.contact.index'],
-                    'style' => 'primary',
+                    'style'  => 'primary',
                 ],
                 [
                     'label' => 'Peržiūrėti pristatymo informaciją',
-                    'type' => 'page',
-                    'page' => 'shipping',
+                    'type'  => 'page',
+                    'page'  => 'shipping',
                     'style' => 'secondary',
                 ],
             ],

@@ -39,4 +39,3 @@ class EditNotification extends EditRecord
         return parent::getRedirectUrl();
     }
 }
-

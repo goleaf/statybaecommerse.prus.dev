@@ -16,7 +16,7 @@ class CreateProductImage extends CreateRecord
     protected static string $resource = ProductImageResource::class;
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param array<string, mixed> $data
      */
     protected function handleRecordCreation(array $data): Model
     {

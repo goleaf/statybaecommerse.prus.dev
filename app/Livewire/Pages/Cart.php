@@ -64,7 +64,20 @@ class Cart extends Component
         if ($cartItem !== null) {
             $productId = (int) $cartItem->product_id;
             $cartItem->delete();
+        }
+
+        if ($productId) {
             $this->removeFromSessionCart($productId);
+        } else {
+            $this->removeFromSessionCart($id);
+        }
+
+        if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
+            $sessionId = $this->resolveSessionId();
+            \Darryldecode\Cart\Facades\CartFacade::session($sessionId)->remove($id);
+            if ($productId) {
+                \Darryldecode\Cart\Facades\CartFacade::session($sessionId)->remove($productId);
+            }
         }
 
         $this->dispatch('cart-updated');
@@ -83,21 +96,34 @@ class Cart extends Component
     /**
      * Handle updateItemQuantity functionality with proper error handling.
      */
-    public function updateItemQuantity(int $id, int $quantity, ?int $productId = null): void
+    public function updateItemQuantity(int $id, mixed $quantity, ?int $productId = null): void
     {
+        $quantity = is_numeric($quantity) ? (int) $quantity : 0;
         $quantity = max(0, $quantity);
         $cartItem = $this->resolveCartItem($id, $productId);
 
         if ($cartItem === null) {
-            return;
-        }
-
-        if ($quantity === 0) {
-            $productId = (int) $cartItem->product_id;
-            $cartItem->delete();
-            $this->removeFromSessionCart($productId);
+            if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
+                $sessionId = $this->resolveSessionId();
+                if ($quantity === 0) {
+                    \Darryldecode\Cart\Facades\CartFacade::session($sessionId)->remove($id);
+                } else {
+                    \Darryldecode\Cart\Facades\CartFacade::session($sessionId)->update($id, [
+                        'quantity' => [
+                            'relative' => false,
+                            'value'    => $quantity,
+                        ],
+                    ]);
+                }
+            }
         } else {
-            $cartItem->updateQuantity($quantity);
+            if ($quantity === 0) {
+                $productId = (int) $cartItem->product_id;
+                $cartItem->delete();
+                $this->removeFromSessionCart($productId);
+            } else {
+                $cartItem->updateQuantity($quantity);
+            }
         }
 
         $this->dispatch('cart-updated');
@@ -112,10 +138,15 @@ class Cart extends Component
         $cartItem = $this->resolveCartItem($id, $productId);
 
         if ($cartItem === null) {
-            return;
+            if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
+                $sessionId = $this->resolveSessionId();
+                \Darryldecode\Cart\Facades\CartFacade::session($sessionId)->update($id, [
+                    'quantity' => ['relative' => true, 'value' => 1],
+                ]);
+            }
+        } else {
+            $cartItem->incrementQuantity(1);
         }
-
-        $cartItem->incrementQuantity(1);
 
         $this->dispatch('cart-updated');
         $this->refreshTotals();
@@ -129,15 +160,20 @@ class Cart extends Component
         $cartItem = $this->resolveCartItem($id, $productId);
 
         if ($cartItem === null) {
-            return;
-        }
-
-        if ((int) $cartItem->quantity <= 1) {
-            $productId = (int) $cartItem->product_id;
-            $cartItem->delete();
-            $this->removeFromSessionCart($productId);
+            if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
+                $sessionId = $this->resolveSessionId();
+                \Darryldecode\Cart\Facades\CartFacade::session($sessionId)->update($id, [
+                    'quantity' => ['relative' => true, 'value' => -1],
+                ]);
+            }
         } else {
-            $cartItem->decrementQuantity(1);
+            if ((int) $cartItem->quantity <= 1) {
+                $productId = (int) $cartItem->product_id;
+                $cartItem->delete();
+                $this->removeFromSessionCart($productId);
+            } else {
+                $cartItem->decrementQuantity(1);
+            }
         }
 
         $this->dispatch('cart-updated');

@@ -385,4 +385,3 @@ final class SitemapService
         return Schema::hasTable($table);
     }
 }
-

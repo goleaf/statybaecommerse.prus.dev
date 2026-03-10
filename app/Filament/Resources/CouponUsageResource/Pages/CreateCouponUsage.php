@@ -39,4 +39,3 @@ class CreateCouponUsage extends CreateRecord
         return parent::getRedirectUrl();
     }
 }
-

@@ -23,11 +23,6 @@ final class GenerateOrderInvoiceJob implements ShouldQueue
 
     public int $tries = 5;
 
-    /**
-     * @param  int  $orderId
-     * @param  bool  $force
-     * @param  string  $mode
-     */
     public function __construct(
         private readonly int $orderId,
         private readonly bool $force = false,

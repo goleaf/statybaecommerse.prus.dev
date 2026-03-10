@@ -117,4 +117,3 @@ final class ProductController extends Controller
         return redirect()->to($request->fullUrlWithQuery(['category' => $categorySlug]), 301);
     }
 }
-

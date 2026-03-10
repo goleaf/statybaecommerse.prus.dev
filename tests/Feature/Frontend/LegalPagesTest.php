@@ -173,7 +173,7 @@ final class LegalPagesTest extends TestCase
                     'is_required' => true,
                 ],
                 'expectedTitle' => 'Privatumo politika',
-                'expectedBody' => 'Ši privatumo politika paaiškina, kaip renkame, naudojame ir saugome jūsų asmens duomenis naudojantis mūsų svetaine bei paslaugomis.',
+                'expectedBody'  => 'Ši privatumo politika paaiškina, kaip renkame, naudojame ir saugome jūsų asmens duomenis naudojantis mūsų svetaine bei paslaugomis.',
             ],
             'terms page repairs title and body' => [
                 'routeName' => 'localized.legal.terms',
@@ -183,7 +183,7 @@ final class LegalPagesTest extends TestCase
                     'is_required' => true,
                 ],
                 'expectedTitle' => 'Naudojimosi sąlygos',
-                'expectedBody' => 'Naudodamiesi svetaine sutinkate su šiomis sąlygomis. Prieš pateikdami užsakymą, susipažinkite su visa sąlygų redakcija.',
+                'expectedBody'  => 'Naudodamiesi svetaine sutinkate su šiomis sąlygomis. Prieš pateikdami užsakymą, susipažinkite su visa sąlygų redakcija.',
             ],
             'cookie page repairs title and body' => [
                 'routeName' => 'localized.legal.cookies',
@@ -192,7 +192,7 @@ final class LegalPagesTest extends TestCase
                     'type' => 'cookie_policy',
                 ],
                 'expectedTitle' => 'Slapukų politika',
-                'expectedBody' => 'Slapukus naudojame svetainės funkcionalumui, analitikai ir turinio personalizavimui. Daugiau informacijos rasite šiame dokumente.',
+                'expectedBody'  => 'Slapukus naudojame svetainės funkcionalumui, analitikai ir turinio personalizavimui. Daugiau informacijos rasite šiame dokumente.',
             ],
         ];
     }

@@ -21,8 +21,8 @@ use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Facades\Schema as SchemaFacade;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Schema as SchemaFacade;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -322,6 +322,7 @@ final class Index extends Component implements HasSchemas
                 });
             });
     }
+
     /**
      * @return SupportCollection<int, array{category: Category, depth: int}>
      */
@@ -406,7 +407,7 @@ final class Index extends Component implements HasSchemas
     }
 
     /**
-     * @param  array<int, EloquentCollection<int, Category>>  $categoriesByParent
+     * @param  array<int, EloquentCollection<int, Category>>                 $categoriesByParent
      * @return SupportCollection<int, array{category: Category, depth: int}>
      */
     private function flattenCategoryRows(array $categoriesByParent, int $parentId, int $depth): SupportCollection
@@ -429,7 +430,7 @@ final class Index extends Component implements HasSchemas
     }
 
     /**
-     * @param  EloquentCollection<int, Category>  $siblings
+     * @param  EloquentCollection<int, Category> $siblings
      * @return EloquentCollection<int, Category>
      */
     private function sortCategorySiblings(EloquentCollection $siblings): EloquentCollection
@@ -440,7 +441,7 @@ final class Index extends Component implements HasSchemas
                 $rightName = mb_strtolower((string) $right->name);
 
                 return match ($this->sort) {
-                    'name_desc' => strcmp($rightName, $leftName),
+                    'name_desc'     => strcmp($rightName, $leftName),
                     'products_desc' => ((int) ($right->products_count ?? 0) <=> (int) ($left->products_count ?? 0))
                         ?: strcmp($leftName, $rightName),
                     'products_asc' => ((int) ($left->products_count ?? 0) <=> (int) ($right->products_count ?? 0))
@@ -452,7 +453,7 @@ final class Index extends Component implements HasSchemas
     }
 
     /**
-     * @param  Builder<Product>  $query
+     * @param  Builder<Product> $query
      * @return Builder<Product>
      */
     private function applyActiveProductFilters(Builder $query): Builder
@@ -478,7 +479,7 @@ final class Index extends Component implements HasSchemas
     }
 
     /**
-     * @param  Builder<Product>  $query
+     * @param  Builder<Product> $query
      * @return Builder<Product>
      */
     private function applyInStockProductFilter(Builder $query): Builder

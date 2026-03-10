@@ -35,7 +35,7 @@ final class InfoPages
     }
 
     /**
-     * @param  array<int, string>  $keys
+     * @param  array<int, string>                                                      $keys
      * @return array<int, array{title: string, description: string|null, url: string}>
      */
     public static function resolveRelatedPages(array $keys): array
@@ -51,7 +51,7 @@ final class InfoPages
             }
 
             $pages[] = [
-                'title' => (string) ($page['title'] ?? $key),
+                'title'       => (string) ($page['title'] ?? $key),
                 'description' => isset($page['description']) && is_string($page['description'])
                     ? $page['description']
                     : null,
@@ -63,7 +63,7 @@ final class InfoPages
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $actions
+     * @param  array<int, array<string, mixed>>                             $actions
      * @return array<int, array{label: string, url: string, style: string}>
      */
     public static function resolveActions(array $actions): array
@@ -81,7 +81,7 @@ final class InfoPages
 
             $resolved[] = [
                 'label' => $label,
-                'url' => $url,
+                'url'   => $url,
                 'style' => $style,
             ];
         }
@@ -92,23 +92,23 @@ final class InfoPages
     public static function resolvePageUrl(string $key): ?string
     {
         return match ($key) {
-            'faq' => self::routeUrl(['localized.info.faq', 'frontend.info.faq']),
-            'payment-methods' => self::routeUrl(['localized.info.payment-methods', 'frontend.info.payment-methods']),
-            'popular-products' => self::routeUrl(['localized.info.popular-products', 'frontend.info.popular-products']),
-            'building-materials' => self::routeUrl(['localized.info.building-materials', 'frontend.info.building-materials']),
-            'tools-equipment' => self::routeUrl(['localized.info.tools-equipment', 'frontend.info.tools-equipment']),
-            'special-offers' => self::routeUrl(['localized.info.special-offers', 'frontend.info.special-offers']),
+            'faq'                    => self::routeUrl(['localized.info.faq', 'frontend.info.faq']),
+            'payment-methods'        => self::routeUrl(['localized.info.payment-methods', 'frontend.info.payment-methods']),
+            'popular-products'       => self::routeUrl(['localized.info.popular-products', 'frontend.info.popular-products']),
+            'building-materials'     => self::routeUrl(['localized.info.building-materials', 'frontend.info.building-materials']),
+            'tools-equipment'        => self::routeUrl(['localized.info.tools-equipment', 'frontend.info.tools-equipment']),
+            'special-offers'         => self::routeUrl(['localized.info.special-offers', 'frontend.info.special-offers']),
             'services-for-craftsmen' => self::routeUrl(['localized.info.services-for-craftsmen', 'frontend.info.services-for-craftsmen']),
-            'privacy' => self::routeUrl(['localized.legal.privacy']),
-            'terms' => self::routeUrl(['localized.legal.terms']),
-            'shipping' => self::routeUrl(['localized.legal.shipping']),
-            'returns' => self::routeUrl(['localized.legal.returns']),
-            default => null,
+            'privacy'                => self::routeUrl(['localized.legal.privacy']),
+            'terms'                  => self::routeUrl(['localized.legal.terms']),
+            'shipping'               => self::routeUrl(['localized.legal.shipping']),
+            'returns'                => self::routeUrl(['localized.legal.returns']),
+            default                  => null,
         };
     }
 
     /**
-     * @param  array<string, mixed>  $action
+     * @param array<string, mixed> $action
      */
     private static function resolveActionUrl(array $action): ?string
     {
@@ -139,7 +139,7 @@ final class InfoPages
     }
 
     /**
-     * @param  array<int, string>  $routeNames
+     * @param array<int, string> $routeNames
      */
     private static function routeUrl(array $routeNames): ?string
     {

@@ -21,20 +21,20 @@ final class OrderInvoiceFactory extends Factory
         $fullNumber = 'INV-' . $this->faker->numerify('######');
 
         return [
-            'order_id'             => Order::factory(),
-            'file_id'              => null,
-            'external_invoice_id'  => (string) $this->faker->numberBetween(1000, 999999),
-            'invoice_series'       => 'INV',
-            'invoice_number'       => (string) $this->faker->numberBetween(1, 99999),
-            'full_number'          => $fullNumber,
-            'invoice_type'         => 'sf',
-            'status'               => OrderInvoice::STATUS_READY,
-            'is_current'           => true,
-            'generation_mode'      => OrderInvoice::MODE_AUTO,
-            'provider_payload'     => ['factory' => true],
-            'error_message'        => null,
-            'generated_at'         => now(),
-            'failed_at'            => null,
+            'order_id'            => Order::factory(),
+            'file_id'             => null,
+            'external_invoice_id' => (string) $this->faker->numberBetween(1000, 999999),
+            'invoice_series'      => 'INV',
+            'invoice_number'      => (string) $this->faker->numberBetween(1, 99999),
+            'full_number'         => $fullNumber,
+            'invoice_type'        => 'sf',
+            'status'              => OrderInvoice::STATUS_READY,
+            'is_current'          => true,
+            'generation_mode'     => OrderInvoice::MODE_AUTO,
+            'provider_payload'    => ['factory' => true],
+            'error_message'       => null,
+            'generated_at'        => now(),
+            'failed_at'           => null,
         ];
     }
 

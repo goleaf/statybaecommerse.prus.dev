@@ -251,7 +251,7 @@ final class ProductFilterWidget extends Component
     {
         return view('livewire.components.product-filter', [
             'availableCategories' => $this->availableCategories,
-            'availableBrands' => $this->availableBrands,
+            'availableBrands'     => $this->availableBrands,
             'availableAttributes' => $this->availableAttributes,
         ]);
     }
@@ -259,16 +259,16 @@ final class ProductFilterWidget extends Component
     private function dispatchFilters(): void
     {
         $this->dispatch('filter-updated', filters: [
-            'search' => $this->search,
-            'categories' => $this->normalizeIdList($this->categories),
-            'brands' => $this->normalizeIdList($this->brands),
+            'search'             => $this->search,
+            'categories'         => $this->normalizeIdList($this->categories),
+            'brands'             => $this->normalizeIdList($this->brands),
             'selectedAttributes' => $this->normalizeSelectedAttributes($this->selectedAttributes),
-            'minPrice' => $this->minPrice,
-            'maxPrice' => $this->maxPrice,
-            'inStock' => $this->inStock,
-            'onSale' => $this->onSale,
-            'sortBy' => $this->sortBy,
-            'sortDirection' => $this->sortDirection,
+            'minPrice'           => $this->minPrice,
+            'maxPrice'           => $this->maxPrice,
+            'inStock'            => $this->inStock,
+            'onSale'             => $this->onSale,
+            'sortBy'             => $this->sortBy,
+            'sortDirection'      => $this->sortDirection,
         ]);
     }
 

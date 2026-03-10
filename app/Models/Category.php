@@ -1142,4 +1142,3 @@ final class Category extends Model implements HasMedia
         return '(?i)^(?!(?:' . implode('|', $escaped) . ')$)[a-z0-9\\-]+$';
     }
 }
-

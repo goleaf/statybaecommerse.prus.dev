@@ -17,8 +17,6 @@ return [
     'sandbox'    => env('MONTONIO_SANDBOX', true),
     'demo_mode'  => env('MONTONIO_DEMO_MODE', false),
 
-
-
     /*
     |--------------------------------------------------------------------------
     | Montonio API URLs

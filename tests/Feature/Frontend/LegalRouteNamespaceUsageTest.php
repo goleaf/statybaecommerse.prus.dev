@@ -52,4 +52,3 @@ it('does not reference removed frontend legal route names in runtime code', func
 
     expect($violations)->toBe([], implode(PHP_EOL, $violations));
 });
-

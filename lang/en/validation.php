@@ -13,7 +13,7 @@ return array_replace_recursive($base, [
         'email'                 => 'email address',
         'password'              => 'password',
         'password_confirmation' => 'password confirmation',
-        'loginForm' => [
+        'loginForm'             => [
             'email'           => 'email address',
             'password'        => 'password',
             'captchaToken'    => 'security token',

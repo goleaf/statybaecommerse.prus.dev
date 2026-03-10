@@ -24,8 +24,8 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
-use Tests\Support\PdfFixture;
 use Livewire\Livewire;
+use Tests\Support\PdfFixture;
 
 uses(RefreshDatabase::class);
 

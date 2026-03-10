@@ -31,6 +31,7 @@ use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Throwable;
 use Tiptap\Editor;
 
 /**
@@ -311,7 +312,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             $html = trim((string) $editor->getHTML());
 
             return $html !== '' ? $html : null;
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return null;
         }
     }

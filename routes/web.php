@@ -1030,4 +1030,3 @@ Route::get('/{locale}/{path?}', function (string $locale, ?string $path, Request
     'locale' => 'lt',
     'path'   => '.*',
 ]);
-

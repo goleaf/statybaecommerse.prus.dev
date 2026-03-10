@@ -703,4 +703,3 @@ class Show extends Component
         return in_array($operator, ['less_than', 'greater_than', 'equals_to', 'not_equals_to'], true);
     }
 }
-

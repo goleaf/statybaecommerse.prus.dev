@@ -14,12 +14,17 @@ final class OrderInvoice extends Model
     use HasFactory;
 
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_READY = 'ready';
+
     public const STATUS_FAILED = 'failed';
+
     public const STATUS_REFUNDED = 'refunded';
 
     public const MODE_AUTO = 'auto';
+
     public const MODE_MANUAL = 'manual';
+
     public const MODE_BACKFILL = 'backfill';
 
     protected $fillable = [

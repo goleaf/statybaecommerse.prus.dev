@@ -39,4 +39,3 @@ class EditCouponUsage extends EditRecord
         return parent::getRedirectUrl();
     }
 }
-

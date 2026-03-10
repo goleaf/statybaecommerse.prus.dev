@@ -17,18 +17,18 @@ beforeEach(function (): void {
 
 it('clones an attached image without reassigning the source owner', function (): void {
     $sourceProduct = Product::factory()->create([
-        'status' => 'published',
+        'status'       => 'published',
         'published_at' => now(),
     ]);
 
     $targetProduct = Product::factory()->create([
-        'status' => 'published',
+        'status'       => 'published',
         'published_at' => now(),
     ]);
 
     $sourceImage = ProductImage::factory()->create([
         'product_id' => $sourceProduct->getKey(),
-        'path' => 'product-images/shared-source.jpg',
+        'path'       => 'product-images/shared-source.jpg',
         'sort_order' => 0,
         'is_default' => true,
     ]);
@@ -46,20 +46,20 @@ it('does not delete a shared file path while another image record still referenc
     Storage::disk('public')->put('product-images/shared-file.jpg', 'shared-content');
 
     $product = Product::factory()->create([
-        'status' => 'published',
+        'status'       => 'published',
         'published_at' => now(),
     ]);
 
     $first = ProductImage::factory()->create([
         'product_id' => $product->getKey(),
-        'path' => 'product-images/shared-file.jpg',
+        'path'       => 'product-images/shared-file.jpg',
         'sort_order' => 0,
         'is_default' => true,
     ]);
 
     $second = ProductImage::factory()->create([
         'product_id' => $product->getKey(),
-        'path' => 'product-images/shared-file.jpg',
+        'path'       => 'product-images/shared-file.jpg',
         'sort_order' => 1,
         'is_default' => false,
     ]);
@@ -75,13 +75,13 @@ it('deletes the old file when updating an image with a new uploaded file', funct
     Storage::disk('public')->put('product-images/old-update-image.jpg', 'old-content');
 
     $product = Product::factory()->create([
-        'status' => 'published',
+        'status'       => 'published',
         'published_at' => now(),
     ]);
 
     $image = ProductImage::factory()->create([
         'product_id' => $product->getKey(),
-        'path' => 'product-images/old-update-image.jpg',
+        'path'       => 'product-images/old-update-image.jpg',
         'sort_order' => 0,
         'is_default' => true,
     ]);
@@ -90,7 +90,7 @@ it('deletes the old file when updating an image with a new uploaded file', funct
 
     $service = app(ProductImageWriteService::class);
     $updated = $service->update($image, [
-        'path' => $replacementUpload,
+        'path'     => $replacementUpload,
         'alt_text' => 'Updated image',
     ]);
 

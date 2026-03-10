@@ -54,7 +54,7 @@ Route::middleware(['web'])->group(function () {
 
     // Cart
     Route::prefix('cart')->name('frontend.cart.')->group(function () {
-        Route::get('/', [App\Http\Controllers\Frontend\CartController::class, 'index'])->name('index');
+        Route::get('/', \App\Livewire\Pages\Cart::class)->name('index');
         Route::post('/items', [App\Http\Controllers\Frontend\CartController::class, 'add'])->name('add');
         Route::match(['post', 'patch'], '/items/update/{cartItem?}', [App\Http\Controllers\Frontend\CartController::class, 'update'])->name('update');
         Route::match(['post', 'delete'], '/items/remove/{cartItem?}', [App\Http\Controllers\Frontend\CartController::class, 'remove'])->name('remove');

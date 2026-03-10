@@ -134,4 +134,3 @@ final class NavigationMenu extends Component
         return view('livewire.components.navigation');
     }
 }
-

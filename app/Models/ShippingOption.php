@@ -194,6 +194,6 @@ final class ShippingOption extends Model
             return (int) $min . '-' . (int) $max . ' day(s)';
         }
 
-        return (($min !== null ? (int) $min : (int) $max)) . ' day(s)';
+        return ($min !== null ? (int) $min : (int) $max) . ' day(s)';
     }
 }

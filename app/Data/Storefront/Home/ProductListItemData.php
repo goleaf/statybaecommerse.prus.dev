@@ -192,4 +192,3 @@ final class ProductListItemData implements Arrayable
         ];
     }
 }
-

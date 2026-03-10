@@ -76,11 +76,6 @@
                 @else
                     <div class="grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
                         <section class="space-y-4">
-                            <div class="rounded-xl border border-gray-200 bg-white p-5">
-                                <h2 class="text-lg font-semibold text-gray-900">{{ __('messages.cart_items') }}</h2>
-                                <p class="text-sm text-gray-600">{{ $totalQuantity }} {{ __('messages.items_in_your_cart') }}</p>
-                            </div>
-
                             <div class="space-y-4">
                                 @foreach ($itemsCollection as $item)
                                     @php
@@ -97,8 +92,8 @@
                                         $itemQuantity = (int) ($item->quantity ?? 0);
                                     @endphp
                                     <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                                        <div class="flex flex-wrap items-center justify-between gap-5 lg:flex-nowrap">
-                                            <div class="flex min-w-0 flex-1 items-center gap-4">
+                                        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                                            <div class="flex min-w-0 w-full flex-1 items-center gap-4">
                                                 <div class="h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
                                                     @if ($productUrl !== '#')
                                                         <a href="{{ $productUrl }}" class="block h-full w-full">
@@ -136,29 +131,30 @@
                                                 </div>
                                             </div>
 
-                                            <div class="flex items-center gap-3">
-                                                <div class="inline-flex h-11 items-center rounded-lg border border-gray-300 bg-white">
+                                            <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+                                                <div class="inline-flex items-center self-start rounded-lg border border-gray-300 sm:self-auto">
                                                     <button type="button"
                                                             wire:click="decrementItem({{ $cartItemId }}, {{ $productId }})"
                                                             wire:loading.attr="disabled"
-                                                            class="inline-flex h-10 w-10 items-center justify-center text-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
-                                                            title="{{ __('translations.decrease_quantity') }}">
+                                                            class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                                                            title="{{ __('translations.decrease_quantity') }}"
+                                                            {{ $itemQuantity <= 1 ? 'disabled' : '' }}>
                                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                                                         </svg>
                                                     </button>
                                                     <input type="number"
-                                                           min="0"
+                                                           min="1"
                                                            step="1"
                                                            value="{{ $itemQuantity }}"
-                                                           wire:input="updateItemQuantity({{ $cartItemId }}, $event.target.value, {{ $productId }})"
+                                                           wire:change="updateItemQuantity({{ $cartItemId }}, $el.value, {{ $productId }})"
                                                            wire:loading.attr="disabled"
                                                            inputmode="numeric"
-                                                           class="h-10 w-16 border-x border-gray-300 bg-white text-center text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-primary/30" />
+                                                           class="w-16 px-3 py-2 text-center border-0 focus:ring-0 focus:outline-none bg-transparent" />
                                                     <button type="button"
                                                             wire:click="incrementItem({{ $cartItemId }}, {{ $productId }})"
                                                             wire:loading.attr="disabled"
-                                                            class="inline-flex h-10 w-10 items-center justify-center text-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+                                                            class="px-3 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                                                             title="{{ __('translations.increase_quantity') }}">
                                                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -166,7 +162,7 @@
                                                     </button>
                                                 </div>
 
-                                                <p class="min-w-[110px] text-right text-lg font-bold text-gray-900">
+                                                <p class="text-lg font-bold text-gray-900 sm:min-w-[110px] sm:text-right">
                                                         {{ \Illuminate\Support\Number::currency((float) $item->price * (int) $item->quantity, current_currency(), app()->getLocale()) }}
                                                 </p>
 
@@ -174,7 +170,7 @@
                                                         wire:confirm="{{ __('translations.confirm_remove_cart_item') }}"
                                                         wire:loading.attr="disabled"
                                                         title="{{ __('translations.remove_item_from_cart') }}"
-                                                        class="inline-flex h-11 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 text-sm font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-50">
+                                                        class="inline-flex h-11 w-full items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 text-sm font-medium text-red-600 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
                                                     {{ __('messages.remove') }}
                                                 </button>
                                             </div>

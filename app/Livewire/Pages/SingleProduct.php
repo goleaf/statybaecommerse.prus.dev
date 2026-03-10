@@ -999,7 +999,6 @@ final class SingleProduct extends Component
         return true;
     }
 
-
     /**
      * @param SupportCollection<int, array<string, mixed>> $candidateVariants
      */
@@ -1305,6 +1304,7 @@ final class SingleProduct extends Component
             'currency' => function_exists('current_currency') ? current_currency() : null,
         ];
     }
+
     protected function buildPricingSummary(?ProductVariant $variant = null): array
     {
         $currency = function_exists('current_currency') ? current_currency() : null;

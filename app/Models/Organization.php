@@ -152,7 +152,7 @@ final class Organization extends Model
             'id',
             'id'
         )->join('organization_user', 'organization_user.user_id', '=', 'users.id')
-         ->where('organization_user.organization_id', $this->id);
+            ->where('organization_user.organization_id', $this->id);
     }
 
     /**

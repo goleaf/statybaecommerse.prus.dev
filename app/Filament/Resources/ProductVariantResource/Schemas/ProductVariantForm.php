@@ -191,7 +191,6 @@ class ProductVariantForm
     }
 
     /**
-     * @param  mixed $state
      * @return array<int, array{attribute_id:int, attribute_value_id:int}>
      */
     public static function normalizeAttributeSelections(mixed $state): array
@@ -407,7 +406,7 @@ class ProductVariantForm
     }
 
     /**
-     * @param  array<string, mixed> $matrix
+     * @param  array<string, mixed>                                        $matrix
      * @return array<int, array{attribute_id:int, attribute_value_id:int}>
      */
     private static function normalizeSelectionsFromMatrix(array $matrix): array

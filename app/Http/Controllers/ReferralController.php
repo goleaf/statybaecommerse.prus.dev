@@ -288,7 +288,7 @@ final class ReferralController extends Controller
                 [$year, $month] = array_map('intval', explode('-', $yearMonth));
 
                 return (object) [
-                    'year' => $year,
+                    'year'  => $year,
                     'month' => $month,
                     'count' => $groupedRows->count(),
                 ];

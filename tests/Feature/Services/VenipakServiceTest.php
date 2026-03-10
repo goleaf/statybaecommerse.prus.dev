@@ -14,7 +14,7 @@ it('fetches pickup points successfully', function () {
         ], 200),
     ]);
 
-    $service = new VenipakService();
+    $service = new VenipakService;
     $pickupPoints = $service->getPickupPoints('LT');
 
     expect($pickupPoints)->toBeArray()
@@ -27,7 +27,7 @@ it('generates shipping labels successfully', function () {
         '*/print_label' => Http::response('mock_pdf_content', 200),
     ]);
 
-    $service = new VenipakService();
+    $service = new VenipakService;
     $pdf = $service->getLabels(['V123', 'V124']);
 
     expect($pdf)->toBe('mock_pdf_content');
@@ -38,8 +38,8 @@ it('dispatches order successfully', function () {
     config()->set('venipak.password', 'test_pass');
 
     $order = Order::factory()->create();
-    
-    $service = new VenipakService();
+
+    $service = new VenipakService;
     // Assuming simple return array simulation as defined in service
     $response = $service->dispatchOrder($order, 2);
 

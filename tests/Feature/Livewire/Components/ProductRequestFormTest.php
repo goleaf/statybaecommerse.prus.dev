@@ -50,4 +50,3 @@ final class ProductRequestFormTest extends TestCase
         ]);
     }
 }
-

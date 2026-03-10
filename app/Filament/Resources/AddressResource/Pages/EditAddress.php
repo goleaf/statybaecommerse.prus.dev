@@ -39,4 +39,3 @@ class EditAddress extends EditRecord
         return parent::getRedirectUrl();
     }
 }
-

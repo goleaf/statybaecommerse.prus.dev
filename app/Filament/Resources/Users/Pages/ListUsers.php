@@ -20,7 +20,7 @@ class ListUsers extends ListRecords
     public function getTabs(): array
     {
         return [
-            'all'     => Tab::make(__('common.all'))
+            'all' => Tab::make(__('common.all'))
                 ->key('all'),
             'company' => Tab::make(__('messages.company'))
                 ->key('company')

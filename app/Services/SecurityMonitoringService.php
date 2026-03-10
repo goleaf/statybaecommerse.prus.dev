@@ -172,7 +172,7 @@ final class SecurityMonitoringService
     }
 
     /**
-     * @param  list<string>  $patterns
+     * @param list<string> $patterns
      */
     private function checkPatterns(Request $request, array $patterns): bool
     {
@@ -206,7 +206,7 @@ final class SecurityMonitoringService
     }
 
     /**
-     * @param  list<string>  $threats
+     * @param list<string> $threats
      */
     private function updateThreatCounters(string $ip, array $threats): void
     {
@@ -233,7 +233,7 @@ final class SecurityMonitoringService
     }
 
     /**
-     * @param  list<string>  $threats
+     * @param list<string> $threats
      */
     private function trackSuspiciousActivity(string $ip, array $threats): void
     {

@@ -22,7 +22,7 @@ final class DirectoryMemoryManager
             return;
         }
 
-        $normalizedDirectory = rtrim($directory, "/\\");
+        $normalizedDirectory = rtrim($directory, '/\\');
         $this->recentDirectories[$normalizedDirectory] = time();
 
         $this->cleanupIfNeeded();
@@ -37,7 +37,7 @@ final class DirectoryMemoryManager
             return [];
         }
 
-        $normalizedPrefix = $this->normalizeForMatching(rtrim($prefix, "/\\") . DIRECTORY_SEPARATOR);
+        $normalizedPrefix = $this->normalizeForMatching(rtrim($prefix, '/\\') . DIRECTORY_SEPARATOR);
 
         return array_keys(array_filter(
             $this->recentDirectories,

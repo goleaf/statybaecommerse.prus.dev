@@ -73,11 +73,11 @@ final class AutocompleteServiceTest extends TestCase
         ]);
 
         ProductImage::factory()->create([
-            'product_id'  => $product->getKey(),
-            'path'        => 'product-images/test-image.jpg',
-            'is_active'   => true,
-            'is_default'  => true,
-            'sort_order'  => 0,
+            'product_id' => $product->getKey(),
+            'path'       => 'product-images/test-image.jpg',
+            'is_active'  => true,
+            'is_default' => true,
+            'sort_order' => 0,
         ]);
 
         $results = app(AutocompleteService::class)->searchProducts('Kniedė Bralo aliuminis', 10);
@@ -92,7 +92,7 @@ final class AutocompleteServiceTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $overrides
+     * @param array<string, mixed> $overrides
      */
     private function createSearchableProduct(array $overrides = []): Product
     {

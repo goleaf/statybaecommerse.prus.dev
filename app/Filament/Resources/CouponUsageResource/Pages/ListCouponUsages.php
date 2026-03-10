@@ -19,4 +19,3 @@ class ListCouponUsages extends ListRecords
         ];
     }
 }
-

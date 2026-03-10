@@ -341,4 +341,3 @@ final class SEOService
         return is_string($value) ? $value : '';
     }
 }
-

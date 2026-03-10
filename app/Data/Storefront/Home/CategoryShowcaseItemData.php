@@ -91,4 +91,3 @@ final class CategoryShowcaseItemData implements Arrayable
         ];
     }
 }
-

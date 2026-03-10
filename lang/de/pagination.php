@@ -12,4 +12,3 @@ return [
     'results'    => 'Ergebnisse',
     'go_to_page' => 'Gehe zu Seite :page',
 ];
-

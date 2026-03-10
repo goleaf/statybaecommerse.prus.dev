@@ -47,9 +47,9 @@ final class BrandBrowsingTest extends TestCase
 
         foreach (range(1, 13) as $index) {
             $this->createPublishedProduct([
-                'brand_id' => $brand->id,
-                'name' => "Wkret Product {$index}",
-                'slug' => "wkret-product-{$index}",
+                'brand_id'     => $brand->id,
+                'name'         => "Wkret Product {$index}",
+                'slug'         => "wkret-product-{$index}",
                 'published_at' => Carbon::now()->subMinutes($index),
             ]);
         }
@@ -123,10 +123,10 @@ final class BrandBrowsingTest extends TestCase
         $brand = Brand::factory()->create(['name' => 'Featured Filter Brand']);
         $category = Category::factory()->create();
         $regularProduct = $this->createPublishedProduct([
-            'brand_id'     => $brand->id,
-            'name'         => 'Regular Product',
-            'slug'         => 'regular-product',
-            'is_featured'  => false,
+            'brand_id'       => $brand->id,
+            'name'           => 'Regular Product',
+            'slug'           => 'regular-product',
+            'is_featured'    => false,
             'stock_quantity' => 10,
         ]);
         $regularProduct->categories()->attach($category->id);

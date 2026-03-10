@@ -66,4 +66,3 @@ final class LanguageSwitcher extends Component
         return $links;
     }
 }
-

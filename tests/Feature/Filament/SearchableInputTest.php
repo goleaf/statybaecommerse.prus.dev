@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Filament\Resources\CartItemResource;
 use App\Filament\Resources\InventoryResource;
 use App\Filament\Resources\OrderItemResource;
-use App\Filament\Resources\PriceResource;
 use App\Filament\Resources\ProductRequestResource;
 use App\Models\Product;
 use App\Support\Filament\Components\SearchableInput;

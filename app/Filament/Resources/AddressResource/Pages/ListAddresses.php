@@ -19,4 +19,3 @@ class ListAddresses extends ListRecords
         ];
     }
 }
-

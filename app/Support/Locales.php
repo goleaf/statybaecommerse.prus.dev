@@ -102,4 +102,3 @@ final class Locales
         return $targetUrl ?? url('/');
     }
 }
-

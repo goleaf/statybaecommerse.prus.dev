@@ -6,7 +6,6 @@ namespace App\Services\Dashboard;
 
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Config;
 

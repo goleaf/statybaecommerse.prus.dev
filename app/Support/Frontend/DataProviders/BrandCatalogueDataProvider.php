@@ -61,16 +61,16 @@ final class BrandCatalogueDataProvider
         }
 
         return [
-            'brand'               => $brand,
-            'products'            => $products,
-            'availableSorts'      => $this->products->sortOptions(),
-            'availableFilters'    => $this->products->filterOptions(),
-            'activeSort'          => $this->products->resolveSortKey($filters['sort'] ?? null),
-            'activeFilter'        => $filters['filter'] ?? null,
-            'availableCategories' => $availableCategories,
-            'relatedCategories'   => $availableCategories,
+            'brand'                   => $brand,
+            'products'                => $products,
+            'availableSorts'          => $this->products->sortOptions(),
+            'availableFilters'        => $this->products->filterOptions(),
+            'activeSort'              => $this->products->resolveSortKey($filters['sort'] ?? null),
+            'activeFilter'            => $filters['filter'] ?? null,
+            'availableCategories'     => $availableCategories,
+            'relatedCategories'       => $availableCategories,
             'categoryProductSections' => $categoryProductSections,
-            'filters'             => $filtersWithBrand,
+            'filters'                 => $filtersWithBrand,
         ];
     }
 

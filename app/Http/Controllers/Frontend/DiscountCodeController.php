@@ -14,7 +14,6 @@ use App\Services\Discounts\DiscountEngine;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -343,5 +342,4 @@ final class DiscountCodeController extends Controller
 
         return response()->json(['codes' => $codes->all()]);
     }
-
 }

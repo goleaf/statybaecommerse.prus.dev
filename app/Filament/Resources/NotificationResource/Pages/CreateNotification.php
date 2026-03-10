@@ -39,4 +39,3 @@ class CreateNotification extends CreateRecord
         return parent::getRedirectUrl();
     }
 }
-

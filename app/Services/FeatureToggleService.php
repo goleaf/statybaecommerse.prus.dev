@@ -45,7 +45,7 @@ class FeatureToggleService
     /**
      * Resolve the list of zero-decimal currencies for the current context.
      *
-     * @param  array<string, mixed>  $context
+     * @param  array<string, mixed> $context
      * @return list<string>
      */
     public function getZeroDecimalCurrencies(array $context = []): array
@@ -86,7 +86,7 @@ class FeatureToggleService
     }
 
     /**
-     * @param  array<string, mixed>  $context
+     * @param array<string, mixed> $context
      */
     private function isCurrencyZeroDecimalOverridesEnabled(array $context): bool
     {
@@ -105,7 +105,7 @@ class FeatureToggleService
     }
 
     /**
-     * @param  array<string, mixed>  $context
+     * @param array<string, mixed> $context
      */
     private function resolveEnvironment(array $context): string
     {
@@ -119,7 +119,7 @@ class FeatureToggleService
     }
 
     /**
-     * @param  array<string, mixed>  $context
+     * @param array<string, mixed> $context
      */
     private function resolveRolloutSubjectKey(array $context): string
     {
@@ -137,7 +137,7 @@ class FeatureToggleService
     }
 
     /**
-     * @param  array<string, mixed>  $context
+     * @param array<string, mixed> $context
      */
     private function evaluateCurrencyFeatureFromConfig(string $environment, array $context): bool
     {
@@ -161,7 +161,7 @@ class FeatureToggleService
     }
 
     /**
-     * @param  array<string, mixed>  $context
+     * @param array<string, mixed> $context
      */
     private function evaluateCurrencyFeatureFromDatabase(string $environment, array $context): ?bool
     {
@@ -263,7 +263,6 @@ class FeatureToggleService
     }
 
     /**
-     * @param  mixed  $codes
      * @return list<string>
      */
     private function normalizeCurrencyCodes(mixed $codes): array

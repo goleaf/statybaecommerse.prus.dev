@@ -39,4 +39,3 @@ class CreateAddress extends CreateRecord
         return parent::getRedirectUrl();
     }
 }
-

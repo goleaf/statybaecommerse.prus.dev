@@ -18,7 +18,7 @@ return array_replace_recursive($base, [
     'min'        => [
         'string' => ':attribute turi būti bent :min simbolių.',
     ],
-    'max'        => [
+    'max' => [
         'string' => ':attribute negali būti ilgesnis nei :max simbolių.',
     ],
     'attributes' => [
@@ -27,7 +27,7 @@ return array_replace_recursive($base, [
         'email'                 => 'el. paštas',
         'password'              => 'slaptažodis',
         'password_confirmation' => 'slaptažodžio patvirtinimas',
-        'loginForm' => [
+        'loginForm'             => [
             'email'           => 'el. paštas',
             'password'        => 'slaptažodis',
             'captchaToken'    => 'saugos žetonas',

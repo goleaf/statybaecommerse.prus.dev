@@ -68,7 +68,7 @@ final class CategoryCatalogueDataProvider
     }
 
     /**
-     * @param array<string, mixed> $filters
+     * @param  array<string, mixed> $filters
      * @return array<string, mixed>
      */
     private function sanitizeFilters(array $filters): array
@@ -121,5 +121,4 @@ final class CategoryCatalogueDataProvider
             ->limit(6)
             ->get();
     }
-
 }

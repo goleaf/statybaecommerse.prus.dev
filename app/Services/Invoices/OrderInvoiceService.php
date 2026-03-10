@@ -597,8 +597,7 @@ final readonly class OrderInvoiceService
         ?string $externalInvoiceId,
         ?string $fullNumber,
         string $binary
-    ): string
-    {
+    ): string {
         $baseName = trim((string) ($fullNumber ?? ''));
         if ($baseName === '') {
             $baseName = trim((string) ($externalInvoiceId ?? ''));

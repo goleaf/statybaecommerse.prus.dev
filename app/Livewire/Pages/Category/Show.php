@@ -388,7 +388,7 @@ final class Show extends Component implements HasForms
     }
 
     /**
-     * @param  BelongsToMany<Product, Category>  $query
+     * @param BelongsToMany<Product, Category> $query
      */
     private function applyInStockProductFilter(BelongsToMany $query): void
     {
