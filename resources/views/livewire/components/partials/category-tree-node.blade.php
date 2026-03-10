@@ -2,9 +2,9 @@
 
 @php
     $hasChildren = !empty($category['children']) && count($category['children']) > 0;
-    $categoryUrl = route('frontend.categories.show', [
-        'category' => $category['slug']
-    ]);
+    $categorySlug = trim((string) ($category['slug'] ?? ''), '/');
+    $categoryUrl = $categorySlug !== '' ? url('/categories/' . $categorySlug) : url('/categories');
+    $totalProductsCount = (int) ($category['aggregate_products_count'] ?? $category['products_count'] ?? 0);
 @endphp
 
 @if($level === 0)
@@ -16,9 +16,7 @@
     >
         <div class="category-link-content">
             <span class="category-name">{{ $category['name'] }}</span>
-            @if(isset($category['products_count']) && $category['products_count'] > 0)
-                <span class="category-count">{{ $category['products_count'] }}</span>
-            @endif
+            <span class="category-count">{{ $totalProductsCount }}</span>
             @if($hasChildren)
                 <svg class="category-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -44,7 +42,9 @@
                 @foreach($category['children'] as $child)
                     @php
                         $childHasChildren = !empty($child['children']) && count($child['children']) > 0;
-                        $childUrl = route('frontend.categories.show', ['category' => $child['slug']]);
+                        $childSlug = trim((string) ($child['slug'] ?? ''), '/');
+                        $childUrl = $childSlug !== '' ? url('/categories/' . $childSlug) : url('/categories');
+                        $childTotalProductsCount = (int) ($child['aggregate_products_count'] ?? $child['products_count'] ?? 0);
                     @endphp
                     <div class="popup-item-wrapper level-2-wrapper">
                         <a 
@@ -54,9 +54,7 @@
                         >
                             <div class="popup-item-content">
                                 <span class="popup-item-name">{{ $child['name'] }}</span>
-                                @if(isset($child['products_count']) && $child['products_count'] > 0)
-                                    <span class="popup-item-count">{{ $child['products_count'] }}</span>
-                                @endif
+                                <span class="popup-item-count">{{ $childTotalProductsCount }}</span>
                                 @if($childHasChildren)
                                     <svg class="popup-item-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -81,7 +79,9 @@
                                 <div class="popup-list level-3-list">
                                     @foreach($child['children'] as $grandchild)
                                         @php
-                                            $grandchildUrl = route('frontend.categories.show', ['category' => $grandchild['slug']]);
+                                            $grandchildSlug = trim((string) ($grandchild['slug'] ?? ''), '/');
+                                            $grandchildUrl = $grandchildSlug !== '' ? url('/categories/' . $grandchildSlug) : url('/categories');
+                                            $grandchildTotalProductsCount = (int) ($grandchild['aggregate_products_count'] ?? $grandchild['products_count'] ?? 0);
                                         @endphp
                                         <div class="popup-item-wrapper level-3-wrapper">
                                             <a 
@@ -91,9 +91,7 @@
                                             >
                                                 <div class="popup-item-content">
                                                     <span class="popup-item-name">{{ $grandchild['name'] }}</span>
-                                                    @if(isset($grandchild['products_count']) && $grandchild['products_count'] > 0)
-                                                        <span class="popup-item-count">{{ $grandchild['products_count'] }}</span>
-                                                    @endif
+                                                    <span class="popup-item-count">{{ $grandchildTotalProductsCount }}</span>
                                                 </div>
                                             </a>
                                         </div>

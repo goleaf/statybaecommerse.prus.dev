@@ -33,31 +33,127 @@ final class CategorySidebar extends Component
     {
         $locale = app()->getLocale();
 
-        return TagAwareCache::remember("category_tree:{$locale}", now()->addMinutes(30), function () {
-            $roots = Category::query()->withProductCounts()->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale()), 'children' => function ($q) {
-                $q->withProductCounts()->with(['translations' => fn ($q) => $q->where('locale', app()->getLocale())])->visible()->ordered();
-            }])->visible()->roots()->ordered()->get();
+        return TagAwareCache::remember("category_tree:v2:{$locale}", now()->addMinutes(30), function () use ($locale) {
+            $allVisibleCategories = Category::query()
+                ->withProductCounts()
+                ->with([
+                    'translations' => fn ($q) => $q->where('locale', $locale),
+                ])
+                ->visible()
+                ->ordered()
+                ->get();
 
-            return $this->buildTree($roots, 0);
+            $categoriesById = [];
+            $childrenByParentId = [];
+            $directProductCounts = [];
+
+            foreach ($allVisibleCategories as $category) {
+                $categoryId = (int) $category->id;
+                $parentId = $category->parent_id !== null ? (int) $category->parent_id : null;
+
+                $categoriesById[$categoryId] = $category;
+                $childrenByParentId[$parentId][] = $categoryId;
+                $directProductCounts[$categoryId] = (int) ($category->products_count ?? 0);
+            }
+
+            $aggregateCounts = [];
+
+            return $this->buildTreeFromCategoryIds(
+                $childrenByParentId[null] ?? [],
+                0,
+                $categoriesById,
+                $childrenByParentId,
+                $directProductCounts,
+                $aggregateCounts
+            );
         }, [CacheKeys::homeTag()]);
     }
 
     /**
-     * Handle buildTree functionality with proper error handling.
+     * Build tree nodes for the sidebar up to maxDepth while keeping aggregate
+     * counts calculated across the full descendant hierarchy.
      *
-     * @param mixed $categories
+     * @param array<int, int>                  $categoryIds
+     * @param array<int, \App\Models\Category> $categoriesById
+     * @param array<int|null, array<int, int>> $childrenByParentId
+     * @param array<int, int>                  $directProductCounts
+     * @param array<int, int>                  $aggregateCounts
+     *
+     * @return array<int, array<string, mixed>>
      */
-    private function buildTree($categories, int $depth): array
-    {
+    private function buildTreeFromCategoryIds(
+        array $categoryIds,
+        int $depth,
+        array $categoriesById,
+        array $childrenByParentId,
+        array $directProductCounts,
+        array &$aggregateCounts
+    ): array {
         if ($depth >= $this->maxDepth) {
             return [];
         }
 
-        return $categories->map(function ($category) use ($depth) {
-            $children = $category->children->isNotEmpty() ? $this->buildTree($category->children, $depth + 1) : [];
+        $tree = [];
 
-            return ['id' => $category->id, 'slug' => method_exists($category, 'trans') ? $category->trans('slug') ?? $category->slug : $category->slug, 'name' => method_exists($category, 'trans') ? $category->trans('name') ?? $category->name : $category->name, 'description' => $category->description, 'products_count' => $category->products_count ?? 0, 'has_children' => $category->children->isNotEmpty(), 'children' => $children, 'depth' => $depth];
-        })->toArray();
+        foreach ($categoryIds as $categoryId) {
+            $category = $categoriesById[$categoryId] ?? null;
+
+            if (! $category instanceof Category) {
+                continue;
+            }
+
+            $childIds = $childrenByParentId[$categoryId] ?? [];
+            $children = $this->buildTreeFromCategoryIds(
+                $childIds,
+                $depth + 1,
+                $categoriesById,
+                $childrenByParentId,
+                $directProductCounts,
+                $aggregateCounts
+            );
+
+            $tree[] = [
+                'id'                       => $categoryId,
+                'slug'                     => method_exists($category, 'trans') ? $category->trans('slug') ?? $category->slug : $category->slug,
+                'name'                     => method_exists($category, 'trans') ? $category->trans('name') ?? $category->name : $category->name,
+                'description'              => $category->description,
+                'products_count'           => $directProductCounts[$categoryId] ?? 0,
+                'aggregate_products_count' => $this->resolveAggregateProductsCount($categoryId, $childrenByParentId, $directProductCounts, $aggregateCounts),
+                'has_children'             => $childIds !== [],
+                'children'                 => $children,
+                'depth'                    => $depth,
+            ];
+        }
+
+        return $tree;
+    }
+
+    /**
+     * Resolve product count as (self + all descendants) with memoization.
+     *
+     * @param array<int|null, array<int, int>> $childrenByParentId
+     * @param array<int, int>                  $directProductCounts
+     * @param array<int, int>                  $aggregateCounts
+     */
+    private function resolveAggregateProductsCount(
+        int $categoryId,
+        array $childrenByParentId,
+        array $directProductCounts,
+        array &$aggregateCounts
+    ): int {
+        if (array_key_exists($categoryId, $aggregateCounts)) {
+            return $aggregateCounts[$categoryId];
+        }
+
+        $total = (int) ($directProductCounts[$categoryId] ?? 0);
+
+        foreach ($childrenByParentId[$categoryId] ?? [] as $childId) {
+            $total += $this->resolveAggregateProductsCount($childId, $childrenByParentId, $directProductCounts, $aggregateCounts);
+        }
+
+        $aggregateCounts[$categoryId] = $total;
+
+        return $total;
     }
 
     /**

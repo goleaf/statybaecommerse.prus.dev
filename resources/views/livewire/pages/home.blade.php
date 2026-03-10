@@ -2,7 +2,7 @@
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 gap-8 py-8 lg:grid-cols-4">
             <aside class="lg:col-span-1">
-                <div class="sticky top-4 space-y-6 z-30">
+                <div class="home-category-sidebar space-y-4 z-30 lg:sticky lg:top-4">
                     <livewire:components.category-sidebar />
                 </div>
             </aside>
