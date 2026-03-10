@@ -124,4 +124,56 @@ final class IndexTest extends TestCase
         $this->assertContains($variantInStockCategory->id, $filteredIds);
         $this->assertNotContains($outOfStockCategory->id, $filteredIds);
     }
+
+    public function test_brand_facet_counts_ignore_selected_brand_filter(): void
+    {
+        $selectedBrand = Brand::factory()->create([
+            'name' => 'Selected Brand',
+        ]);
+        $otherBrand = Brand::factory()->create([
+            'name' => 'Other Brand',
+        ]);
+
+        $selectedCategory = Category::factory()->create([
+            'name'       => 'Selected Brand Category',
+            'is_visible' => true,
+        ]);
+        $otherCategory = Category::factory()->create([
+            'name'       => 'Other Brand Category',
+            'is_visible' => true,
+        ]);
+
+        $selectedBrandProduct = Product::factory()->create([
+            'brand_id' => $selectedBrand->id,
+        ]);
+        $selectedBrandProduct->categories()->attach($selectedCategory->id);
+
+        $otherBrandProduct = Product::factory()->create([
+            'brand_id' => $otherBrand->id,
+        ]);
+        $otherBrandProduct->categories()->attach($otherCategory->id);
+
+        $component = Livewire::test(Index::class);
+
+        /** @var array{id: int, name: string, count: int}|null $otherFacetBefore */
+        $otherFacetBefore = collect($component->instance()->facetBrands)->firstWhere('id', $otherBrand->id);
+        $this->assertNotNull($otherFacetBefore);
+        $this->assertSame(1, $otherFacetBefore['count']);
+
+        $component->set('selectedBrandIds', [$selectedBrand->id]);
+
+        /** @var array{id: int, name: string, count: int}|null $otherFacetAfter */
+        $otherFacetAfter = collect($component->instance()->facetBrands)->firstWhere('id', $otherBrand->id);
+        $this->assertNotNull($otherFacetAfter);
+        $this->assertSame(1, $otherFacetAfter['count']);
+
+        /** @var \Illuminate\Support\Collection<int, array{category: \App\Models\Category, depth: int}> $filteredRows */
+        $filteredRows = $component->instance()->categories;
+        $filteredIds = $filteredRows
+            ->map(static fn (array $row): int => (int) $row['category']->id)
+            ->all();
+
+        $this->assertContains($selectedCategory->id, $filteredIds);
+        $this->assertNotContains($otherCategory->id, $filteredIds);
+    }
 }

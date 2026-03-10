@@ -202,7 +202,7 @@ final class Index extends Component implements HasSchemas
     public function facetBrands(): array
     {
         $locale = app()->getLocale();
-        $filters = $this->filtersForCache();
+        $filters = $this->filtersForCache(includeBrandFilters: false);
 
         return TagAwareCache::remember(
             CacheKeys::categoryIndexFacetBrands($locale, $filters),
@@ -211,7 +211,8 @@ final class Index extends Component implements HasSchemas
                 $facetCountingService = app(FacetCountingService::class);
                 $facetCountingService->resetQueryCount();
 
-                return $facetCountingService->getBrandFacets($this->baseProductQuery());
+                // Keep the brand facet stable when a brand is selected; only dependent facets should narrow.
+                return $facetCountingService->getBrandFacets($this->baseProductQuery(includeBrandFilter: false));
             },
             $this->tagsForCategoryIndex([
                 CacheTags::brands(),
@@ -294,13 +295,16 @@ final class Index extends Component implements HasSchemas
     /**
      * @return Builder<Product>
      */
-    private function baseProductQuery(): Builder
+    private function baseProductQuery(bool $includeBrandFilter = true): Builder
     {
         return Product::query()
             ->visible()
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
-            ->when(! empty($this->selectedBrandIds), fn (Builder $q): Builder => $q->whereIn('brand_id', $this->selectedBrandIds))
+            ->when(
+                $includeBrandFilter && ! empty($this->selectedBrandIds),
+                fn (Builder $q): Builder => $q->whereIn('brand_id', $this->selectedBrandIds)
+            )
             ->when(
                 ! empty($this->selectedCollectionIds),
                 fn (Builder $q): Builder => $q->whereHas(
@@ -543,11 +547,11 @@ final class Index extends Component implements HasSchemas
     /**
      * @return array<string, mixed>
      */
-    private function filtersForCache(): array
+    private function filtersForCache(bool $includeBrandFilters = true): array
     {
         return [
             'search'                => $this->search,
-            'selectedBrandIds'      => $this->normalizeIds($this->selectedBrandIds),
+            'selectedBrandIds'      => $includeBrandFilters ? $this->normalizeIds($this->selectedBrandIds) : [],
             'selectedCollectionIds' => $this->normalizeIds($this->selectedCollectionIds),
             'selectedCategoryIds'   => $this->normalizeIds($this->selectedCategoryIds),
             'inStock'               => $this->inStock,

@@ -1,62 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Frontend\CartTest" file="Cart (Tests\Feature\Frontend\Cart)" tests="2" assertions="2" errors="1" failures="1" skipped="0" time="16.727075">
-    <testcase name="Guest can clear cart" file="Cart (Tests\Feature\Frontend\Cart)::Guest can clear cart" class="Tests\Feature\Frontend\CartTest" classname="Tests.Feature.Frontend.CartTest" assertions="2" time="16.499891">
-      <failure type="PHPUnit\Framework\ExpectationFailedException">Guest can clear cartUnable to find JSON: &#13;
-&#13;
-[{
-    "success": true,
-    "message": "Cart cleared successfully."
-}]&#13;
-&#13;
-within response JSON:&#13;
-&#13;
-[{
-    "success": true,
-    "message": "Krepšelis sėkmingai išvalytas.",
-    "cart": {
-        "item_count": 0,
-        "items": [],
-        "totals": {
-            "subtotal": 0,
-            "tax": 0,
-            "shipping": 0,
-            "discount": 0,
-            "total": 0
-        }
-    },
-    "summary": {
-        "item_count": 0,
-        "subtotal": 0,
-        "tax": 0,
-        "shipping": 0,
-        "discount": 0,
-        "total": 0
-    }
-}].&#13;
-&#13;
-
-Failed asserting that an array has the subset Array &amp;0 [
-    'success' =&gt; true,
-    'message' =&gt; 'Cart cleared successfully.',
-].&#13;
-at vendor\laravel\framework\src\Illuminate\Testing\Constraints\ArraySubset.php:80
-at vendor\laravel\framework\src\Illuminate\Testing\Assert.php:36
-at vendor\laravel\framework\src\Illuminate\Testing\AssertableJsonString.php:319
-at vendor\laravel\framework\src\Illuminate\Testing\TestResponse.php:856
-at tests\Feature\Frontend\CartTest.php:47</failure>
-    </testcase>
-    <testcase name="Authenticated user can clear cart" file="Cart (Tests\Feature\Frontend\Cart)::Authenticated user can clear cart" class="Tests\Feature\Frontend\CartTest" classname="Tests.Feature.Frontend.CartTest" assertions="0" time="0.227184">
-      <error type="ValueError">Authenticated user can clear cartValueError: Unknown format specifier "i"&#13;
-at database\factories\UserFactory.php:34
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:550
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:529
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:513
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Concerns\GuardsAttributes.php:157
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:512
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:429
-at vendor\laravel\framework\src\Illuminate\Database\Eloquent\Factories\Factory.php:318
-at tests\Feature\Frontend\CartTest.php:61</error>
-    </testcase>
+  <testsuite name="Tests\Feature\Livewire\Pages\Category\IndexTest" file="Index (Tests\Feature\Livewire\Pages\Category\Index)" tests="5" assertions="14" errors="0" failures="0" skipped="0" time="14.791729">
+    <testcase name="Localized categories route renders when visible categories exist" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::Localized categories route renders when visible categories exist" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="1" time="13.820546"/>
+    <testcase name="Brand facet counts ignore selected brand filter" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::Brand facet counts ignore selected brand filter" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="6" time="0.284802"/>
+    <testcase name="It filters categories by selected brand checkboxes" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::It filters categories by selected brand checkboxes" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="2" time="0.248720"/>
+    <testcase name="It hides categories without in stock products when in stock filter is enabled" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::It hides categories without in stock products when in stock filter is enabled" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="3" time="0.250141"/>
+    <testcase name="It renders successfully" file="Index (Tests\Feature\Livewire\Pages\Category\Index)::It renders successfully" class="Tests\Feature\Livewire\Pages\Category\IndexTest" classname="Tests.Feature.Livewire.Pages.Category.IndexTest" assertions="2" time="0.187520"/>
   </testsuite>
 </testsuites>
