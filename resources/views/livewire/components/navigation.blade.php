@@ -60,6 +60,8 @@
             : (Route::has('frontend.contact.index')
                 ? route('frontend.contact.index')
                 : url('/contact'));
+        $supportPhone = (string) (app_setting('company_phone') ?: '+370 695 72123');
+        $supportPhoneHref = preg_replace('/[^\d+]/', '', $supportPhone) ?: '+37069572123';
         $socialFacebookTopbarUrl = 'https://www.facebook.com/p/Egis-statyba-100076148592033/';
         $quickLinks = collect([
             [
@@ -104,13 +106,13 @@
     <section class="hidden text-dark sm:block border-b border-ash bg-sage">
         <div class="container mx-auto flex justify-between gap-10 h-9 px-5">
             <div class="flex items-center gap-5 sm:gap-8">
-                <a href="tel:{{ __('frontend.header.topbar.phone_href') }}"
+                <a href="tel:{{ $supportPhoneHref }}"
                     class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M2.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S8.838 3 6 3 2.25 4.612 2.25 6.75zM2.25 17.25c0 2.138 1.912 3.75 3.75 3.75S9.75 19.388 9.75 17.25 7.838 13.5 6 13.5s-3.75 1.612-3.75 3.75zM14.25 6.75c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75S20.088 3 18.25 3s-3.75 1.612-3.75 3.75zM14.25 17.25c0 2.138 1.912 3.75 3.75 3.75s3.75-1.612 3.75-3.75-1.912-3.75-3.75-3.75-3.75 1.612-3.75 3.75z" />
                     </svg>
-                    <span class="hidden sm:block">{{ __('frontend.header.topbar.phone') }}</span>
+                    <span class="hidden sm:block">{{ $supportPhone }}</span>
                 </a>
                 <a href="mailto:{{ __('frontend.header.topbar.email_href') }}"
                     class="flex items-center group gap-2 hover:text-stone transition-colors">
@@ -137,13 +139,13 @@
                     </svg>
                     <span class="hidden sm:block">{{ __('frontend.header.topbar.consultations') }}</span>
                 </a>
-                <a href="tel:{{ __('frontend.header.topbar.phone_href') }}"
+                <a href="tel:{{ $supportPhoneHref }}"
                     class="flex items-center group gap-2 hover:text-stone transition-colors">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M2 5a2 2 0 012-2h2l2 5-2 1a14 14 0 006 6l1-2 5 2v2a2 2 0 01-2 2h-1C9.163 19 5 14.837 5 9V8a2 2 0 00-2-2z" />
                     </svg>
-                    <span class="hidden sm:block">{{ __('frontend.header.topbar.phone') }}</span>
+                    <span class="hidden sm:block">{{ $supportPhone }}</span>
                 </a>
                 <a href="{{ $socialFacebookTopbarUrl }}" target="_blank" rel="noopener noreferrer"
                     class="inline-flex items-center justify-center rounded-full p-1.5 hover:text-stone transition-colors"

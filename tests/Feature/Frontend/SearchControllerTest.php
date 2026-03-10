@@ -143,4 +143,26 @@ final class SearchControllerTest extends TestCase
         $this->assertSame('mat', $query['q'] ?? null);
         $this->assertSame($category->slug, $query['category'] ?? null);
     }
+
+    public function test_search_page_renders_homepage_category_menu_in_sidebar(): void
+    {
+        app()->setLocale('lt');
+
+        Category::factory()->create([
+            'name'       => 'Statybinės medžiagos',
+            'slug'       => 'statybines-medziagos',
+            'is_active'  => true,
+            'is_visible' => true,
+        ]);
+
+        $response = $this->get(route('frontend.search.index', [
+            'q' => 'as',
+        ]));
+
+        $response->assertOk()
+            ->assertSee('category-sidebar', false)
+            ->assertSee('Statybinės medžiagos')
+            ->assertDontSee('id="search-category"', false)
+            ->assertDontSee(__('frontend.search.refine_title'));
+    }
 }

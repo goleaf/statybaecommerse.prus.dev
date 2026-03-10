@@ -100,14 +100,14 @@
             </div>
         @elseif(count($results) > 0)
             {{-- Search Results --}}
-            <div class="py-2">
+            <div class="space-y-1 p-2">
                 @foreach($results as $index => $result)
                     <button
                         wire:click="selectResult({{ json_encode($result) }})"
-                        class="w-full px-4 py-3 text-left hover:bg-sage/20 hover:text-white focus:bg-sage/20 focus:text-white focus:outline-none transition-all duration-200 ease-in-out group"
+                        class="group w-full rounded-xl border border-transparent px-4 py-3 text-left text-sage transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-sage/30 hover:bg-sage/10 hover:text-white hover:shadow-lg hover:ring-1 hover:ring-sage/20 focus:-translate-y-0.5 focus:border-sage/30 focus:bg-sage/20 focus:text-white focus:outline-none focus:shadow-lg focus:ring-1 focus:ring-sage/20"
                         x-on:mouseenter="setHoveredIndex({{ $index }})"
                         x-on:mouseleave="clearHoveredIndex({{ $index }})"
-                        :class="{ 'bg-sage/20 text-white': isHighlightedIndex({{ $index }}) }"
+                        :class="{ 'border-sage/30 bg-sage/20 text-white shadow-lg ring-1 ring-sage/20 -translate-y-0.5': isHighlightedIndex({{ $index }}) }"
                     >
                         <div class="flex items-center space-x-3">
                             {{-- Result Image --}}
@@ -123,20 +123,20 @@
                                     <img
                                         src="{{ $image }}"
                                         alt="{{ $result['title'] }}"
-                                        class="w-12 h-12 object-cover rounded-lg"
+                                        class="h-12 w-12 rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
                                     />
                                 @else
-                                    <div class="w-12 h-12 bg-sage/10 rounded-lg flex items-center justify-center">
+                                    <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-sage/10 transition-all duration-200 group-hover:scale-105 group-hover:bg-white/10">
                                         @if($result['type'] === 'product')
-                                            <svg class="w-6 h-6 text-sage/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="h-6 w-6 text-sage/70 transition-colors duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                             </svg>
                                         @elseif($result['type'] === 'category')
-                                            <svg class="w-6 h-6 text-sage/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="h-6 w-6 text-sage/70 transition-colors duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                             </svg>
                                         @elseif($result['type'] === 'brand')
-                                            <svg class="w-6 h-6 text-sage/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg class="h-6 w-6 text-sage/70 transition-colors duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                                             </svg>
                                         @endif
@@ -154,31 +154,31 @@
                                 @endphp
 
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-sm font-medium text-sage group-hover:text-white truncate transition-colors duration-200">
+                                    <h3 class="truncate text-sm font-medium text-sage transition-colors duration-200 group-hover:text-white">
                                         {!! $titleHtml !!}
                                     </h3>
                                     @if(isset($result['formatted_price']))
-                                        <span class="text-sm font-semibold text-sage group-hover:text-white/90 transition-colors duration-200">
+                                        <span class="text-sm font-semibold text-sage transition-colors duration-200 group-hover:text-white/90">
                                             {{ $result['formatted_price'] }}
                                         </span>
                                     @endif
                                 </div>
 
                                 @if(! empty($result['subtitle']))
-                                    <p class="text-sm text-sage/70 group-hover:text-sage/90 truncate transition-colors duration-200">
+                                    <p class="truncate text-sm text-sage/70 transition-colors duration-200 group-hover:text-sage/95">
                                         {!! $subtitleHtml !!}
                                     </p>
                                 @endif
 
                                 @if($descriptionPreview)
-                                    <p class="text-xs text-sage/50 group-hover:text-sage/80 truncate transition-colors duration-200">
+                                    <p class="truncate text-xs text-sage/50 transition-colors duration-200 group-hover:text-sage/85">
                                         {{ $descriptionPreview }}
                                     </p>
                                 @endif
                                 
                                 {{-- Type Badge --}}
                                 <div class="mt-1">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
+                                    <span class="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium transition-colors duration-200 group-hover:bg-white/10 group-hover:text-white
                                         @if($result['type'] === 'product') bg-sage/20 text-sage
                                         @elseif($result['type'] === 'category') bg-sage/20 text-sage
                                         @elseif($result['type'] === 'brand') bg-sage/20 text-sage
@@ -191,7 +191,7 @@
                             
                             {{-- Arrow Icon --}}
                             <div class="flex-shrink-0">
-                                <svg class="w-5 h-5 text-sage/70 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-5 w-5 text-sage/70 transition-all duration-200 group-hover:translate-x-1 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                 </svg>
                             </div>
@@ -201,12 +201,15 @@
             </div>
             
             {{-- View All Results Link --}}
-            <div class="border-t border-sage/30">
+            <div class="border-t border-sage/30 px-2 py-2">
                 <a 
                     href="{{ route('frontend.search.index', ['q' => $query]) }}"
-                    class="block w-full px-4 py-3 text-center text-sm font-medium text-sage/70 hover:bg-sage/20 hover:text-sage focus:bg-sage/20 focus:text-sage focus:outline-none transition-all duration-200 ease-in-out"
+                    class="block w-full rounded-xl border border-transparent px-4 py-3 text-center text-sm font-medium text-white/90 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-sage/30 hover:bg-sage/10 hover:text-white focus:-translate-y-0.5 focus:border-sage/30 focus:bg-sage/20 focus:text-white focus:outline-none"
+                    style="color: #ffffff !important;"
                 >
-                    {{ __('frontend.search.view_all_results') }}
+                    <span style="color: #ffffff !important;">
+                        {{ __('frontend.search.view_all_results') }}
+                    </span>
                 </a>
             </div>
         @elseif(strlen($query) >= $minQueryLength)
@@ -255,28 +258,28 @@
             @endif
             
             {{-- Suggestions List --}}
-            <div class="py-2">
+            <div class="space-y-1 p-2">
                 @foreach($suggestions as $index => $suggestion)
                     <button
                         wire:click="selectSuggestion({{ json_encode($suggestion) }})"
-                        class="w-full px-4 py-3 text-left hover:bg-sage/20 hover:text-white focus:bg-sage/20 focus:text-white focus:outline-none transition-all duration-200 ease-in-out group"
+                        class="group w-full rounded-xl border border-transparent px-4 py-3 text-left text-sage transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-sage/30 hover:bg-sage/10 hover:text-white hover:shadow-lg hover:ring-1 hover:ring-sage/20 focus:-translate-y-0.5 focus:border-sage/30 focus:bg-sage/20 focus:text-white focus:outline-none focus:shadow-lg focus:ring-1 focus:ring-sage/20"
                         x-on:mouseenter="setHoveredIndex({{ $index }})"
                         x-on:mouseleave="clearHoveredIndex({{ $index }})"
-                        :class="{ 'bg-sage/20 text-white': isHighlightedIndex({{ $index }}) }"
+                        :class="{ 'border-sage/30 bg-sage/20 text-white shadow-lg ring-1 ring-sage/20 -translate-y-0.5': isHighlightedIndex({{ $index }}) }"
                     >
                         <div class="flex items-center space-x-3">
                             {{-- Suggestion Icon --}}
-                            <div class="flex-shrink-0">
+                            <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-sage/10 transition-all duration-200 group-hover:scale-105 group-hover:bg-white/10">
                                 @if(isset($suggestion['is_recent']))
-                                    <svg class="w-5 h-5 text-sage/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="h-5 w-5 text-sage/70 transition-colors duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                 @elseif(isset($suggestion['is_popular']))
-                                    <svg class="w-5 h-5 text-sage/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="h-5 w-5 text-sage/70 transition-colors duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                     </svg>
                                 @else
-                                    <svg class="w-5 h-5 text-sage/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg class="h-5 w-5 text-sage/70 transition-colors duration-200 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
                                 @endif
@@ -285,22 +288,22 @@
                             {{-- Suggestion Content --}}
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-sm font-medium text-sage group-hover:text-white truncate transition-colors duration-200">
+                                    <h3 class="truncate text-sm font-medium text-sage transition-colors duration-200 group-hover:text-white">
                                         {{ $suggestion['title'] ?? $suggestion['search_term'] ?? '' }}
                                     </h3>
                                     @if(isset($suggestion['is_recent']))
-                                        <span class="text-xs text-sage/70">
+                                        <span class="text-xs text-sage/70 transition-colors duration-200 group-hover:text-white/80">
                                             {{ __('frontend.search.recent') }}
                                         </span>
                                     @elseif(isset($suggestion['is_popular']))
-                                        <span class="text-xs text-sage/70">
+                                        <span class="text-xs text-sage/70 transition-colors duration-200 group-hover:text-white/80">
                                             {{ __('frontend.search.popular') }}
                                         </span>
                                     @endif
                                 </div>
                                 
                                 @if(!empty($suggestion['subtitle']))
-                                    <p class="text-sm text-sage/70 group-hover:text-sage/90 truncate transition-colors duration-200">
+                                    <p class="truncate text-sm text-sage/70 transition-colors duration-200 group-hover:text-sage/95">
                                         {{ $suggestion['subtitle'] }}
                                     </p>
                                 @endif
@@ -308,7 +311,7 @@
                             
                             {{-- Arrow Icon --}}
                             <div class="flex-shrink-0">
-                                <svg class="w-5 h-5 text-sage/70 group-hover:text-white group-hover:translate-x-1 transition-all duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="h-5 w-5 text-sage/70 transition-all duration-200 group-hover:translate-x-1 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                                 </svg>
                             </div>

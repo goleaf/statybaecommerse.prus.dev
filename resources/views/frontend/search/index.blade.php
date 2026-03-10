@@ -53,12 +53,10 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-6">
-                @include('frontend.search.partials._filters', [
-                    'categories' => $categories,
-                    'selectedCategory' => $selectedCategory,
-                    'query' => $query,
-                ])
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,300px)_minmax(0,1fr)] lg:items-start">
+                <aside class="lg:sticky lg:top-4 lg:self-start">
+                    <livewire:components.category-sidebar />
+                </aside>
 
                 @include('frontend.search.partials._results', [
                     'products' => $products,

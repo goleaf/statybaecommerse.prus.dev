@@ -91,14 +91,6 @@
                 </div>
             </div>
 
-            {{-- Localized Description --}}
-            @if($this->getVariantLocalizedDescription())
-                <div class="mb-4">
-                    <span class="text-sm text-gray-600">{{ __('product.variants.fields.description') }}:</span>
-                    <p class="mt-1 text-sm text-gray-700">{{ $this->getVariantLocalizedDescription() }}</p>
-                </div>
-            @endif
-
             @if($selectedVariant->size_display_name)
                 <div class="mb-4">
                     <span class="text-sm text-gray-600">{{ __('product.variants.fields.size') }}:</span>

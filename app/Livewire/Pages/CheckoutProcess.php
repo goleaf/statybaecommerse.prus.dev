@@ -20,6 +20,7 @@ use App\Models\ShippingOption;
 use App\Models\User;
 use App\Services\Cart\CartLifecycleService;
 use App\Services\Discounts\DiscountEngine;
+use App\Services\Payments\MontonioService;
 use App\Services\Pricing\PriceCalculator;
 use App\Services\Shipping\ShippingOptionResolver;
 use Exception;
@@ -101,6 +102,22 @@ final class CheckoutProcess extends Component
 
     public string $selectedPaymentMethod = '';
 
+    /** @var array<string, array{type:string,label:string,logo_url:?string,preview_logos:list<string>}> */
+    public array $montonioPaymentMethodOptions = [];
+
+    /** @var list<array{code:string,name:string,logo_url:?string,ui_position:int,supported_currencies:list<string>}> */
+    public array $montonioBankOptions = [];
+
+    public string $selectedMontonioPaymentMethodType = '';
+
+    public string $selectedMontonioBankCode = '';
+
+    public string $montonioPreferredCountry = 'LT';
+
+    public ?string $montonioPaymentOptionsError = null;
+
+    public bool $isResolvingMontonioPaymentOptions = false;
+
     public function mount(): void
     {
         if (auth()->check()) {
@@ -117,6 +134,7 @@ final class CheckoutProcess extends Component
 
         $this->initialisePaymentMethods();
         $this->resolveShippingOptions();
+        $this->refreshMontonioPaymentOptions();
     }
 
     /**
@@ -137,6 +155,7 @@ final class CheckoutProcess extends Component
             // Persist address data for authenticated shoppers and refresh the available shipping matrix.
             $this->persistAuthenticatedAddresses();
             $this->resolveShippingOptions();
+            $this->refreshMontonioPaymentOptions();
         }
 
         if ($movingForward && $this->currentStep === 2) {
@@ -187,12 +206,7 @@ final class CheckoutProcess extends Component
         match ($this->currentStep) {
             1 => $this->validate($this->addressStepRules()),
             2 => $this->validate($this->deliveryStepRules()),
-            3 => $this->validate([
-                'selectedPaymentMethod' => [
-                    'required',
-                    Rule::in(array_keys($this->paymentMethods)),
-                ],
-            ]),
+            3 => $this->validate($this->paymentStepRules()),
             default => null,
         };
     }
@@ -231,7 +245,10 @@ final class CheckoutProcess extends Component
 
         if ($this->selectedPaymentMethod === PaymentMethod::MONTONIO->value) {
             try {
-                $montonioUrl = app(\App\Services\Payments\MontonioService::class)->getPaymentUrl($createdOrder);
+                $montonioUrl = app(MontonioService::class)->getPaymentUrl(
+                    $createdOrder,
+                    $this->buildMontonioPaymentSelection()
+                );
                 $this->redirect($montonioUrl);
 
                 return;
@@ -693,6 +710,143 @@ final class CheckoutProcess extends Component
             : PaymentMethod::MONTONIO->value;
     }
 
+    private function refreshMontonioPaymentOptions(): void
+    {
+        $this->isResolvingMontonioPaymentOptions = true;
+        $this->montonioPaymentOptionsError = null;
+        $this->montonioPreferredCountry = $this->determineMontonioPreferredCountry();
+
+        try {
+            $options = app(MontonioService::class)->getCheckoutOptions(
+                $this->montonioPreferredCountry,
+                $this->determineCheckoutCurrency()
+            );
+
+            $methodOptions = $options['methods'] ?? [];
+            $bankOptions = $options['banks'] ?? [];
+
+            $this->montonioPaymentMethodOptions = is_array($methodOptions) ? $methodOptions : [];
+            $this->montonioBankOptions = is_array($bankOptions) ? $bankOptions : [];
+            $this->montonioPreferredCountry = strtoupper((string) ($options['preferred_country'] ?? $this->montonioPreferredCountry));
+            $this->synchroniseMontonioSelections();
+        } catch (Exception $e) {
+            $this->montonioPaymentMethodOptions = [];
+            $this->montonioBankOptions = [];
+            $this->selectedMontonioPaymentMethodType = '';
+            $this->selectedMontonioBankCode = '';
+            $this->montonioPaymentOptionsError = $e->getMessage();
+        } finally {
+            $this->isResolvingMontonioPaymentOptions = false;
+        }
+    }
+
+    private function synchroniseMontonioSelections(): void
+    {
+        $availableTypes = $this->availableMontonioPaymentMethodTypes();
+
+        if ($availableTypes === []) {
+            $this->selectedMontonioPaymentMethodType = '';
+            $this->selectedMontonioBankCode = '';
+
+            return;
+        }
+
+        if (! in_array($this->selectedMontonioPaymentMethodType, $availableTypes, true)) {
+            $this->selectedMontonioPaymentMethodType = in_array('paymentInitiation', $availableTypes, true)
+                ? 'paymentInitiation'
+                : $availableTypes[0];
+        }
+
+        if ($this->selectedMontonioPaymentMethodType !== 'paymentInitiation') {
+            $this->selectedMontonioBankCode = '';
+
+            return;
+        }
+
+        $availableBankCodes = $this->availableMontonioBankCodes();
+
+        if ($availableBankCodes === []) {
+            $this->selectedMontonioBankCode = '';
+
+            return;
+        }
+
+        if (! in_array($this->selectedMontonioBankCode, $availableBankCodes, true)) {
+            $this->selectedMontonioBankCode = $availableBankCodes[0];
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildMontonioPaymentSelection(): array
+    {
+        if ($this->montonioPaymentMethodOptions === [] || $this->selectedMontonioPaymentMethodType === '') {
+            return [];
+        }
+
+        $selection = [
+            'method' => $this->selectedMontonioPaymentMethodType,
+        ];
+
+        if ($this->selectedMontonioPaymentMethodType === 'paymentInitiation') {
+            $selection['preferred_country'] = $this->montonioPreferredCountry !== ''
+                ? $this->montonioPreferredCountry
+                : $this->determineMontonioPreferredCountry();
+
+            if ($this->selectedMontonioBankCode !== '') {
+                $selection['preferred_provider'] = $this->selectedMontonioBankCode;
+            }
+        }
+
+        return $selection;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function availableMontonioPaymentMethodTypes(): array
+    {
+        /** @var list<string> $methodTypes */
+        $methodTypes = array_values(array_keys($this->montonioPaymentMethodOptions));
+
+        return $methodTypes;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function availableMontonioBankCodes(): array
+    {
+        /** @var list<string> $bankCodes */
+        $bankCodes = collect($this->montonioBankOptions)
+            ->pluck('code')
+            ->filter(static fn (mixed $code): bool => is_string($code) && trim($code) !== '')
+            ->values()
+            ->all();
+
+        return $bankCodes;
+    }
+
+    private function determineMontonioPreferredCountry(): string
+    {
+        $shippingAddress = $this->normalizedShippingAddress();
+        $countryCode = strtoupper((string) ($shippingAddress['country'] ?? $this->billing['country'] ?? 'LT'));
+
+        return $countryCode !== '' ? $countryCode : 'LT';
+    }
+
+    private function determineCheckoutCurrency(): string
+    {
+        $currency = current_currency();
+
+        if (is_string($currency) && trim($currency) !== '') {
+            return strtoupper($currency);
+        }
+
+        return 'EUR';
+    }
+
     /**
      * Refresh the available shipping options based on the current cart, destination, and package weight.
      */
@@ -1040,8 +1194,7 @@ final class CheckoutProcess extends Component
     {
         return $this->addressStepRules() + [
             'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
-            'selectedPaymentMethod'  => ['required', Rule::in(array_keys($this->paymentMethods))],
-        ];
+        ] + $this->paymentStepRules();
     }
 
     /**
@@ -1088,6 +1241,34 @@ final class CheckoutProcess extends Component
     }
 
     /**
+     * @return array<string, mixed>
+     */
+    private function paymentStepRules(): array
+    {
+        $rules = [
+            'selectedPaymentMethod' => ['required', Rule::in(array_keys($this->paymentMethods))],
+        ];
+
+        if ($this->montonioPaymentMethodOptions === []) {
+            return $rules;
+        }
+
+        $rules['selectedMontonioPaymentMethodType'] = [
+            'required',
+            Rule::in($this->availableMontonioPaymentMethodTypes()),
+        ];
+
+        if ($this->selectedMontonioPaymentMethodType === 'paymentInitiation' && $this->montonioBankOptions !== []) {
+            $rules['selectedMontonioBankCode'] = [
+                'required',
+                Rule::in($this->availableMontonioBankCodes()),
+            ];
+        }
+
+        return $rules;
+    }
+
+    /**
      * Helper to expose the list of selectable shipping identifiers for validation constraints.
      *
      * @return list<int>
@@ -1113,6 +1294,7 @@ final class CheckoutProcess extends Component
     {
         $this->sameAsShipping = $value;
         $this->synchroniseShippingFromBilling();
+        $this->refreshMontonioPaymentOptions();
     }
 
     /**
@@ -1144,6 +1326,8 @@ final class CheckoutProcess extends Component
         if ($this->sameAsShipping) {
             $this->resolveShippingOptions(resetSelection: true);
         }
+
+        $this->refreshMontonioPaymentOptions();
     }
 
     public function updatedBillingRegion(): void
@@ -1152,6 +1336,8 @@ final class CheckoutProcess extends Component
         if ($this->sameAsShipping) {
             $this->resolveShippingOptions(resetSelection: true);
         }
+
+        $this->refreshMontonioPaymentOptions();
     }
 
     public function updatedBillingCompany(): void
@@ -1167,6 +1353,8 @@ final class CheckoutProcess extends Component
         if ($this->sameAsShipping) {
             $this->resolveShippingOptions(resetSelection: true);
         }
+
+        $this->refreshMontonioPaymentOptions();
     }
 
     public function updatedShippingCountry(): void
@@ -1174,6 +1362,7 @@ final class CheckoutProcess extends Component
         $country = $this->shipping['country'] ?? '';
         $this->shipping['country'] = is_string($country) ? strtoupper($country) : 'LT';
         $this->resolveShippingOptions(resetSelection: true);
+        $this->refreshMontonioPaymentOptions();
     }
 
     public function updatedShippingRegion(): void
@@ -1189,6 +1378,30 @@ final class CheckoutProcess extends Component
     public function updatedSelectedShippingOption(): void
     {
         $this->updateSelectedShippingPrice();
+    }
+
+    public function updatedSelectedMontonioPaymentMethodType(): void
+    {
+        $this->synchroniseMontonioSelections();
+        $this->resetErrorBag('selectedMontonioPaymentMethodType');
+        $this->resetErrorBag('selectedMontonioBankCode');
+    }
+
+    public function updatedSelectedMontonioBankCode(): void
+    {
+        $this->resetErrorBag('selectedMontonioBankCode');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function validationAttributes(): array
+    {
+        return [
+            'selectedPaymentMethod'            => __('messages.payment_method'),
+            'selectedMontonioPaymentMethodType' => __('ui.payment_type'),
+            'selectedMontonioBankCode'        => __('ui.bank'),
+        ];
     }
 
     private function authenticatedUserId(): ?int

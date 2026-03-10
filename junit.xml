@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Models\LegalTest" file="tests\Models\LegalTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="12.805051">
-    <testcase name="it repairs mojibake in legacy legal translations before rendering" file="tests\Models\LegalTest.php::it repairs mojibake in legacy legal translations before rendering" class="Tests\Models\LegalTest" classname="Tests.Models.LegalTest" assertions="2" time="12.805051"/>
+  <testsuite name="Tests\Feature\Frontend\SearchControllerTest" file="C:\Dropbox\projects\egistatyba\tests\Feature\Frontend\SearchControllerTest.php" tests="5" assertions="17" errors="0" failures="0" skipped="0" time="16.238772">
+    <testcase name="test_search_redirects_numeric_category_query_to_slug" file="C:\Dropbox\projects\egistatyba\tests\Feature\Frontend\SearchControllerTest.php" line="123" class="Tests\Feature\Frontend\SearchControllerTest" classname="Tests.Feature.Frontend.SearchControllerTest" assertions="4" time="14.466900"/>
+    <testcase name="test_search_suggestions_can_match_product_sku_for_visible_products" file="C:\Dropbox\projects\egistatyba\tests\Feature\Frontend\SearchControllerTest.php" line="47" class="Tests\Feature\Frontend\SearchControllerTest" classname="Tests.Feature.Frontend.SearchControllerTest" assertions="3" time="0.532071"/>
+    <testcase name="test_search_page_renders_homepage_category_menu_in_sidebar" file="C:\Dropbox\projects\egistatyba\tests\Feature\Frontend\SearchControllerTest.php" line="147" class="Tests\Feature\Frontend\SearchControllerTest" classname="Tests.Feature.Frontend.SearchControllerTest" assertions="5" time="0.345907"/>
+    <testcase name="test_search_filters_by_category_slug" file="C:\Dropbox\projects\egistatyba\tests\Feature\Frontend\SearchControllerTest.php" line="77" class="Tests\Feature\Frontend\SearchControllerTest" classname="Tests.Feature.Frontend.SearchControllerTest" assertions="3" time="0.613317"/>
+    <testcase name="test_search_results_include_visible_products_even_when_is_active_flag_is_false" file="C:\Dropbox\projects\egistatyba\tests\Feature\Frontend\SearchControllerTest.php" line="18" class="Tests\Feature\Frontend\SearchControllerTest" classname="Tests.Feature.Frontend.SearchControllerTest" assertions="2" time="0.280576"/>
   </testsuite>
 </testsuites>

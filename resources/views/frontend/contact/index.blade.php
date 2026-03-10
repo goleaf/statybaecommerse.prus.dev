@@ -11,8 +11,8 @@
             ? route('frontend.contact.send', [])
             : url('/contact/send'));
     $supportAddress = 'Jurbarkas, Lietuva';
-    $supportPhone = '+370 695 72123';
-    $supportPhoneHref = '+37069572123';
+    $supportPhone = (string) (app_setting('company_phone') ?: '+370 695 72123');
+    $supportPhoneHref = preg_replace('/[^\d+]/', '', $supportPhone) ?: '+37069572123';
     $supportEmail = 'info@egisstatyba.lt';
     $supportAddressHref = 'https://maps.google.com/?q=' . urlencode($supportAddress);
 @endphp

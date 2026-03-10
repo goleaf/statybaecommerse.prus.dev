@@ -61,12 +61,12 @@
                     </div>
                     <template x-for="suggestion in suggestions" :key="suggestion.id">
                         <a :href="`${searchUrl}?q=${encodeURIComponent(suggestion.name)}`"
-                           class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors duration-200">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           class="group mx-2 flex items-center gap-3 rounded-lg border border-transparent px-4 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-100 hover:bg-blue-50 hover:shadow-sm focus:-translate-y-0.5 focus:border-blue-100 focus:bg-blue-50 focus:outline-none focus:shadow-sm">
+                            <svg class="h-4 w-4 text-gray-400 transition-colors duration-200 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
-                            <span class="text-sm text-gray-700" x-text="suggestion.name"></span>
+                            <span class="text-sm text-gray-700 transition-colors duration-200 group-hover:text-blue-700" x-text="suggestion.name"></span>
                         </a>
                     </template>
                 </div>
@@ -80,12 +80,12 @@
                     </div>
                     <template x-for="search in recentSearches" :key="search">
                         <button @click="query = search; search()"
-                                class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors duration-200 text-left">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="group mx-2 flex w-[calc(100%-1rem)] items-center gap-3 rounded-lg border border-transparent px-4 py-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-blue-100 hover:bg-blue-50 hover:shadow-sm focus:-translate-y-0.5 focus:border-blue-100 focus:bg-blue-50 focus:outline-none focus:shadow-sm">
+                            <svg class="h-4 w-4 text-gray-400 transition-colors duration-200 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span class="text-sm text-gray-700" x-text="search"></span>
+                            <span class="text-sm text-gray-700 transition-colors duration-200 group-hover:text-blue-700" x-text="search"></span>
                         </button>
                     </template>
                 </div>
