@@ -41,6 +41,11 @@ final class PriceConfiguration
         return round($amount, $this->precision(), $this->roundingMode());
     }
 
+    public function vatEnabled(): bool
+    {
+        return (bool) Arr::get($this->config, 'vat.enable', false);
+    }
+
     public function vatRate(): float
     {
         $value = $this->setting(

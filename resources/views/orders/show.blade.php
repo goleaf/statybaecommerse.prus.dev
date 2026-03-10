@@ -215,12 +215,14 @@
                                 <span class="text-gray-900 dark:text-white">€{{ number_format($order->subtotal, 2) }}</span>
                             </div>
                             
+                            @vatenabled
                             @if($order->tax_amount > 0)
                                 <div class="flex justify-between text-sm">
                                     <span class="text-gray-600 dark:text-gray-400">{{ __('orders.tax_amount') }}</span>
                                     <span class="text-gray-900 dark:text-white">€{{ number_format($order->tax_amount, 2) }}</span>
                                 </div>
                             @endif
+                            @endvatenabled
                             
                             @if($order->shipping_amount > 0)
                                 <div class="flex justify-between text-sm">

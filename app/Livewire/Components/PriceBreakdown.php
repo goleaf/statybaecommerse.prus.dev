@@ -65,7 +65,7 @@ class PriceBreakdown extends Component
     ): void {
         $this->variant = $variant;
         $this->showSubtotal = $showSubtotal;
-        $this->showTaxes = $showTaxes;
+        $this->showTaxes = $showTaxes && app(\App\Services\Pricing\PriceConfiguration::class)->vatEnabled();
         $this->showTotal = $showTotal;
     }
 

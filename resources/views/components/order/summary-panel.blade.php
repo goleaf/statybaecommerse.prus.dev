@@ -68,10 +68,12 @@
             <dd class="font-medium text-gray-900">{{ $formattedShipping }}</dd>
         </div>
 
+        @vatenabled
         <div class="flex justify-between">
             <dt>{{ __('ui.tax') }}</dt>
             <dd class="font-medium text-gray-900">{{ $formattedTax }}</dd>
         </div>
+        @endvatenabled
 
         @if ((float) ($summary['discount_amount'] ?? 0) > 0)
             <div class="flex justify-between text-green-600">

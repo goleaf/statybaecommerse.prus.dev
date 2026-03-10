@@ -1137,7 +1137,7 @@ return [
         'shipping'         => 'Pristatymas',
         'shipping_address' => 'Pristatymo adresas',
         'subtotal'         => 'Tarpinė suma',
-        'tax'              => 'Mokestis',
+        'tax'              => 'PVM suma',
         'total'            => 'Iš viso',
     ],
     'pagination' => [

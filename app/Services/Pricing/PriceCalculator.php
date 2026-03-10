@@ -16,7 +16,9 @@ final class PriceCalculator
         $discount = max(0.0, min($discount, $subtotal));
         $taxable = max(0.0, $subtotal - $discount);
         $rate = $this->normalizeRate($vatRate ?? $this->configuration->vatRate());
-        $tax = $this->configuration->round($taxable * $rate);
+        $tax = $this->configuration->vatEnabled()
+            ? $this->configuration->round($taxable * $rate)
+            : 0.0;
         $shipping = $shipping ?? $this->resolveShipping($subtotal);
         $shipping = $this->configuration->round(max(0.0, $shipping));
         $total = $this->configuration->round($taxable + $tax + $shipping);

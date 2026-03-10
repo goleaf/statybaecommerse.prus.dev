@@ -26,12 +26,14 @@
                 {{ \Illuminate\Support\Number::currency($shippingAmount, $currency, app()->getLocale()) }}
             </dd>
         </div>
+        @vatenabled
         <div class="flex items-center justify-between">
             <dt class="text-sm">{{ __('frontend.order_summary.tax') }}</dt>
             <dd class="text-sm font-medium text-gray-900">
                 {{ \Illuminate\Support\Number::currency($taxAmount, $currency, app()->getLocale()) }}
             </dd>
         </div>
+        @endvatenabled
         <div class="flex items-center justify-between border-t border-gray-200 pt-4">
             <dt class="font-heading font-medium text-gray-900">{{ __('frontend.order_summary.total') }}</dt>
             <dd class="text-base font-bold text-gray-900">

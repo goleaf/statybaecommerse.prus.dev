@@ -670,7 +670,7 @@ return [
     'system_settings'                           => 'Sistemos nustatymai',
     'tags'                                      => 'Žymos',
     'target_audience'                           => 'Tikslinė auditorija',
-    'tax'                                       => 'Mokestis',
+    'tax'                                       => 'PVM suma',
     'technical_specifications'                  => 'Techninės charakteristikos',
     'technical_specifications_description'      => 'Techninių charakteristikų aprašymas',
     'technical_support'                         => 'Techninė pagalba',

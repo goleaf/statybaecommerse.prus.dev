@@ -15,10 +15,12 @@
                     <dt>{{ __('messages.subtotal') }}</dt>
                     <dd>{{ app_money_format($order->subtotal) }}</dd>
                 </div>
+                @vatenabled
                 <div class="flex justify-between">
                     <dt>{{ __('ui.tax') }}</dt>
                     <dd>{{ app_money_format($order->tax_amount) }}</dd>
                 </div>
+                @endvatenabled
                 <div class="flex justify-between">
                     <dt>{{ __('messages.shipping') }}</dt>
                     <dd>{{ app_money_format($order->shipping_amount) }}</dd>

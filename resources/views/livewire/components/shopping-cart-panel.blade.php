@@ -244,10 +244,12 @@
                             </div>
                         @endif
                         
+                        @vatenabled
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600 dark:text-gray-400">{{ __('translations.tax') }}</span>
                             <span class="text-gray-900 dark:text-white">{{ app_money_format($cartSummary['tax_amount']) }}</span>
                         </div>
+                        @endvatenabled
                         
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-600 dark:text-gray-400">{{ __('translations.shipping') }}</span>

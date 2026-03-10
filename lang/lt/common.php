@@ -100,7 +100,7 @@ return [
     'Subject'      => 'Tema',
     'Success'      => 'Sėkmė',
     'System'       => 'Sistema',
-    'Tax'          => 'Mokestis',
+    'Tax'          => 'PVM suma',
     'Time'         => 'Laikas',
     'Timezone'     => 'Laiko juosta',
     'Title'        => 'Pavadinimas',

@@ -217,6 +217,9 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
+        // Register VAT display directives so blade files don't resolve services directly.
+        Blade::if('vatenabled', static fn (): bool => app(\App\Services\Pricing\PriceConfiguration::class)->vatEnabled());
+
         // Expose the bespoke Filament widget tab views as anonymous Blade components for reuse across resources.
         Blade::anonymousComponentPath(resource_path('views/filament/components'), 'filament.components');
 

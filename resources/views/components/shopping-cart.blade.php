@@ -155,10 +155,12 @@
 
                 {{-- Tax --}}
                 @if ($showTax && $tax > 0)
+                    @vatenabled
                     <div class="flex justify-between text-gray-700">
                         <span>{{ __('ui.tax') }}</span>
                         <span>{{ \Illuminate\Support\Number::currency($tax, current_currency(), app()->getLocale()) }}</span>
                     </div>
+                    @endvatenabled
                 @endif
 
                 {{-- Shipping --}}

@@ -9,6 +9,7 @@ return [
         'mode'      => (int) env('PRICING_ROUNDING_MODE', PHP_ROUND_HALF_UP),
     ],
     'vat' => [
+        'enable'      => (bool) env('PRICING_VAT_ENABLE', false),
         'rate'        => (float) env('PRICING_VAT_RATE', 21.0),
         'setting_key' => env('PRICING_VAT_SETTING_KEY', 'tax_rate'),
     ],

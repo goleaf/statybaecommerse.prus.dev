@@ -54,12 +54,14 @@
     </div>
     <div class="p-4 space-y-4 sm:p-6">
         <div class="text-sm text-gray-500">
+        @vatenabled
             <div class="flex items-center justify-between pb-1 mb-3 border-b border-gray-200">
                 <p>{{ __('ui.tax') }}</p>
                 <p class="text-base text-right text-gray-950">
                     {{ \Illuminate\Support\Number::currency(0, current_currency(), app()->getLocale()) }}
                 </p>
             </div>
+        @endvatenabled
             <div class="flex items-center justify-between pt-1 pb-1 mb-3 border-b border-gray-200">
                 <p>{{ __('ui.delivery') }}</p>
                 <p class="text-right">{{ __('ui.calculated_at_the_time_of_payment') }}</p>

@@ -213,12 +213,14 @@
                                 {{ \Illuminate\Support\Number::currency($order->shipping_cost ?? 0, current_currency(), app()->getLocale()) }}
                             </span>
                         </div>
+                        @vatenabled
                         <div class="flex justify-between">
                             <span class="text-gray-600">{{ __('translations.tax') }}</span>
                             <span class="font-medium">
                                 {{ \Illuminate\Support\Number::currency($order->tax_amount ?? 0, current_currency(), app()->getLocale()) }}
                             </span>
                         </div>
+                        @endvatenabled
                         <div class="flex justify-between text-lg font-semibold pt-2 border-t border-gray-200">
                             <span>{{ __('messages.total') }}</span>
                             <span>

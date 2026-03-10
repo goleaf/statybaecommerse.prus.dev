@@ -54,9 +54,9 @@
                             <label
                                 wire:key="montonio-payment-method-{{ $methodType }}"
                                 @class([
-                                    'block cursor-pointer rounded-xl border p-4 transition',
-                                    'border-primary-500 bg-primary-50 shadow-sm' => $isSelected,
-                                    'border-gray-200 bg-white hover:border-primary-200 hover:bg-primary-50/60' => ! $isSelected,
+                                    'relative block cursor-pointer rounded-xl border p-4 transition duration-200 ease-in-out',
+                                    'border-gray-900 bg-white shadow-md ring-1 ring-gray-900' => $isSelected,
+                                    'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/50 hover:shadow-sm' => ! $isSelected,
                                 ])
                             >
                                 <input
@@ -71,16 +71,6 @@
                                         <p class="text-sm font-semibold text-gray-900">{{ $option['label'] }}</p>
                                         <p class="text-xs text-gray-500">{{ $helperText }}</p>
                                     </div>
-                                    <span
-                                        @class([
-                                            'inline-flex size-5 items-center justify-center rounded-full border text-[10px] font-semibold',
-                                            'border-primary-600 bg-primary-600 text-white' => $isSelected,
-                                            'border-gray-300 text-transparent' => ! $isSelected,
-                                        ])
-                                        aria-hidden="true"
-                                    >
-                                        ✓
-                                    </span>
                                 </div>
 
                                 <div class="mt-4 flex flex-wrap items-center gap-2">
@@ -118,11 +108,9 @@
                 @if ($showMontonioBanks)
                     <fieldset class="space-y-3" aria-label="{{ __('ui.choose_bank') }}">
                         <legend class="text-sm font-semibold text-gray-900">{{ __('ui.choose_bank') }}</legend>
-                        <p class="text-sm text-gray-500">
-                            {{ __('ui.bank_selection_is_shown_for_country', ['country' => $montonioPreferredCountry]) }}
-                        </p>
 
-                        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+
+                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                             @foreach ($montonioBankOptions as $bank)
                                 @php
                                     $isSelectedBank = $selectedMontonioBankCode === $bank['code'];
@@ -131,11 +119,10 @@
                                 <label
                                     wire:key="montonio-bank-{{ $bank['code'] }}"
                                     @class([
-                                        'block cursor-pointer rounded-xl border p-3 transition',
-                                        'border-primary-500 bg-primary-50 shadow-sm' => $isSelectedBank,
-                                        'border-gray-200 bg-white hover:border-primary-200 hover:bg-primary-50/60' => ! $isSelectedBank,
+                                        'group relative flex cursor-pointer flex-col items-center justify-between gap-3 rounded-xl border p-3 text-center transition duration-200 ease-in-out',
+                                        'border-gray-900 bg-white shadow-md ring-1 ring-gray-900 z-10' => $isSelectedBank,
+                                        'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50/50 hover:shadow-sm' => ! $isSelectedBank,
                                     ])
-                                    title="{{ $bank['name'] }}"
                                 >
                                     <input
                                         type="radio"
@@ -144,7 +131,7 @@
                                         class="sr-only"
                                     >
 
-                                    <span class="flex min-h-20 items-center justify-center rounded-lg bg-white px-4 py-3">
+                                    <div class="flex h-12 w-full items-center justify-center">
                                         @if ($bank['logo_url'])
                                             <img
                                                 src="{{ $bank['logo_url'] }}"
@@ -153,9 +140,23 @@
                                                 loading="lazy"
                                             >
                                         @else
-                                            <span class="text-sm font-medium text-gray-900">{{ $bank['name'] }}</span>
+                                            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
+                                                </svg>
+                                            </div>
                                         @endif
-                                    </span>
+                                    </div>
+                                    
+                                    <div class="space-y-1">
+                                        <span @class([
+                                            'block text-xs font-medium transition-colors duration-200',
+                                            'text-gray-900' => $isSelectedBank,
+                                            'text-gray-500 group-hover:text-gray-900' => ! $isSelectedBank,
+                                        ])>
+                                            {{ $bank['name'] }}
+                                        </span>
+                                    </div>
                                 </label>
                             @endforeach
                         </div>
