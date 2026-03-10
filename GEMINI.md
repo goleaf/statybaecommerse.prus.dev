@@ -444,7 +444,7 @@ use function Pest\Livewire\livewire;
 livewire(CreateUser::class)
     ->fillForm([
         'name' => 'Test',
-        'email' => 'info@egisstatyba.lt',
+        'email' => 'test@example.com',
     ])
     ->call('create')
     ->assertNotified()
@@ -452,7 +452,7 @@ livewire(CreateUser::class)
 
 assertDatabaseHas(User::class, [
     'name' => 'Test',
-    'email' => 'info@egisstatyba.lt',
+    'email' => 'test@example.com',
 ]);
 
 </code-snippet>

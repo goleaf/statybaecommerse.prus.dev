@@ -238,10 +238,8 @@
                                         : null;
                                 @endphp
 
-                                <article class="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-cyan-200 hover:shadow-xl">
-                                    <div class="absolute inset-x-0 top-0 h-28 bg-gradient-to-br from-slate-50 via-white to-cyan-50"></div>
-
-                                    <div class="relative flex h-full flex-col p-6">
+                                <article class="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition duration-200 hover:-translate-y-1 hover:border-cyan-200 hover:shadow-xl">
+                                    <div class="flex h-full flex-col p-6">
                                         <div class="flex items-start justify-between gap-4">
                                             @if ($brand->logo)
                                                 <div class="flex h-14 w-14 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">

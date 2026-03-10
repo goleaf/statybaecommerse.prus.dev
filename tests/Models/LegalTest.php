@@ -8,6 +8,7 @@ use App\Models\Translations\LegalTranslation;
 use App\Services\Security\HtmlContentSanitizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 // Leverage the shared RefreshDatabase trait while the global Pest configuration boots the Laravel TestCase.
@@ -41,6 +42,31 @@ it('returns sanitized translated content for the requested locale', function ():
     // Act & Assert: the sanitized value should be returned when requesting the translated content.
     expect($expectedSanitized)->not->toBe($originalContent);
     expect($legal->fresh()->getTranslatedContent('en'))->toBe($expectedSanitized);
+});
+
+it('repairs mojibake in legacy legal translations before rendering', function (): void {
+    App::setLocale('lt');
+
+    $legal = Legal::factory()->create();
+    $translation = LegalTranslation::factory()->create([
+        'legal_id' => $legal->id,
+        'locale'   => 'lt',
+        'title'    => 'Laikinas pavadinimas',
+        'content'  => '<p>Laikinas tekstas</p>',
+    ]);
+
+    $expectedTitle = 'Privatumo politika';
+    $expectedContent = '<p>Ši privatumo politika paaiškina, kaip renkame, naudojame ir saugome jūsų asmens duomenis naudojantis mūsų svetaine bei paslaugomis.</p>';
+
+    DB::table('legal_translations')
+        ->where('id', $translation->id)
+        ->update([
+            'title'   => mb_convert_encoding($expectedTitle, 'UTF-8', 'Windows-1252'),
+            'content' => mb_convert_encoding($expectedContent, 'UTF-8', 'Windows-1252'),
+        ]);
+
+    expect($legal->fresh()->getTranslatedTitle('lt'))->toBe($expectedTitle);
+    expect($legal->fresh()->getTranslatedContent('lt'))->toBe($expectedContent);
 });
 
 it('returns null when a translation is missing for the requested locale', function (): void {

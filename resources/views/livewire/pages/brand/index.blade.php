@@ -13,6 +13,7 @@
         'featured'       => __('messages.brands_index_sort_option_featured'),
         default          => __('messages.brands_index_sort_option_name'),
     };
+    $hasFilters = filled($search) || $sortBy !== 'name';
     $alphabet = $paginator->getCollection()
         ->pluck('name')
         ->filter()
@@ -50,14 +51,14 @@
                     </p>
                 </div>
 
-                <dl class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3 lg:grid-cols-1 lg:justify-items-end">
-                    <div class="border-b border-sage/40 pb-2 lg:min-w-56">
+                <dl class="grid gap-4 text-sm sm:grid-cols-3 lg:min-w-[22rem]">
+                    <div class="rounded-2xl border border-sage/30 bg-sage/10 p-4 shadow-soft">
                         <dt class="text-sage/70">{{ __('messages.brands') }}</dt>
-                        <dd class="mt-1 text-lg font-semibold text-white">{{ number_format($totalBrands) }}</dd>
+                        <dd class="mt-2 text-2xl font-semibold text-white">{{ number_format($totalBrands) }}</dd>
                     </div>
-                    <div class="border-b border-sage/40 pb-2 lg:min-w-56">
+                    <div class="rounded-2xl border border-sage/30 bg-sage/10 p-4 shadow-soft">
                         <dt class="text-sage/70">{{ __('messages.brands_index_filters_title') }}</dt>
-                        <dd class="mt-1 text-lg font-semibold text-white">
+                        <dd class="mt-2 text-lg font-semibold text-white">
                             @if ($activeFilterCount > 0)
                                 {{ trans_choice('messages.brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
                             @else
@@ -65,9 +66,9 @@
                             @endif
                         </dd>
                     </div>
-                    <div class="border-b border-sage/40 pb-2 lg:min-w-56">
+                    <div class="rounded-2xl border border-sage/30 bg-sage/10 p-4 shadow-soft">
                         <dt class="text-sage/70">{{ __('messages.brands_index_sort_label') }}</dt>
-                        <dd class="mt-1 text-lg font-semibold text-white">{{ $activeSortLabel }}</dd>
+                        <dd class="mt-2 text-lg font-semibold text-white">{{ $activeSortLabel }}</dd>
                     </div>
                 </dl>
             </div>
@@ -75,8 +76,8 @@
     </header>
 
     <x-container class="px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <section class="border border-dark/25 bg-sage/60">
-            <div class="grid gap-4 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_240px_auto] lg:items-end">
+        <section class="rounded-3xl border border-ash bg-white/85 p-5 shadow-soft backdrop-blur-sm sm:p-6">
+            <div class="grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px_auto] lg:items-end">
                 <div>
                     <label for="brand-search" class="text-sm font-semibold text-dark">{{ __('messages.brands_index_search_label') }}</label>
                     <input
@@ -84,7 +85,7 @@
                         type="search"
                         wire:model.live.debounce.400ms="search"
                         placeholder="{{ __('messages.brands_index_search_placeholder') }}"
-                        class="mt-2 w-full border border-dark/30 bg-white/80 px-4 py-2.5 text-sm text-dark placeholder:text-dark/50 focus:border-dark focus:outline-none focus:ring-2 focus:ring-dark/20"
+                        class="mt-2 w-full rounded-full border border-ash bg-sage/20 px-4 py-3 text-sm text-dark placeholder:text-dark/50 focus:border-dark focus:outline-none focus:ring-2 focus:ring-dark/10"
                     />
                 </div>
 
@@ -93,7 +94,7 @@
                     <select
                         id="brand-sort"
                         wire:model.live="sortBy"
-                        class="mt-2 w-full border border-dark/30 bg-white/80 px-4 py-2.5 text-sm font-medium text-dark focus:border-dark focus:outline-none focus:ring-2 focus:ring-dark/20"
+                        class="mt-2 w-full rounded-full border border-ash bg-sage/20 px-4 py-3 text-sm font-medium text-dark focus:border-dark focus:outline-none focus:ring-2 focus:ring-dark/10"
                     >
                         <option value="name">{{ __('messages.brands_index_sort_option_name') }}</option>
                         <option value="name_desc">{{ __('messages.brands_index_sort_option_name_desc') }}</option>
@@ -103,12 +104,12 @@
                     </select>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    @if (filled($search) || $sortBy !== 'name')
+                <div class="flex items-center gap-3 lg:justify-end">
+                    @if ($hasFilters)
                         <button
                             type="button"
                             wire:click="clearFilters"
-                            class="inline-flex items-center border border-dark/30 px-4 py-2.5 text-sm font-semibold text-dark transition-colors hover:border-dark hover:bg-sage/50"
+                            class="inline-flex items-center justify-center rounded-full border border-dark bg-dark px-5 py-3 text-sm font-semibold text-sage shadow-soft transition-colors hover:bg-stone"
                         >
                             {{ __('messages.brands_index_reset_filters') }}
                         </button>
@@ -116,140 +117,158 @@
                 </div>
             </div>
 
-            <p class="border-t border-dark/20 px-4 py-3 text-sm text-dark/75 sm:px-6">
-                @if ($paginator->count() > 0)
-                    {{ __('messages.brands_index_showing_results', ['from' => $paginator->firstItem() ?? 0, 'to' => $paginator->lastItem() ?? 0, 'total' => $totalBrands]) }}
-                @else
-                    {{ __('messages.brands_index_no_results') }}
-                @endif
-            </p>
+            <div class="mt-5 space-y-4 border-t border-ash/80 pt-4">
+                <p class="text-sm text-dark/75">
+                    @if ($paginator->count() > 0)
+                        {{ __('messages.brands_index_showing_results', ['from' => $paginator->firstItem() ?? 0, 'to' => $paginator->lastItem() ?? 0, 'total' => $totalBrands]) }}
+                    @else
+                        {{ __('messages.brands_index_no_results') }}
+                    @endif
+                </p>
 
-            @if ($alphabet->isNotEmpty())
-                <nav class="border-t border-dark/20 px-4 py-3 sm:px-6" aria-label="{{ __('messages.brands') }}">
-                    <ol class="flex flex-wrap items-center gap-2 text-xs font-semibold text-dark/70">
-                        @foreach ($alphabet as $letter)
-                            <li>
-                                <a href="#brands-letter-{{ $letter }}" class="inline-flex min-w-8 justify-center border border-dark/25 px-2.5 py-1 transition-colors hover:border-dark hover:bg-sage/50 hover:text-dark">
-                                    {{ $letter }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ol>
-                </nav>
-            @endif
+                @if ($alphabet->isNotEmpty())
+                    <nav aria-label="{{ __('messages.brands') }}">
+                        <ol class="flex flex-wrap items-center gap-2 text-xs font-semibold text-dark/70">
+                            @foreach ($alphabet as $letter)
+                                <li>
+                                    <a
+                                        href="#brands-letter-{{ $letter }}"
+                                        class="inline-flex min-w-9 items-center justify-center rounded-full border border-ash bg-sage/40 px-3 py-1.5 transition-colors hover:border-dark hover:bg-sage hover:text-dark"
+                                    >
+                                        {{ $letter }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ol>
+                    </nav>
+                @endif
+            </div>
         </section>
 
         <div class="relative mt-8">
-            <div wire:loading.delay.longer class="absolute inset-0 z-10 bg-white/70"></div>
+            <div wire:loading.delay.longer class="absolute inset-0 z-10 rounded-3xl bg-sage/70 backdrop-blur-sm"></div>
 
             @if ($paginator->count() > 0)
-                <section class="border border-dark/25 bg-white/50">
-                    <div class="hidden overflow-x-auto md:block">
-                        <table class="min-w-full table-auto border-collapse">
-                            <thead class="sticky top-0 z-10 bg-dark text-sage">
-                                <tr class="text-left text-xs uppercase tracking-wider">
-                                    <th scope="col" class="w-12 px-4 py-3 text-right font-semibold sm:px-6">#</th>
-                                    <th scope="col" class="px-4 py-3 font-semibold sm:px-6">{{ __('messages.brand') }}</th>
-                                    <th scope="col" class="px-4 py-3 font-semibold sm:px-6">{{ __('messages.description') }}</th>
-                                    <th scope="col" class="px-4 py-3 text-right font-semibold sm:px-6">{{ __('messages.products') }}</th>
-                                    <th scope="col" class="px-4 py-3 text-right font-semibold sm:px-6">{{ __('messages.view') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-dark/15">
-                                @php
-                                    $renderedLetters = [];
-                                @endphp
-                                @foreach ($paginator as $brand)
-                                    @php
-                                        $letter = mb_strtoupper(mb_substr((string) ($brand->name ?? ''), 0, 1));
-                                        $rowNumber = ($paginator->firstItem() ?? 1) + $loop->index;
-                                        $anchorId = '';
-                                        if (! in_array($letter, $renderedLetters, true)) {
-                                            $anchorId = 'brands-letter-' . $letter;
-                                            $renderedLetters[] = $letter;
-                                        }
-                                    @endphp
-                                    <tr class="align-top odd:bg-white/40 even:bg-sage/20 hover:bg-sage/50">
-                                        <td id="{{ $anchorId }}" class="scroll-mt-20 px-4 py-4 text-right text-sm font-semibold text-dark/55 sm:px-6">
-                                            {{ $rowNumber }}
-                                        </td>
-                                        <td class="px-4 py-4 sm:px-6">
-                                            <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}" class="text-base font-semibold text-dark underline decoration-dark/40 underline-offset-4 transition-colors hover:decoration-dark">
-                                                {{ $brand->name ?? '' }}
-                                            </a>
-                                        </td>
-                                        <td class="px-4 py-4 text-sm leading-6 text-dark/75 sm:px-6">
-                                            @if ($brand->description)
-                                                {{ \Illuminate\Support\Str::limit(strip_tags((string) $brand->description), 180) }}
-                                            @else
-                                                {{ __('messages.brands_index_description_placeholder') }}
-                                            @endif
-                                        </td>
-                                        <td class="px-4 py-4 text-right text-sm font-semibold text-dark sm:px-6">
-                                            {{ number_format($brand->products_count ?? 0) }}
-                                        </td>
-                                        <td class="px-4 py-4 text-right sm:px-6">
-                                            <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}" class="text-sm font-semibold text-dark underline decoration-dark/40 underline-offset-4 transition-colors hover:decoration-dark">
-                                                {{ __('messages.brands_index_visit_brand') }}
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                @php
+                    $renderedLetters = [];
+                @endphp
 
-                    <ul class="divide-y divide-dark/15 md:hidden">
-                        @foreach ($paginator as $brand)
-                            @php
-                                $letter = mb_strtoupper(mb_substr((string) ($brand->name ?? ''), 0, 1));
-                                $rowNumber = ($paginator->firstItem() ?? 1) + $loop->index;
-                            @endphp
-                            <li class="space-y-3 px-4 py-4">
+                <section class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    @foreach ($paginator as $brand)
+                        @php
+                            $letter = mb_strtoupper(mb_substr((string) ($brand->name ?? ''), 0, 1));
+                            $rowNumber = ($paginator->firstItem() ?? 1) + $loop->index;
+                            $anchorId = '';
+                            if (! in_array($letter, $renderedLetters, true)) {
+                                $anchorId = 'brands-letter-' . $letter;
+                                $renderedLetters[] = $letter;
+                            }
+
+                            $brandDescription = $brand->description
+                                ? \Illuminate\Support\Str::limit(strip_tags((string) $brand->description), 150)
+                                : __('messages.brands_index_description_placeholder');
+                            $brandInitials = mb_strtoupper(mb_substr(trim((string) ($brand->name ?? '')), 0, 2));
+                        @endphp
+
+                        <article
+                            id="{{ $anchorId }}"
+                            class="group flex h-full scroll-mt-24 flex-col overflow-hidden rounded-3xl border border-ash bg-white shadow-soft transition duration-200 hover:-translate-y-1 hover:border-dark/25 hover:shadow-medium"
+                        >
+                            <div class="h-1.5 bg-gradient-to-r from-dark via-stone to-sage"></div>
+
+                            <div class="flex h-full flex-col p-6">
                                 <div class="flex items-start justify-between gap-4">
-                                    <div class="space-y-1">
-                                        <span class="inline-flex border border-dark/25 px-2 py-0.5 text-[10px] font-semibold text-dark/70">
-                                            {{ $letter }}{{ str_pad((string) $rowNumber, 2, '0', STR_PAD_LEFT) }}
-                                        </span>
-                                        <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}" class="block text-base font-semibold text-dark underline decoration-dark/40 underline-offset-4">
-                                            {{ $brand->name ?? '' }}
-                                        </a>
+                                    <div class="flex min-w-0 items-center gap-4">
+                                        @if ($brand->logo)
+                                            <div class="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-dark/10 bg-sage/40">
+                                                <img
+                                                    src="{{ $brand->logo }}"
+                                                    alt="{{ $brand->name ?? '' }}"
+                                                    loading="lazy"
+                                                    class="h-10 w-10 object-contain"
+                                                />
+                                            </div>
+                                        @else
+                                            <div class="flex size-16 shrink-0 items-center justify-center rounded-2xl border border-dark/10 bg-sage text-lg font-semibold tracking-[0.24em] text-dark">
+                                                {{ $brandInitials !== '' ? $brandInitials : '--' }}
+                                            </div>
+                                        @endif
+
+                                        <div class="min-w-0 space-y-2">
+                                            <span class="inline-flex items-center rounded-full border border-ash bg-sage/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-dark/70">
+                                                {{ $letter }}{{ str_pad((string) $rowNumber, 2, '0', STR_PAD_LEFT) }}
+                                            </span>
+                                            <h2 class="text-xl font-semibold leading-tight text-dark">
+                                                <a
+                                                    href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}"
+                                                    class="transition-colors hover:text-stone"
+                                                >
+                                                    {{ $brand->name ?? '' }}
+                                                </a>
+                                            </h2>
+                                        </div>
                                     </div>
-                                    <span class="shrink-0 border border-dark/25 px-2.5 py-1 text-xs font-semibold text-dark">
+
+                                    <span class="shrink-0 rounded-full border border-dark/15 bg-dark px-3 py-1 text-xs font-semibold text-sage">
                                         {{ number_format($brand->products_count ?? 0) }} {{ __('messages.products') }}
                                     </span>
                                 </div>
-                                <p class="text-sm leading-6 text-dark/75">
-                                    @if ($brand->description)
-                                        {{ \Illuminate\Support\Str::limit(strip_tags((string) $brand->description), 120) }}
-                                    @else
-                                        {{ __('messages.brands_index_description_placeholder') }}
-                                    @endif
-                                </p>
-                                <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}" class="inline-flex text-sm font-semibold text-dark underline decoration-dark/40 underline-offset-4">
-                                    {{ __('messages.brands_index_visit_brand') }}
-                                </a>
-                            </li>
-                        @endforeach
-                    </ul>
+
+                                <div class="mt-6 flex-1 space-y-4">
+                                    <p class="text-sm leading-6 text-dark/70">
+                                        {{ $brandDescription }}
+                                    </p>
+
+                                    <div class="flex min-h-8 flex-wrap gap-2">
+                                        @if ($brand->is_featured)
+                                            <span class="inline-flex items-center rounded-full border border-dark/15 bg-sage px-3 py-1 text-xs font-semibold text-dark">
+                                                {{ __('messages.featured') }}
+                                            </span>
+                                        @endif
+
+                                        @if ($brand->website_domain)
+                                            <span class="inline-flex items-center rounded-full border border-ash bg-sage/20 px-3 py-1 text-xs font-medium text-dark/70">
+                                                {{ $brand->website_domain }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <div class="mt-6 border-t border-ash/80 pt-4">
+                                    <a
+                                        href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}"
+                                        class="inline-flex items-center gap-2 rounded-full border border-dark bg-dark px-4 py-2.5 text-sm font-semibold text-sage shadow-soft transition-colors hover:bg-stone"
+                                    >
+                                        {{ __('messages.brands_index_visit_brand') }}
+                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    @endforeach
                 </section>
 
                 @if ($paginator->hasPages())
-                    <div class="brands-pagination mt-8 border-t border-dark/20 pt-6">
+                    <div class="brands-pagination mt-8 rounded-3xl border border-ash bg-white p-6 shadow-soft">
                         {{ $paginator->onEachSide(1)->links('pagination::tailwind') }}
                     </div>
                 @endif
             @else
-                <section class="border border-dashed border-dark/30 bg-sage/40 p-10 text-center">
+                <section class="rounded-3xl border border-dashed border-ash bg-white/80 p-10 text-center shadow-soft">
                     <h2 class="text-xl font-semibold text-dark">{{ __('messages.brands_index_empty_title') }}</h2>
                     <p class="mt-2 text-sm text-dark/70">{{ __('messages.brands_index_empty_description') }}</p>
-                    <button
-                        type="button"
-                        wire:click="clearFilters"
-                        class="mt-6 inline-flex items-center border border-dark bg-dark px-5 py-2.5 text-sm font-semibold text-sage transition-colors hover:bg-dark/90"
-                    >
-                        {{ __('messages.brands_index_reset_filters') }}
-                    </button>
+
+                    @if ($hasFilters)
+                        <button
+                            type="button"
+                            wire:click="clearFilters"
+                            class="mt-6 inline-flex items-center rounded-full border border-dark bg-dark px-5 py-2.5 text-sm font-semibold text-sage shadow-soft transition-colors hover:bg-stone"
+                        >
+                            {{ __('messages.brands_index_reset_filters') }}
+                        </button>
+                    @endif
                 </section>
             @endif
         </div>

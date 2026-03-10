@@ -20,6 +20,7 @@
             ...entangle,
             minQueryLength,
             selectedIndex: entangle?.selectedIndex ?? -1,
+            hoveredIndex: -1,
             /**
              * Alpine lifecycle hook: automatically wires listeners once the component boots.
              * Uses function references so they can be removed later if Alpine tears down the DOM node.
@@ -29,6 +30,8 @@
                 this.__handleKeydown = (event) => this.handleKeydown(event);
 
                 this.$watch('query', (value) => {
+                    this.hoveredIndex = -1;
+
                     const length = typeof value === 'string' ? value.length : 0;
                     if (length < this.minQueryLength) {
                         this.showResults = false;
@@ -61,20 +64,24 @@
 
                 if (event.key === 'ArrowDown') {
                     event.preventDefault();
+                    this.hoveredIndex = -1;
                     this.selectedIndex = Math.min(this.selectedIndex + 1, totalItems - 1);
                 } else if (event.key === 'ArrowUp') {
                     event.preventDefault();
+                    this.hoveredIndex = -1;
                     this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
                 } else if (event.key === 'Enter') {
                     event.preventDefault();
-                    if (this.selectedIndex >= 0) {
+                    const activeIndex = this.selectedIndex >= 0 ? this.selectedIndex : this.hoveredIndex;
+
+                    if (activeIndex >= 0) {
                         if (this.showResults && Array.isArray(this.results)) {
-                            const result = this.results[this.selectedIndex];
+                            const result = this.results[activeIndex];
                             if (result) {
                                 this.$wire?.selectResult(result);
                             }
                         } else if (this.showSuggestions && Array.isArray(this.suggestions)) {
-                            const suggestion = this.suggestions[this.selectedIndex];
+                            const suggestion = this.suggestions[activeIndex];
                             if (suggestion) {
                                 this.$wire?.selectSuggestion(suggestion);
                             }
@@ -98,9 +105,40 @@
                     if (typeof this.selectedIndex !== 'undefined') {
                         this.selectedIndex = -1;
                     }
+                    this.hoveredIndex = -1;
                 } catch (error) {
                     console.warn('Error closing dropdowns:', error);
                 }
+            },
+            /**
+             * Track the hovered row so pointer users see the same highlight as keyboard users.
+             * @param {number} index
+             */
+            setHoveredIndex(index) {
+                if (!Number.isInteger(index) || index < 0) {
+                    return;
+                }
+
+                this.hoveredIndex = index;
+            },
+            /**
+             * Clear the hovered row when the pointer leaves an item or dropdown.
+             * @param {number | null} index
+             */
+            clearHoveredIndex(index = null) {
+                if (Number.isInteger(index) && this.hoveredIndex !== index) {
+                    return;
+                }
+
+                this.hoveredIndex = -1;
+            },
+            /**
+             * Shared predicate for active row styling across keyboard and pointer interactions.
+             * @param {number} index
+             * @returns {boolean}
+             */
+            isHighlightedIndex(index) {
+                return this.selectedIndex === index || this.hoveredIndex === index;
             },
             /**
              * Public method used by templates to pick a specific result index when clicking list buttons.

@@ -9,6 +9,7 @@
     $actions = is_array($actions ?? null) ? $actions : [];
     $relatedPages = is_array($relatedPages ?? null) ? $relatedPages : [];
     $documentMeta = is_array($documentMeta ?? null) ? $documentMeta : [];
+    $contentHtml = is_string($contentHtml ?? null) ? trim($contentHtml) : null;
     $emptyMessage = $emptyMessage ?? __('frontend.legal.document_unavailable', ['document' => mb_strtolower((string) $title)]);
     $contents = collect($sections)
         ->map(static fn (array $section): ?string => isset($section['title']) && is_string($section['title']) ? $section['title'] : null)
@@ -95,7 +96,13 @@
                     </article>
                 @endif
 
-                @if ($sections !== [])
+                @if (filled($contentHtml))
+                    <article class="rounded-3xl border border-ash bg-white/95 p-6 shadow-xl md:p-8">
+                        <div class="prose prose-lg max-w-none text-stone">
+                            {!! $contentHtml !!}
+                        </div>
+                    </article>
+                @elseif ($sections !== [])
                     @foreach ($sections as $section)
                         <article class="rounded-3xl border border-ash bg-white/95 p-6 shadow-xl md:p-8">
                             @if (filled($section['title'] ?? null))

@@ -130,7 +130,9 @@
                         <button
                             x-on:click="selectResultByIndex(index)"
                             class="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                            :class="{ 'bg-gray-50': selectedIndex === index }"
+                            x-on:mouseenter="setHoveredIndex(index)"
+                            x-on:mouseleave="clearHoveredIndex(index)"
+                            :class="{ 'bg-gray-50': isHighlightedIndex(index) }"
                         >
                             <div class="flex items-center space-x-3">
                                 {{-- Result Image --}}
@@ -169,7 +171,9 @@
                     <button
                         x-on:click="selectSuggestionByIndex(index)"
                             class="w-full text-left p-3 rounded-lg hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                            :class="{ 'bg-gray-50': selectedIndex === index }"
+                            x-on:mouseenter="setHoveredIndex(index)"
+                            x-on:mouseleave="clearHoveredIndex(index)"
+                            :class="{ 'bg-gray-50': isHighlightedIndex(index) }"
                         >
                             <div class="flex items-center space-x-3">
                                 <div class="flex-shrink-0">
@@ -214,7 +218,9 @@
                 <button
                     @click="$wire.selectResult(result)"
                     class="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                    :class="{ 'bg-gray-50': selectedIndex === index }"
+                    x-on:mouseenter="setHoveredIndex(index)"
+                    x-on:mouseleave="clearHoveredIndex(index)"
+                    :class="{ 'bg-gray-50': isHighlightedIndex(index) }"
                 >
                     <div class="flex items-center space-x-3">
                         <div class="flex-shrink-0">

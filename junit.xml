@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\Frontend\BrandBrowsingTest" file="Brand Browsing (Tests\Feature\Frontend\BrandBrowsing)" tests="6" assertions="24" errors="0" failures="0" skipped="0" time="13.715391">
-    <testcase name="Brand show displays message when no products" file="Brand Browsing (Tests\Feature\Frontend\BrandBrowsing)::Brand show displays message when no products" class="Tests\Feature\Frontend\BrandBrowsingTest" classname="Tests.Feature.Frontend.BrandBrowsingTest" assertions="3" time="12.189598"/>
-    <testcase name="Brand index lists brands" file="Brand Browsing (Tests\Feature\Frontend\BrandBrowsing)::Brand index lists brands" class="Tests\Feature\Frontend\BrandBrowsingTest" classname="Tests.Feature.Frontend.BrandBrowsingTest" assertions="3" time="0.306421"/>
-    <testcase name="Brand show lists products" file="Brand Browsing (Tests\Feature\Frontend\BrandBrowsing)::Brand show lists products" class="Tests\Feature\Frontend\BrandBrowsingTest" classname="Tests.Feature.Frontend.BrandBrowsingTest" assertions="3" time="0.278046"/>
-    <testcase name="Brand show in stock filter only returns in stock products" file="Brand Browsing (Tests\Feature\Frontend\BrandBrowsing)::Brand show in stock filter only returns in stock products" class="Tests\Feature\Frontend\BrandBrowsingTest" classname="Tests.Feature.Frontend.BrandBrowsingTest" assertions="3" time="0.244844"/>
-    <testcase name="Brand show featured filter does not fallback to category sections" file="Brand Browsing (Tests\Feature\Frontend\BrandBrowsing)::Brand show featured filter does not fallback to category sections" class="Tests\Feature\Frontend\BrandBrowsingTest" classname="Tests.Feature.Frontend.BrandBrowsingTest" assertions="5" time="0.228120"/>
-    <testcase name="Brand show paginates products by twelve and renders bottom pager" file="Brand Browsing (Tests\Feature\Frontend\BrandBrowsing)::Brand show paginates products by twelve and renders bottom pager" class="Tests\Feature\Frontend\BrandBrowsingTest" classname="Tests.Feature.Frontend.BrandBrowsingTest" assertions="7" time="0.468362"/>
+  <testsuite name="Tests\Models\LegalTest" file="tests\Models\LegalTest.php" tests="1" assertions="2" errors="0" failures="0" skipped="0" time="12.805051">
+    <testcase name="it repairs mojibake in legacy legal translations before rendering" file="tests\Models\LegalTest.php::it repairs mojibake in legacy legal translations before rendering" class="Tests\Models\LegalTest" classname="Tests.Models.LegalTest" assertions="2" time="12.805051"/>
   </testsuite>
 </testsuites>

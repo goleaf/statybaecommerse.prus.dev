@@ -8,6 +8,7 @@ use App\Enums\LegalDocumentType;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\PublishedScope;
 use App\Services\Security\HtmlContentSanitizer;
+use App\Support\Encoding\MojibakeFixer;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -240,7 +241,11 @@ final class Legal extends Model
 
         $value = $translation->{$field};
 
-        return is_string($value) && $value !== '' ? $value : null;
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        return MojibakeFixer::repair($value);
     }
 
     /**

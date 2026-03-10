@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models\Translations;
 
 use App\Models\Legal;
+use App\Support\Encoding\MojibakeFixer;
 use App\Support\Html\HtmlSanitizer;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,6 +47,16 @@ final class LegalTranslation extends Model
     protected static function booted(): void
     {
         self::saving(static function (LegalTranslation $translation): void {
+            foreach (['title', 'content'] as $attribute) {
+                $value = $translation->getAttribute($attribute);
+
+                if (! is_string($value) || trim($value) === '') {
+                    continue;
+                }
+
+                $translation->setAttribute($attribute, MojibakeFixer::repair($value));
+            }
+
             /** @var HtmlSanitizer $sanitizer */
             $sanitizer = app(HtmlSanitizer::class);
 

@@ -210,10 +210,13 @@
          x-cloak>
         
         <div class="py-2">
-            @foreach($results as $result)
+            @foreach($results as $index => $result)
                 <button
                     wire:click="selectResult({{ json_encode($result) }})"
                     class="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
+                    x-on:mouseenter="setHoveredIndex({{ $index }})"
+                    x-on:mouseleave="clearHoveredIndex({{ $index }})"
+                    :class="{ 'bg-gray-50': isHighlightedIndex({{ $index }}) }"
                 >
                     <div class="flex items-center space-x-3">
                         {{-- Result Image --}}

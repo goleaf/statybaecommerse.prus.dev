@@ -101,10 +101,13 @@
         @elseif(count($results) > 0)
             {{-- Search Results --}}
             <div class="py-2">
-                @foreach($results as $result)
+                @foreach($results as $index => $result)
                     <button
                         wire:click="selectResult({{ json_encode($result) }})"
                         class="w-full px-4 py-3 text-left hover:bg-sage/20 hover:text-white focus:bg-sage/20 focus:text-white focus:outline-none transition-all duration-200 ease-in-out group"
+                        x-on:mouseenter="setHoveredIndex({{ $index }})"
+                        x-on:mouseleave="clearHoveredIndex({{ $index }})"
+                        :class="{ 'bg-sage/20 text-white': isHighlightedIndex({{ $index }}) }"
                     >
                         <div class="flex items-center space-x-3">
                             {{-- Result Image --}}
@@ -257,7 +260,9 @@
                     <button
                         wire:click="selectSuggestion({{ json_encode($suggestion) }})"
                         class="w-full px-4 py-3 text-left hover:bg-sage/20 hover:text-white focus:bg-sage/20 focus:text-white focus:outline-none transition-all duration-200 ease-in-out group"
-                        :class="{ 'bg-sage/20 text-white': selectedIndex === {{ $index }} }"
+                        x-on:mouseenter="setHoveredIndex({{ $index }})"
+                        x-on:mouseleave="clearHoveredIndex({{ $index }})"
+                        :class="{ 'bg-sage/20 text-white': isHighlightedIndex({{ $index }}) }"
                     >
                         <div class="flex items-center space-x-3">
                             {{-- Suggestion Icon --}}
@@ -337,4 +342,3 @@
         @endif
     </div>
 </div>
-

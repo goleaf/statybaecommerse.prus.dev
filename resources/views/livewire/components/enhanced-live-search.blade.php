@@ -211,7 +211,9 @@
                     <button
                         wire:click="selectResult({{ json_encode($result) }})"
                         class="w-full px-4 py-4 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none border-b border-gray-100 last:border-b-0"
-                        :class="{ 'bg-gray-50': selectedIndex === {{ $index }} }"
+                        x-on:mouseenter="setHoveredIndex({{ $index }})"
+                        x-on:mouseleave="clearHoveredIndex({{ $index }})"
+                        :class="{ 'bg-gray-50': isHighlightedIndex({{ $index }}) }"
                     >
                         <div class="flex items-center space-x-4">
                             <!-- Enhanced Result Image -->
@@ -379,7 +381,9 @@
                     <button
                         wire:click="selectSuggestion({{ json_encode($suggestion) }})"
                         class="w-full px-4 py-3 text-left hover:bg-gray-50 focus:bg-gray-50 focus:outline-none transition-colors duration-200"
-                        :class="{ 'bg-gray-50': selectedIndex === {{ $index }} }"
+                        x-on:mouseenter="setHoveredIndex({{ $index }})"
+                        x-on:mouseleave="clearHoveredIndex({{ $index }})"
+                        :class="{ 'bg-gray-50': isHighlightedIndex({{ $index }}) }"
                     >
                         <div class="flex items-center space-x-3">
                             <!-- Enhanced Suggestion Icon -->
@@ -465,4 +469,3 @@
         @endif
     </div>
 </div>
-
