@@ -32,6 +32,8 @@ class DiscountRedemptionResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = null;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->withoutGlobalScopes([

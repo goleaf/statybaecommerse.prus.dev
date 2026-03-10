@@ -45,6 +45,10 @@ it('unit: has correct navigation group', function (): void {
     expect(DiscountRedemptionResource::getNavigationGroup())->toBe(__('messages.discounts'));
 });
 
+it('unit: does not register navigation', function (): void {
+    expect(DiscountRedemptionResource::shouldRegisterNavigation())->toBeFalse();
+});
+
 it('unit: has correct navigation icon', function (): void {
     expect(DiscountRedemptionResource::getNavigationIcon())->toBe('heroicon-o-receipt-percent');
 });
