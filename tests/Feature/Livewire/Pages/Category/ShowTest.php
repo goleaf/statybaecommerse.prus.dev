@@ -7,6 +7,7 @@ namespace Tests\Feature\Livewire\Pages\Category;
 use App\Livewire\Pages\Category\Show;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -148,5 +149,48 @@ final class ShowTest extends TestCase
 
         $this->assertArrayHasKey($cartKey, $cart);
         $this->assertSame(1, $cart[$cartKey]['quantity']);
+    }
+
+    public function test_in_stock_filter_keeps_products_with_in_stock_variants(): void
+    {
+        $category = Category::factory()->create([
+            'is_visible' => true,
+        ]);
+
+        $variantBackedProduct = Product::factory()->published()->create([
+            'is_enabled'     => true,
+            'status'         => 'published',
+            'published_at'   => now()->subDay(),
+            'manage_stock'   => true,
+            'stock_quantity' => 0,
+        ]);
+        $category->products()->attach($variantBackedProduct->getKey());
+
+        ProductVariant::factory()->create([
+            'product_id'      => $variantBackedProduct->getKey(),
+            'stock_quantity'  => 4,
+            'track_inventory' => true,
+        ]);
+
+        $outOfStockProduct = Product::factory()->published()->create([
+            'is_enabled'     => true,
+            'status'         => 'published',
+            'published_at'   => now()->subDay(),
+            'manage_stock'   => true,
+            'stock_quantity' => 0,
+        ]);
+        $category->products()->attach($outOfStockProduct->getKey());
+
+        $component = Livewire::test(Show::class, ['category' => $category])
+            ->set('inStock', true);
+
+        /** @var \Illuminate\Contracts\Pagination\LengthAwarePaginator<int, \App\Data\Storefront\Home\ProductListItemData> $products */
+        $products = $component->instance()->products;
+        $productIds = $products->getCollection()
+            ->map(static fn ($product): int => (int) ($product->id ?? 0))
+            ->all();
+
+        $this->assertContains($variantBackedProduct->getKey(), $productIds);
+        $this->assertNotContains($outOfStockProduct->getKey(), $productIds);
     }
 }

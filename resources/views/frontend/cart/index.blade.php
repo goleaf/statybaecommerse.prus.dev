@@ -11,6 +11,12 @@
         $productSlugById = $productIds->isNotEmpty()
             ? \App\Models\Product::query()->whereIn('id', $productIds->all())->pluck('slug', 'id')
             : collect();
+        $continueShoppingUrl = \Illuminate\Support\Facades\Route::has('frontend.products.index')
+            ? route('frontend.products.index')
+            : route('home', []);
+        $checkoutUrl = auth()->check()
+            ? route('frontend.checkout.index')
+            : route('register');
 
         $orderSummaryItems = $itemsCollection
             ->map(static function (array $item): array {
@@ -27,7 +33,7 @@
             ->values();
     @endphp
 
-    <div class="min-h-screen bg-gray-50">
+    <div class="storefront-cart-page min-h-screen bg-gray-50">
         <section class="border-b border-gray-200 bg-white">
             <x-container class="px-4 py-10">
                 <div class="mx-auto w-full max-w-7xl space-y-3">
@@ -54,8 +60,8 @@
                             <h2 class="text-xl font-semibold text-gray-900">{{ __('messages.your_cart_is_empty') }}</h2>
                             <p class="mt-2 text-sm text-gray-600">{{ __('frontend.cart.empty_description') }}</p>
                             <a
-                                href="{{ \Illuminate\Support\Facades\Route::has('frontend.products.index') ? route('frontend.products.index', []) : route('frontend.products.index') }}"
-                                class="mt-6 inline-flex items-center justify-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary/90"
+                                href="{{ $continueShoppingUrl }}"
+                                class="mt-6 inline-flex items-center justify-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-semibold text-white transition"
                             >
                                 {{ __('frontend.cart.continue_shopping') }}
                             </a>
@@ -78,11 +84,12 @@
                                     $quantity = (int) data_get($item, 'quantity', 0);
                                     $lineTotal = (float) data_get($item, 'total', $unitPrice * $quantity);
                                     $imageUrl = data_get($item, 'image');
+                                    $hasProductControls = $productId > 0;
                                 @endphp
 
                                 <article class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-                                    <div class="flex flex-wrap items-center gap-4 md:flex-nowrap md:justify-between">
-                                        <div class="flex min-w-0 items-center gap-4">
+                                    <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+                                        <div class="flex min-w-0 flex-1 items-center gap-4">
                                             <div class="h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 bg-gray-100">
                                                 @if ($productUrl !== '#')
                                                     <a href="{{ $productUrl }}" class="block h-full w-full">
@@ -114,18 +121,117 @@
                                                 <p class="mt-1 text-sm text-gray-600">
                                                     {{ __('frontend.cart.unit_price', ['price' => app_money_format($unitPrice)]) }}
                                                 </p>
-                                                <p class="mt-2 inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
-                                                    {{ __('frontend.cart.quantity_label', ['quantity' => $quantity]) }}
-                                                </p>
                                             </div>
                                         </div>
 
-                                        <p class="text-lg font-semibold text-gray-900">
-                                            {{ \Illuminate\Support\Number::currency($lineTotal, current_currency(), app()->getLocale()) }}
-                                        </p>
+                                        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
+                                            @if ($hasProductControls)
+                                                <div class="inline-flex items-center overflow-hidden rounded-lg border border-gray-300 bg-white">
+                                                    @if ($quantity > 1)
+                                                        <form method="POST" action="{{ route('frontend.cart.update') }}" class="flex" data-disable-submit-spinner="true">
+                                                            @csrf
+                                                            <input type="hidden" name="product_id" value="{{ $productId }}">
+                                                            <input type="hidden" name="quantity" value="{{ $quantity - 1 }}">
+                                                            <button
+                                                                type="submit"
+                                                                class="inline-flex h-10 w-10 items-center justify-center text-gray-600 transition"
+                                                                title="{{ __('translations.decrease_quantity') }}"
+                                                            >
+                                                                <span class="sr-only">{{ __('translations.decrease_quantity') }}</span>
+                                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                                                                </svg>
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <form method="POST" action="{{ route('frontend.cart.remove') }}" class="flex" data-disable-submit-spinner="true">
+                                                            @csrf
+                                                            <input type="hidden" name="product_id" value="{{ $productId }}">
+                                                            <button
+                                                                type="submit"
+                                                                class="inline-flex h-10 w-10 items-center justify-center text-gray-600 transition"
+                                                                title="{{ __('translations.remove_item_from_cart') }}"
+                                                            >
+                                                                <span class="sr-only">{{ __('translations.remove_item_from_cart') }}</span>
+                                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                                                                </svg>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+
+                                                    <span class="flex h-10 min-w-14 items-center justify-center border-x border-gray-300 px-4 text-sm font-semibold text-gray-900">
+                                                        {{ $quantity }}
+                                                    </span>
+
+                                                    <form method="POST" action="{{ route('frontend.cart.update') }}" class="flex" data-disable-submit-spinner="true">
+                                                        @csrf
+                                                        <input type="hidden" name="product_id" value="{{ $productId }}">
+                                                        <input type="hidden" name="quantity" value="{{ $quantity + 1 }}">
+                                                        <button
+                                                            type="submit"
+                                                            class="inline-flex h-10 w-10 items-center justify-center text-gray-600 transition"
+                                                            title="{{ __('translations.increase_quantity') }}"
+                                                        >
+                                                            <span class="sr-only">{{ __('translations.increase_quantity') }}</span>
+                                                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @else
+                                                <p class="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">
+                                                    {{ __('frontend.cart.quantity_label', ['quantity' => $quantity]) }}
+                                                </p>
+                                            @endif
+
+                                            <p class="min-w-[110px] text-lg font-semibold text-gray-900 sm:text-right">
+                                                {{ \Illuminate\Support\Number::currency($lineTotal, current_currency(), app()->getLocale()) }}
+                                            </p>
+
+                                            @if ($hasProductControls)
+                                                <form method="POST" action="{{ route('frontend.cart.remove') }}" class="sm:shrink-0" data-disable-submit-spinner="true">
+                                                    @csrf
+                                                    <input type="hidden" name="product_id" value="{{ $productId }}">
+                                                    <button
+                                                        type="submit"
+                                                        class="inline-flex h-10 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 text-sm font-semibold text-red-700 transition"
+                                                    >
+                                                        {{ __('messages.remove') }}
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
                                     </div>
                                 </article>
                             @endforeach
+                        </div>
+
+                        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                            <a
+                                href="{{ $checkoutUrl }}"
+                                class="inline-flex w-full items-center justify-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-semibold text-white transition"
+                            >
+                                {{ __('frontend.cart.proceed_to_checkout') }}
+                            </a>
+
+                            <a
+                                href="{{ $continueShoppingUrl }}"
+                                class="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition"
+                            >
+                                {{ __('frontend.cart.continue_shopping') }}
+                            </a>
+
+                            <form method="POST" action="{{ route('frontend.cart.clear') }}" class="w-full" data-disable-submit-spinner="true">
+                                @csrf
+                                <button
+                                    type="submit"
+                                    class="inline-flex w-full items-center justify-center rounded-lg border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 transition"
+                                >
+                                    {{ __('frontend.cart.clear_cart') }}
+                                </button>
+                            </form>
                         </div>
                     @endif
                 </section>
@@ -137,36 +243,6 @@
                         :item-count="$itemCount"
                         :show-coupon="(bool) (config('app-features.features.discount') ?? true)"
                     />
-
-                    <section class="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                        <div class="space-y-3">
-                            <a
-                                href="{{ auth()->check() ? route('frontend.checkout.index') : route('register') }}"
-                                class="inline-flex w-full items-center justify-center rounded-lg bg-brand-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-primary/90"
-                            >
-                                {{ __('frontend.cart.proceed_to_checkout') }}
-                            </a>
-
-                            <a
-                                href="{{ \Illuminate\Support\Facades\Route::has('frontend.products.index') ? route('frontend.products.index', []) : route('frontend.products.index') }}"
-                                class="inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
-                            >
-                                {{ __('frontend.cart.continue_shopping') }}
-                            </a>
-
-                            @if ($itemsCollection->isNotEmpty())
-                                <form method="POST" action="{{ route('frontend.cart.clear') }}">
-                                    @csrf
-                                    <button
-                                        type="submit"
-                                        class="inline-flex w-full items-center justify-center rounded-lg border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 transition hover:bg-red-100"
-                                    >
-                                        {{ __('frontend.cart.clear_cart') }}
-                                    </button>
-                                </form>
-                            @endif
-                        </div>
-                    </section>
                 </aside>
             </div>
         </x-container>

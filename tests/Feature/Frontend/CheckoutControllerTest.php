@@ -75,8 +75,7 @@ final class CheckoutControllerTest extends TestCase
         $this->assertNotNull(session('checkout_order_id'));
 
         $success = $this->actingAs($user)->withSession(['checkout_order_id' => session('checkout_order_id')])->get(route('frontend.checkout.success'));
-        $success->assertOk();
-        $success->assertViewIs('frontend.checkout.success');
+        $success->assertRedirect(route('account.orders'));
     }
 
     public function test_process_requires_items_in_cart(): void

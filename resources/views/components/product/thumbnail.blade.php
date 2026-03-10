@@ -1,6 +1,8 @@
 @props(['product', 'containerClass' => null])
 
-@php($placeholderImageUrl = asset('images/placeholder-product.jpg'))
+@php
+    $placeholderImageUrl = asset('images/placeholder-product.jpg');
+@endphp
 
 <div @class([
     'aspect-1 ring-1 ring-gray-100 overflow-hidden',

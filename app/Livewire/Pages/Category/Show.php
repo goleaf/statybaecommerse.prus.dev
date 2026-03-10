@@ -16,6 +16,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
@@ -362,7 +363,7 @@ final class Show extends Component implements HasForms
         }
 
         if ($this->inStock) {
-            $query->where('products.stock_quantity', '>', 0);
+            $this->applyInStockProductFilter($query);
         }
 
         if ($this->onSale && Schema::hasTable('discount_products') && Schema::hasTable('discounts')) {
@@ -384,6 +385,51 @@ final class Show extends Component implements HasForms
         }
 
         return $query;
+    }
+
+    /**
+     * @param  BelongsToMany<Product, Category>  $query
+     */
+    private function applyInStockProductFilter(BelongsToMany $query): void
+    {
+        $supportsVariants = Schema::hasTable('product_variants')
+            && Schema::hasTable('product_variant_product');
+        $variantHasTrackInventory = $supportsVariants && Schema::hasColumn('product_variants', 'track_inventory');
+        $variantHasStockQuantity = $supportsVariants && Schema::hasColumn('product_variants', 'stock_quantity');
+
+        $query->where(function (Builder $stockQuery) use (
+            $supportsVariants,
+            $variantHasTrackInventory,
+            $variantHasStockQuantity
+        ): void {
+            $stockQuery->where('products.stock_quantity', '>', 0);
+
+            if (! $supportsVariants || (! $variantHasTrackInventory && ! $variantHasStockQuantity)) {
+                return;
+            }
+
+            $stockQuery->orWhereHas('variants', function (Builder $variantQuery) use (
+                $variantHasTrackInventory,
+                $variantHasStockQuantity
+            ): void {
+                $variantQuery->where(function (Builder $variantStockQuery) use (
+                    $variantHasTrackInventory,
+                    $variantHasStockQuantity
+                ): void {
+                    if ($variantHasTrackInventory) {
+                        $variantStockQuery->where('product_variants.track_inventory', false);
+                    }
+
+                    if ($variantHasStockQuantity) {
+                        if ($variantHasTrackInventory) {
+                            $variantStockQuery->orWhere('product_variants.stock_quantity', '>', 0);
+                        } else {
+                            $variantStockQuery->where('product_variants.stock_quantity', '>', 0);
+                        }
+                    }
+                });
+            });
+        });
     }
 
     private function sanitizeSearch(mixed $value): string

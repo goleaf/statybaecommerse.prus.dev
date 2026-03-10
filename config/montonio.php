@@ -12,11 +12,12 @@ return [
     | keys in your Montonio Partner System.
     |
     */
-
-    'access_key' => env('MONTONIO_ACCESS_KEY', '137fc106-2631-4bc6-96cf-595d699c8a28'),
-    'secret_key' => env('MONTONIO_SECRET_KEY', 'ZGcQhGeoL2bmyluOezhXI8EtUEADHy/CPUfOIFOXYOag'),
+    'access_key' => env('MONTONIO_ACCESS_KEY', ''),
+    'secret_key' => env('MONTONIO_SECRET_KEY', ''),
     'sandbox'    => env('MONTONIO_SANDBOX', true),
     'demo_mode'  => env('MONTONIO_DEMO_MODE', false),
+
+
 
     /*
     |--------------------------------------------------------------------------
@@ -26,6 +27,6 @@ return [
     | The base URLs for Montonio API services depending on environment.
     |
     */
-    'sandbox_url'    => 'https://sandbox-stargate.montonio.com/api',
-    'production_url' => 'https://stargate.montonio.com/api',
+    'sandbox_url'    => env('MONTONIO_SANDBOX_URL', 'https://sandbox-stargate.montonio.com/api'),
+    'production_url' => env('MONTONIO_PRODUCTION_URL', 'https://stargate.montonio.com/api'),
 ];

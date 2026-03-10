@@ -67,6 +67,61 @@ a.focus-visible\:outline-blue-600:focus-visible {
   outline-color: var(--btn-primary-ring) !important;
 }
 
+.storefront-cart-page :is(button, a.inline-flex) {
+  box-shadow: none !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+.storefront-cart-page :is(button, a.inline-flex):hover,
+.storefront-cart-page :is(button, a.inline-flex):focus,
+.storefront-cart-page :is(button, a.inline-flex):active {
+  box-shadow: none !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+  text-decoration: none !important;
+}
+
+.storefront-cart-page :is(button, a.inline-flex):hover:not(:disabled) {
+  cursor: pointer !important;
+}
+
+.storefront-cart-page :is(button, a.inline-flex)[class*="bg-brand-primary"]:hover,
+.storefront-cart-page :is(button, a.inline-flex)[class*="bg-brand-primary"]:focus,
+.storefront-cart-page :is(button, a.inline-flex)[class*="bg-brand-primary"]:active {
+  background-color: #262523 !important;
+  border-color: #262523 !important;
+  color: #ffffff !important;
+}
+
+.storefront-cart-page :is(button, a.inline-flex)[class*="bg-white"]:hover,
+.storefront-cart-page :is(button, a.inline-flex)[class*="bg-white"]:focus,
+.storefront-cart-page :is(button, a.inline-flex)[class*="bg-white"]:active {
+  background-color: #ffffff !important;
+}
+
+.storefront-cart-page :is(button, a.inline-flex)[class*="bg-red-50"]:hover,
+.storefront-cart-page :is(button, a.inline-flex)[class*="bg-red-50"]:focus,
+.storefront-cart-page :is(button, a.inline-flex)[class*="bg-red-50"]:active {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
+}
+
+.storefront-cart-page .cart-button-text-danger,
+.storefront-cart-page .cart-button-text-danger:hover,
+.storefront-cart-page .cart-button-text-danger:focus,
+.storefront-cart-page .cart-button-text-danger:active {
+  color: #dc2626 !important;
+  text-decoration: none !important;
+  box-shadow: none !important;
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+
 html,
 body {
   overflow-x: hidden;

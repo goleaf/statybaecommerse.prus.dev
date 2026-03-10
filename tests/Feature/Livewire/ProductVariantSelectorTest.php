@@ -44,4 +44,31 @@ describe('ProductVariantSelector', function (): void {
             ->assertSet('quantity', 1)
             ->assertSet('selectedVariantPricing.final', null);
     });
+
+    it('does not render the selected variant description inside the add to cart card', function (): void {
+        app()->setLocale('lt');
+
+        $product = Product::factory()->create([
+            'status'       => 'published',
+            'is_visible'   => true,
+            'published_at' => now(),
+        ]);
+
+        $variant = ProductVariant::factory()
+            ->for($product)
+            ->create([
+                'is_default_variant' => true,
+                'is_default'         => true,
+            ]);
+
+        $sidebarDescription = 'Šis aprašymas neturi būti rodomas dešinėje pirkimo kortelėje.';
+
+        $variant->translations()
+            ->where('locale', 'lt')
+            ->update(['description' => $sidebarDescription]);
+
+        Livewire::test(ProductVariantSelector::class, ['product' => $product])
+            ->assertDontSee($sidebarDescription)
+            ->assertDontSee(__('product.variants.fields.description'));
+    });
 });

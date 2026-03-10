@@ -185,23 +185,9 @@ final class CheckoutController extends Controller
         return redirect()->route('frontend.checkout.success')->with('status', __('messages.ecommerce'));
     }
 
-    public function success(Request $request): View
+    public function success(Request $request): RedirectResponse
     {
-        $orderId = Session::get('checkout_order_id');
-        if ($orderId === null) {
-            abort(404);
-        }
-
-        /** @var Order $order */
-        $order = Order::withoutGlobalScopes()->with('items')->findOrFail($orderId);
-
-        if ($order->user_id !== null && $request->user()?->getKey() !== $order->user_id) {
-            abort(403);
-        }
-
-        return view('frontend.checkout.success', [
-            'order' => $order,
-        ]);
+        return redirect()->route('account.orders');
     }
 
     public function cancel(Request $request, CartLifecycleService $cartLifecycleService): View

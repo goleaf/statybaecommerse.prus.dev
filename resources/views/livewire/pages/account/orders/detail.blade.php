@@ -142,7 +142,7 @@
 
         <x-order.items :items="$order->items" :currency_code="$order->currency" />
 
-        <div class="max-w-xl space-y-3">
+        <div class="space-y-3">
             <div>
                 <h2 class="text-base font-semibold text-gray-900">{{ __('frontend.account.order_detail.summary') }}</h2>
             </div>

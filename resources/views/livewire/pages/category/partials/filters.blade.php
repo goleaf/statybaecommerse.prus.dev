@@ -1,6 +1,7 @@
 @php
     $variant = $variant ?? 'desktop';
     $showSearch = $showSearch ?? true;
+    $showRefineCard = $showRefineCard ?? $showSearch;
     $cardPadding = $variant === 'mobile' ? 'p-5' : 'p-6';
     $cardShadow = $variant === 'mobile' ? 'shadow-lg' : 'shadow-sm';
     $summaryPaddingX = $variant === 'mobile' ? 'px-5' : 'px-6';
@@ -19,41 +20,43 @@
             : url('/categories'));
 @endphp
 
-<div class="border border-dark/25 bg-white/60 {{ $cardShadow }} {{ $cardPadding }} space-y-4">
-    <div class="flex items-center justify-between gap-3">
-        <h3 class="text-xs font-semibold uppercase tracking-[0.28em] text-dark/70">
-            {{ __('messages.refine_results') }}
-        </h3>
-        <a href="{{ $clearFiltersUrl }}"
-           class="text-xs font-semibold text-dark underline decoration-dark/30 underline-offset-4 transition-colors hover:decoration-dark">
-            {{ __('messages.clear_all') }}
-        </a>
-    </div>
-
-    @if ($showSearch)
-        <div class="flex flex-col gap-3">
-            <label for="category-search-{{ $variant }}" class="text-xs font-semibold uppercase tracking-wide text-dark/60">
-                {{ __('messages.search_categories') }}
-            </label>
-            <div class="flex items-center gap-2 overflow-hidden border border-dark/20 bg-sage/40 focus-within:border-dark focus-within:ring-2 focus-within:ring-dark/10">
-                <span class="px-3 text-dark/45">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
-                    </svg>
-                </span>
-                <input id="category-search-{{ $variant }}"
-                       type="search"
-                       wire:model.live.debounce.400ms="search"
-                       placeholder="{{ __('messages.type_to_filter_categories') }}"
-                       class="w-full border-0 bg-transparent py-2 pr-3 text-sm text-dark placeholder:text-dark/45 focus:outline-none focus:ring-0" />
-            </div>
+@if ($showRefineCard)
+    <div class="border border-dark/25 bg-white/60 {{ $cardShadow }} {{ $cardPadding }} space-y-4">
+        <div class="flex items-center justify-between gap-3">
+            <h3 class="text-xs font-semibold uppercase tracking-[0.28em] text-dark/70">
+                {{ __('messages.refine_results') }}
+            </h3>
+            <a href="{{ $clearFiltersUrl }}"
+               class="text-xs font-semibold text-dark underline decoration-dark/30 underline-offset-4 transition-colors hover:decoration-dark">
+                {{ __('messages.clear_all') }}
+            </a>
         </div>
-    @else
-        <p class="text-sm leading-6 text-dark/70">
-            {{ __('categories.index.filters_description') }}
-        </p>
-    @endif
-</div>
+
+        @if ($showSearch)
+            <div class="flex flex-col gap-3">
+                <label for="category-search-{{ $variant }}" class="text-xs font-semibold uppercase tracking-wide text-dark/60">
+                    {{ __('messages.search_categories') }}
+                </label>
+                <div class="flex items-center gap-2 overflow-hidden border border-dark/20 bg-sage/40 focus-within:border-dark focus-within:ring-2 focus-within:ring-dark/10">
+                    <span class="px-3 text-dark/45">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+                        </svg>
+                    </span>
+                    <input id="category-search-{{ $variant }}"
+                           type="search"
+                           wire:model.live.debounce.400ms="search"
+                           placeholder="{{ __('messages.type_to_filter_categories') }}"
+                           class="w-full border-0 bg-transparent py-2 pr-3 text-sm text-dark placeholder:text-dark/45 focus:outline-none focus:ring-0" />
+                </div>
+            </div>
+        @else
+            <p class="text-sm leading-6 text-dark/70">
+                {{ __('categories.index.filters_description') }}
+            </p>
+        @endif
+    </div>
+@endif
 
 <div class="border border-dark/25 bg-white/60 {{ $cardShadow }} {{ $cardPadding }} space-y-3">
     <h3 class="text-xs font-semibold uppercase tracking-[0.28em] text-dark/70">

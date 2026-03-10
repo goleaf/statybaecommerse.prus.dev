@@ -25,7 +25,14 @@ final class Detail extends Component
      */
     public function mount(string $number): void
     {
-        $query = Order::with(['items', 'items.product', 'shipping', 'invoices.file', 'currentInvoice.file'])
+        $query = Order::with([
+            'items',
+            'items.product',
+            'items.productVariant',
+            'shipping',
+            'invoices.file',
+            'currentInvoice.file',
+        ])
             ->where('number', $number)
             ->where('user_id', auth()->id());
 

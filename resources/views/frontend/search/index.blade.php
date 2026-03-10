@@ -20,7 +20,7 @@
                     <form
                         method="GET"
                         action="{{ route('frontend.search.index') }}"
-                        class="flex w-full md:w-auto gap-2"
+                        class="grid w-full gap-3 md:max-w-2xl md:flex-1 md:grid-cols-[minmax(0,1fr)_auto]"
                         x-data="debouncedSearchForm({
                             initialQuery: @js($query),
                             delay: 400,
@@ -32,20 +32,27 @@
                         @submit.prevent="manualSubmit()"
                     >
                         <label for="search-query" class="sr-only">{{ __('frontend.search.search_products_label') }}</label>
-                        <input
-                            id="search-query"
-                            type="search"
-                            name="q"
-                            x-ref="queryField"
-                            x-model="term"
-                            @input="handleInput()"
-                            value="{{ old('q', $query) }}"
-                            placeholder="{{ __('frontend.search.search_placeholder') }}"
-                            class="flex-1 md:w-72 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:border-blue-500 focus:ring-blue-500"
-                        >
+                        <div class="relative">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400 dark:text-gray-500">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input
+                                id="search-query"
+                                type="search"
+                                name="q"
+                                x-ref="queryField"
+                                x-model="term"
+                                @input="handleInput()"
+                                value="{{ old('q', $query) }}"
+                                placeholder="{{ __('frontend.search.search_placeholder') }}"
+                                class="block w-full min-w-0 rounded-xl border border-gray-200 bg-white py-3 pr-4 pl-12 text-sm text-gray-900 shadow-sm transition focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-500"
+                            >
+                        </div>
                         <button
                             type="submit"
-                            class="inline-flex items-center justify-center px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900"
+                            class="inline-flex w-full shrink-0 items-center justify-center whitespace-nowrap rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-900 md:w-auto"
                         >
                             {{ __('frontend.search.search_action') }}
                         </button>

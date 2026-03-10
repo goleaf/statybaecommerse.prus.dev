@@ -308,7 +308,7 @@ final class Index extends Component implements HasSchemas
                     fn (Builder $inner): Builder => $inner->whereIn('collections.id', $this->selectedCollectionIds)
                 )
             )
-            ->when($this->inStock, fn (Builder $q): Builder => $q->where('stock_quantity', '>', 0))
+            ->when($this->inStock, fn (Builder $q): Builder => $this->applyInStockProductFilter($q))
             ->when(
                 $this->onSale && SchemaFacade::hasTable('discount_products') && SchemaFacade::hasTable('discounts'),
                 fn (Builder $q): Builder => $q->whereHas('discounts', static fn (Builder $discountQuery): Builder => $discountQuery->active())
@@ -344,6 +344,12 @@ final class Index extends Component implements HasSchemas
 
         if ($this->hasProducts) {
             $query->has('products');
+        }
+
+        if ($this->inStock) {
+            $query->whereHas('products', function (Builder $q): void {
+                $this->applyActiveProductFilters($q);
+            });
         }
 
         if (! empty($this->selectedBrandIds)) {
@@ -464,11 +470,57 @@ final class Index extends Component implements HasSchemas
                     fn (Builder $c): Builder => $c->whereIn('collections.id', $this->selectedCollectionIds)
                 )
             )
-            ->when($this->inStock, fn (Builder $qq): Builder => $qq->where('stock_quantity', '>', 0))
+            ->when($this->inStock, fn (Builder $qq): Builder => $this->applyInStockProductFilter($qq))
             ->when(
                 $this->onSale && SchemaFacade::hasTable('discount_products') && SchemaFacade::hasTable('discounts'),
                 fn (Builder $qq): Builder => $qq->whereHas('discounts', static fn (Builder $discountQuery): Builder => $discountQuery->active())
             );
+    }
+
+    /**
+     * @param  Builder<Product>  $query
+     * @return Builder<Product>
+     */
+    private function applyInStockProductFilter(Builder $query): Builder
+    {
+        $supportsVariants = SchemaFacade::hasTable('product_variants')
+            && SchemaFacade::hasTable('product_variant_product');
+        $variantHasTrackInventory = $supportsVariants && SchemaFacade::hasColumn('product_variants', 'track_inventory');
+        $variantHasStockQuantity = $supportsVariants && SchemaFacade::hasColumn('product_variants', 'stock_quantity');
+
+        return $query->where(function (Builder $stockQuery) use (
+            $supportsVariants,
+            $variantHasTrackInventory,
+            $variantHasStockQuantity
+        ): void {
+            $stockQuery->where('stock_quantity', '>', 0);
+
+            if (! $supportsVariants || (! $variantHasTrackInventory && ! $variantHasStockQuantity)) {
+                return;
+            }
+
+            $stockQuery->orWhereHas('variants', function (Builder $variantQuery) use (
+                $variantHasTrackInventory,
+                $variantHasStockQuantity
+            ): void {
+                $variantQuery->where(function (Builder $variantStockQuery) use (
+                    $variantHasTrackInventory,
+                    $variantHasStockQuantity
+                ): void {
+                    if ($variantHasTrackInventory) {
+                        $variantStockQuery->where('track_inventory', false);
+                    }
+
+                    if ($variantHasStockQuantity) {
+                        if ($variantHasTrackInventory) {
+                            $variantStockQuery->orWhere('stock_quantity', '>', 0);
+                        } else {
+                            $variantStockQuery->where('stock_quantity', '>', 0);
+                        }
+                    }
+                });
+            });
+        });
     }
 
     public function render(): View

@@ -8,6 +8,7 @@ use App\Livewire\Pages\Category\Index;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -29,7 +30,7 @@ final class IndexTest extends TestCase
             'is_visible' => true,
         ]);
 
-        $response = $this->get('/lt/categories');
+        $response = $this->followingRedirects()->get('/lt/categories');
 
         $response->assertSuccessful();
     }
@@ -62,11 +63,65 @@ final class IndexTest extends TestCase
         $component = Livewire::test(Index::class)
             ->set('selectedBrandIds', [$selectedBrand->id]);
 
-        /** @var \Illuminate\Contracts\Pagination\LengthAwarePaginator<int, \App\Models\Category> $filteredCategories */
-        $filteredCategories = $component->instance()->categories;
-        $filteredIds = $filteredCategories->getCollection()->pluck('id')->all();
+        /** @var \Illuminate\Support\Collection<int, array{category: \App\Models\Category, depth: int}> $filteredRows */
+        $filteredRows = $component->instance()->categories;
+        $filteredIds = $filteredRows
+            ->map(static fn (array $row): int => (int) $row['category']->id)
+            ->all();
 
         $this->assertContains($matchingCategory->id, $filteredIds);
         $this->assertNotContains($otherCategory->id, $filteredIds);
+    }
+
+    public function test_it_hides_categories_without_in_stock_products_when_in_stock_filter_is_enabled(): void
+    {
+        $inStockCategory = Category::factory()->create([
+            'name'       => 'In Stock Category',
+            'is_visible' => true,
+        ]);
+        $outOfStockCategory = Category::factory()->create([
+            'name'       => 'Out Of Stock Category',
+            'is_visible' => true,
+        ]);
+
+        $inStockProduct = Product::factory()->create([
+            'stock_quantity' => 8,
+        ]);
+        $inStockProduct->categories()->attach($inStockCategory->id);
+
+        $outOfStockProduct = Product::factory()->create([
+            'stock_quantity' => 0,
+        ]);
+        $outOfStockProduct->categories()->attach($outOfStockCategory->id);
+
+        $variantInStockCategory = Category::factory()->create([
+            'name'       => 'Variant In Stock Category',
+            'is_visible' => true,
+        ]);
+
+        $variantBackedProduct = Product::factory()->create([
+            'stock_quantity' => 0,
+            'manage_stock'   => true,
+        ]);
+        $variantBackedProduct->categories()->attach($variantInStockCategory->id);
+
+        ProductVariant::factory()->create([
+            'product_id'      => $variantBackedProduct->id,
+            'stock_quantity'  => 6,
+            'track_inventory' => true,
+        ]);
+
+        $component = Livewire::test(Index::class)
+            ->set('inStock', true);
+
+        /** @var \Illuminate\Support\Collection<int, array{category: \App\Models\Category, depth: int}> $filteredRows */
+        $filteredRows = $component->instance()->categories;
+        $filteredIds = $filteredRows
+            ->map(static fn (array $row): int => (int) $row['category']->id)
+            ->all();
+
+        $this->assertContains($inStockCategory->id, $filteredIds);
+        $this->assertContains($variantInStockCategory->id, $filteredIds);
+        $this->assertNotContains($outOfStockCategory->id, $filteredIds);
     }
 }

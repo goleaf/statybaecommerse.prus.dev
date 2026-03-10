@@ -7,7 +7,7 @@
         <button type="button"
                 wire:click="apply"
                 wire:loading.attr="disabled"
-                class="inline-flex h-11 shrink-0 items-center justify-center rounded-lg bg-brand-primary px-4 text-sm font-semibold text-white transition hover:bg-brand-primary/90 disabled:opacity-50 disabled:cursor-not-allowed">
+                class="inline-flex h-11 shrink-0 items-center justify-center rounded-lg bg-brand-primary px-4 text-sm font-semibold text-white transition disabled:opacity-50 disabled:cursor-not-allowed">
             <span wire:loading.remove>{{ __('messages.apply') }}</span>
             <span wire:loading>{{ __('translations.applying') }}</span>
         </button>
@@ -28,7 +28,7 @@
                         wire:click="remove"
                         wire:confirm="{{ __('translations.confirm_remove_coupon') }}"
                         wire:loading.attr="disabled"
-                        class="text-sm font-medium text-red-600 transition hover:text-red-700 hover:underline disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="cart-button-text-danger text-sm font-medium text-red-600 transition disabled:opacity-50 disabled:cursor-not-allowed">
                     {{ __('messages.remove') }}
                 </button>
             </div>

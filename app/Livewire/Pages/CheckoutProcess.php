@@ -204,9 +204,9 @@ final class CheckoutProcess extends Component
     public function validateCurrentStep(): void
     {
         match ($this->currentStep) {
-            1 => $this->validate($this->addressStepRules()),
-            2 => $this->validate($this->deliveryStepRules()),
-            3 => $this->validate($this->paymentStepRules()),
+            1       => $this->validate($this->addressStepRules()),
+            2       => $this->validate($this->deliveryStepRules()),
+            3       => $this->validate($this->paymentStepRules()),
             default => null,
         };
     }
@@ -437,9 +437,9 @@ final class CheckoutProcess extends Component
                     'variant_id' => isset($item['variant_id']) && is_numeric($item['variant_id'])
                         ? (int) $item['variant_id']
                         : null,
-                    'quantity' => $quantity,
-                    'price' => $price,
-                    'unit_price' => $price,
+                    'quantity'         => $quantity,
+                    'price'            => $price,
+                    'unit_price'       => $price,
                     'product_snapshot' => [
                         'name'  => $item['name'] ?? null,
                         'sku'   => $item['sku'] ?? null,
@@ -1398,9 +1398,9 @@ final class CheckoutProcess extends Component
     protected function validationAttributes(): array
     {
         return [
-            'selectedPaymentMethod'            => __('messages.payment_method'),
+            'selectedPaymentMethod'             => __('messages.payment_method'),
             'selectedMontonioPaymentMethodType' => __('ui.payment_type'),
-            'selectedMontonioBankCode'        => __('ui.bank'),
+            'selectedMontonioBankCode'          => __('ui.bank'),
         ];
     }
 

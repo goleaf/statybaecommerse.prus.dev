@@ -30,8 +30,8 @@ final class MontonioService
 
     public function __construct()
     {
-        $this->accessKey = config('montonio.access_key', '');
-        $this->secretKey = config('montonio.secret_key', '');
+        $this->accessKey = trim((string) config('montonio.access_key', ''));
+        $this->secretKey = trim((string) config('montonio.secret_key', ''));
 
         $this->sandbox = (bool) config('montonio.sandbox', true);
         $this->demoMode = (bool) config('montonio.demo_mode', false);
@@ -243,10 +243,25 @@ final class MontonioService
                 ->get("{$this->apiUrl}/stores/payment-methods");
 
             if (! $response->successful()) {
+                $responseJson = $response->json();
+                $responseMessage = strtoupper((string) data_get(
+                    is_array($responseJson) ? $responseJson : [],
+                    'message',
+                    ''
+                ));
+
                 Log::warning('Montonio payment methods request failed.', [
                     'status' => $response->status(),
                     'body'   => $response->body(),
                 ]);
+
+                if ($response->status() === 403 && $responseMessage === 'INVALID_TOKEN') {
+                    throw new Exception(__('messages.montonio_invalid_payment_methods_credentials'));
+                }
+
+                if ($response->status() === 401 && $responseMessage === 'STORE_NOT_FOUND') {
+                    throw new Exception(__('messages.montonio_payment_methods_store_not_found'));
+                }
 
                 throw new Exception(__('messages.montonio_failed_to_fetch_payment_methods'));
             }
@@ -268,7 +283,7 @@ final class MontonioService
     }
 
     /**
-     * @param  array<string, mixed>  $paymentSelection
+     * @param  array<string, mixed> $paymentSelection
      * @return array<string, mixed>
      */
     private function buildPaymentPayload(Order $order, array $paymentSelection): array
@@ -279,11 +294,15 @@ final class MontonioService
             return [];
         }
 
-        $methodOptions = array_filter([
-            'paymentDescription' => (string) __('ui.payment_for_order_number', ['number' => $order->number]),
-            'preferredCountry'   => $paymentSelection['preferred_country'] ?? null,
-            'preferredProvider'  => $paymentSelection['preferred_provider'] ?? null,
-        ], static fn (mixed $value): bool => ! is_string($value) || trim($value) !== '');
+        $methodOptions = [];
+
+        if ($method === 'paymentInitiation') {
+            $methodOptions = array_filter([
+                'paymentDescription' => (string) __('ui.payment_for_order_number', ['number' => $order->number]),
+                'preferredCountry'   => $paymentSelection['preferred_country'] ?? null,
+                'preferredProvider'  => $paymentSelection['preferred_provider'] ?? null,
+            ], static fn (mixed $value): bool => ! is_string($value) || trim($value) !== '');
+        }
 
         return array_filter([
             'method'        => $method,
@@ -297,14 +316,14 @@ final class MontonioService
     private function resolvePaymentMethodDisplay(string $method): string
     {
         return match ($method) {
-            'cardPayments'     => (string) __('ui.pay_with_card'),
+            'cardPayments'      => (string) __('ui.pay_with_card'),
             'paymentInitiation' => (string) __('ui.pay_with_your_bank'),
-            default            => (string) __('enums.payment_method.montonio'),
+            default             => (string) __('enums.payment_method.montonio'),
         };
     }
 
     /**
-     * @param  array<string, mixed>  $bankSetup
+     * @param array<string, mixed> $bankSetup
      */
     private function resolvePreferredCountry(string $requestedCountry, string $currency, array $bankSetup): string
     {

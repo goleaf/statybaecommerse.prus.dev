@@ -3,42 +3,23 @@
     'currency_code',
 ])
 
-@php($currency = (string) ($currency_code ?? 'EUR'))
+@php
+    $currency = (string) ($currency_code ?? 'EUR');
+@endphp
 
-<div class="space-y-4">
-@foreach($items as $item)
-        @php($unitPrice = (float) ($item->unit_price_amount ?? $item->unit_price ?? $item->price ?? 0))
-        @php
-            $productUrl = null;
-            if ($item->product) {
-                $productUrl = route('product.show', $item->product->trans('slug') ?? $item->product->slug ?? $item->product);
-            }
-        @endphp
-        <div class="relative flex gap-3 rounded-lg border border-gray-200 p-3">
-            @if ($productUrl)
-                <a href="{{ $productUrl }}" class="block">
-                    <x-product.thumbnail :product="$item->product" class="size-28" />
-                </a>
-            @else
-                <x-product.thumbnail :product="$item->product" class="size-28" />
-            @endif
-            <div class="flex-1 space-y-0.5">
-                <h4 class="font-heading text-sm font-medium leading-5 text-gray-900">
-                    @if ($productUrl)
-                        <a href="{{ $productUrl }}" class="hover:text-blue-600 transition-colors">
-                            {{ $item->name }}
-                        </a>
-                    @else
-                        {{ $item->name }}
-                    @endif
-                </h4>
-                <p class="text-sm text-gray-700">
-                    <span class="text-gray-500">{{ __('ui.unit_price') }}</span> : {{ \Illuminate\Support\Number::currency($unitPrice, $currency, app()->getLocale()) }}
-                </p>
-                <p class="text-sm text-gray-700">
-                    <span class="text-gray-500">{{ __('messages.quantity') }}</span> : {{ $item->quantity }}
-                </p>
-            </div>
-        </div>
-    @endforeach
+<div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    {{-- Table header --}}
+    <div class="hidden grid-cols-12 gap-4 border-b border-gray-100 bg-gray-50 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500 sm:grid">
+        <div class="col-span-6">{{ __('messages.product') }}</div>
+        <div class="col-span-2 text-center">{{ __('messages.quantity') }}</div>
+        <div class="col-span-2 text-right">{{ __('messages.unit_price') }}</div>
+        <div class="col-span-2 text-right">{{ __('messages.total') }}</div>
+    </div>
+
+    {{-- Rows --}}
+    <ul class="divide-y divide-gray-100">
+        @foreach ($items as $item)
+            <x-order.item :item="$item" :currency_code="$currency" />
+        @endforeach
+    </ul>
 </div>
