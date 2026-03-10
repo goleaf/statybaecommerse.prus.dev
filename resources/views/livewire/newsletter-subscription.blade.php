@@ -1,4 +1,4 @@
-<div class="w-full max-w-md">
+<div class="w-full max-w-none lg:max-w-sm">
     @if (session()->has('success'))
         <div class="mb-4 p-4 bg-sage/20 border border-sage/40 text-sage rounded-lg">
             {{ session('success') }}
@@ -36,7 +36,7 @@
                 @enderror
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
                     <label for="first_name" class="block text-sm font-medium text-ash mb-2">
                         {{ __('messages.newsletter_first_name') }}

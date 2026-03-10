@@ -60,6 +60,7 @@
             : (Route::has('frontend.contact.index')
                 ? route('frontend.contact.index')
                 : url('/contact'));
+        $socialFacebookTopbarUrl = 'https://www.facebook.com/p/Egis-statyba-100076148592033/';
         $quickLinks = collect([
             [
                 'key' => 'categories',
@@ -135,6 +136,23 @@
                             d="M8 10h8M8 14h5M12 20l-3.5-2H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2h-2" />
                     </svg>
                     <span class="hidden sm:block">{{ __('frontend.header.topbar.consultations') }}</span>
+                </a>
+                <a href="tel:{{ __('frontend.header.topbar.phone_href') }}"
+                    class="flex items-center group gap-2 hover:text-stone transition-colors">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M2 5a2 2 0 012-2h2l2 5-2 1a14 14 0 006 6l1-2 5 2v2a2 2 0 01-2 2h-1C9.163 19 5 14.837 5 9V8a2 2 0 00-2-2z" />
+                    </svg>
+                    <span class="hidden sm:block">{{ __('frontend.header.topbar.phone') }}</span>
+                </a>
+                <a href="{{ $socialFacebookTopbarUrl }}" target="_blank" rel="noopener noreferrer"
+                    class="inline-flex items-center justify-center rounded-full p-1.5 hover:text-stone transition-colors"
+                    aria-label="{{ __('messages.footer_facebook') }}">
+                    <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+                            clip-rule="evenodd" />
+                    </svg>
                 </a>
             </div>
         </div>
@@ -399,4 +417,3 @@
         </div>
     @endif
 </nav>
-

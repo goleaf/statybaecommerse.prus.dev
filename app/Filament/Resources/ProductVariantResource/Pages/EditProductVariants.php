@@ -6,6 +6,7 @@ namespace App\Filament\Resources\ProductVariantResource\Pages;
 
 use App\Filament\Resources\ProductVariantResource;
 use App\Filament\Resources\ProductVariantResource\Schemas\ProductVariantForm;
+use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\ProductVariantAttributeMatrixService;
 use Filament\Actions;
@@ -60,6 +61,8 @@ class EditProductVariants extends EditRecord
             $data['attributes'] = $legacyAttributes !== [] ? $legacyAttributes : null;
         }
 
+        $data = $this->syncLocalizationFromParentProduct($data);
+
         return $data;
     }
 
@@ -108,5 +111,64 @@ class EditProductVariants extends EditRecord
         }
 
         return ProductVariantResource::getUrl('index');
+    }
+
+    private function syncLocalizationFromParentProduct(array $data): array
+    {
+        $productId = $data['product_id'] ?? $this->record->product_id ?? null;
+
+        if (! is_numeric($productId)) {
+            return $data;
+        }
+
+        $table = (new ProductVariant)->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return $data;
+        }
+
+        $columns = [
+            'variant_name_lt',
+            'variant_name_en',
+            'description_lt',
+            'description_en',
+        ];
+
+        $availableColumns = array_filter(
+            $columns,
+            static fn (string $column): bool => Schema::hasColumn($table, $column),
+        );
+
+        if ($availableColumns === []) {
+            return $data;
+        }
+
+        $product = Product::query()
+            ->withoutGlobalScopes()
+            ->find((int) $productId);
+
+        if (! $product instanceof Product) {
+            return $data;
+        }
+
+        $resolvedValues = [
+            'variant_name_lt' => self::normalizeNullableString($product->getTranslatedName('lt')),
+            'variant_name_en' => self::normalizeNullableString($product->getTranslatedName('en')),
+            'description_lt' => self::normalizeNullableString($product->getTranslatedDescription('lt')),
+            'description_en' => self::normalizeNullableString($product->getTranslatedDescription('en')),
+        ];
+
+        foreach ($availableColumns as $column) {
+            $data[$column] = $resolvedValues[$column] ?? null;
+        }
+
+        return $data;
+    }
+
+    private static function normalizeNullableString(?string $value): ?string
+    {
+        $normalized = trim((string) $value);
+
+        return $normalized !== '' ? $normalized : null;
     }
 }

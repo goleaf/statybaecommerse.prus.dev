@@ -194,7 +194,6 @@ return [
     'confirm_toggle_filters'                    => 'Confirm toggle filters',
     'confirm_toggle_lightbox'                   => 'Confirm toggle lightbox',
     'confirm_toggle_modal'                      => 'Confirm toggle modal',
-    'confirm_toggle_sidebar'                    => 'Möchten Sie die Seitenleiste wirklich umschalten?',
     'confirm_toggle_wishlist'                   => 'Confirm toggle wishlist',
     'confirm_type_delete'                       => 'Confirm type delete',
     'contact_information'                       => 'Kontaktinformationen',

@@ -194,7 +194,6 @@ return [
     'confirm_toggle_filters'                    => 'Patvirtinti filtrų perjungimą',
     'confirm_toggle_lightbox'                   => 'Patvirtinti lightbox perjungimą',
     'confirm_toggle_modal'                      => 'Patvirtinti modalinio lango perjungimą',
-    'confirm_toggle_sidebar'                    => 'Ar tikrai perjungti šoninį meniu?',
     'confirm_toggle_wishlist'                   => 'Patvirtinti norų sąrašo perjungimą',
     'confirm_type_delete'                       => 'Patvirtinti tipo ištrynimą',
     'contact_information'                       => 'Kontaktinė informacija',

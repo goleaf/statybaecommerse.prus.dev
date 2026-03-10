@@ -64,7 +64,7 @@
         canonical="{{ url()->current() }}" />
 @endsection
 
-<div x-data="{ showFilters: false }" class="min-h-screen bg-slate-50">
+<div x-data="{ showFilters: false }" class="min-h-screen bg-sage">
     <div class="bg-dark text-sage">
         <div class="mx-auto w-full max-w-8xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
             <nav class="mb-8 text-sm text-sage/80" aria-label="{{ __('ui.breadcrumb') }}">
@@ -92,7 +92,7 @@
             </nav>
 
             <div class="space-y-6">
-                <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+                <div class="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
                     <div class="space-y-4 lg:max-w-none">
                         <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
                             @if ($isIndex)
@@ -131,8 +131,7 @@
                             @endphp
                             <button type="button"
                                     wire:click="$toggle('sidebarOpen')"
-                                    wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                                    class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-2 text-sm font-semibold text-dark shadow-sm transition-colors hover:bg-sage/90 lg:hidden">
+                                    class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-2 text-sm font-semibold text-dark shadow-sm transition-colors hover:bg-sage/90 md:hidden">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                                 </svg>
@@ -151,7 +150,7 @@
                             </div>
                             <button type="button"
                                     @click="showFilters = true"
-                                    class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-2 text-sm font-semibold text-dark shadow-sm transition-colors hover:bg-sage/90 lg:hidden">
+                                    class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-2 text-sm font-semibold text-dark shadow-sm transition-colors hover:bg-sage/90 md:hidden">
                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
                                 </svg>
@@ -164,7 +163,7 @@
         </div>
     </div>
 
-    <x-container class="px-4 pb-16 pt-12">
+    <x-container class="px-3 pb-12 pt-8 sm:px-4 sm:pb-16 sm:pt-12">
         @php
             $roots = \App\Models\Category::query()
                 ->where('is_visible', true)
@@ -214,9 +213,9 @@
                 ->values();
         @endphp
 
-        <div class="grid gap-8 lg:grid-cols-12 lg:items-start">
-            <aside class="hidden lg:col-span-3 lg:block">
-                <div class="lg:sticky lg:top-24 lg:self-start">
+        <div class="grid gap-8 md:grid-cols-12 md:items-start xl:gap-10">
+            <aside class="hidden md:col-span-4 md:block xl:col-span-3">
+                <div class="md:sticky md:top-20 md:self-start xl:top-24">
                     <div class="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg">
                     <div class="mb-6 space-y-2">
                         <span class="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-cyan-700">
@@ -279,11 +278,11 @@
             </div>
             </aside>
 
-            <section class="lg:col-span-9 space-y-6">
+            <section class="space-y-6 md:col-span-8 xl:col-span-9">
                 <!-- Sort and Filter Controls -->
                 @if ($isIndex)
                     <div class="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
-                        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                             <div class="flex flex-wrap items-center gap-3 text-sm text-slate-700">
                                 @if ($from && $to)
                                     <span class="whitespace-nowrap text-slate-500">{{ __('categories.index.showing_results', ['from' => $from, 'to' => $to, 'total' => $totalCategories]) }}</span>
@@ -309,7 +308,7 @@
                     </div>
                 @else
                     <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
-                        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                        <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                             <div class="flex flex-wrap items-center gap-3 text-sm font-medium">
                                 @if ($products->firstItem() && $products->lastItem())
                                     <span class="text-white/80">
@@ -350,7 +349,54 @@
                     @if ($isIndex)
                         {{-- Categories Display --}}
                         @if ($categoryRows->count() > 0)
-                            <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                            <div class="space-y-3 md:hidden">
+                                @foreach ($categoryRows as $row)
+                                    @php
+                                        $category = $row['category'];
+                                        $depth = (int) ($row['depth'] ?? 0);
+                                        $slug = method_exists($category, 'trans')
+                                            ? ($category->trans('slug') ?? $category->slug)
+                                            : ($category->slug ?? (is_string($category) ? $category : null));
+                                        $name = method_exists($category, 'trans')
+                                            ? ($category->trans('name') ?? $category->name)
+                                            : $category->name;
+                                        $description = method_exists($category, 'trans')
+                                            ? ($category->trans('description') ?? $category->description)
+                                            : $category->description;
+                                        $productCount = $category->products_count
+                                            ?? ($category->published_products_count ?? ($category->products?->count() ?? 0));
+                                    @endphp
+
+                                    <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+                                        <div class="space-y-3">
+                                            <div class="flex items-start justify-between gap-3">
+                                                <div class="min-w-0" style="padding-left: {{ min($depth, 4) * 0.7 }}rem;">
+                                                    <a href="{{ route('frontend.categories.show', ['category' => $slug]) }}"
+                                                       class="block truncate text-base font-semibold text-slate-900">
+                                                        {{ $name }}
+                                                    </a>
+                                                </div>
+                                                <span class="shrink-0 inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-700">
+                                                    {{ $productCount }}
+                                                </span>
+                                            </div>
+
+                                            @if ($description)
+                                                <p class="text-sm leading-relaxed text-slate-600">
+                                                    {{ \Illuminate\Support\Str::limit(strip_tags($description), 140) }}
+                                                </p>
+                                            @endif
+
+                                            <a href="{{ route('frontend.categories.show', ['category' => $slug]) }}"
+                                               class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+                                                {{ __('categories.index.view_category') }}
+                                            </a>
+                                        </div>
+                                    </article>
+                                @endforeach
+                            </div>
+
+                            <div class="hidden overflow-hidden rounded-2xl border border-slate-200 bg-white md:block">
                                 <div class="overflow-x-auto">
                                     <table class="min-w-full text-sm">
                                         <thead class="bg-slate-50">
@@ -440,7 +486,7 @@
                         {{-- Products Display --}}
                         @if ($products->count() > 0)
                             <!-- Products Grid -->
-                            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                                 @foreach ($products as $product)
                                     <div class="animate-fade-in-up animate-delay" data-delay="{{ $loop->index * 0.1 }}">
                                         @include('livewire.home.partials.product-card', [
@@ -453,77 +499,10 @@
                             </div>
 
                             <!-- Pagination -->
-                            <div class="mt-12 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                                <nav class="flex items-center justify-center" aria-label="{{ __('categories.show.pagination_navigation') }}">
-                                    <div class="flex items-center justify-center">
-                                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="{{ __('messages.pagination') }}">
-                                            @if ($products->onFirstPage())
-                                                <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200">
-                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            @else
-                                                <button wire:click="previousPage('page')" wire:loading.attr="disabled" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50">
-                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </button>
-                                            @endif
-
-                                            @php
-                                                $currentPage = $products->currentPage();
-                                                $lastPage = $products->lastPage();
-                                                $startPage = max(1, $currentPage - 2);
-                                                $endPage = min($lastPage, $currentPage + 2);
-                                            @endphp
-
-                                            @if ($startPage > 1)
-                                                <button wire:click="gotoPage(1, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0">
-                                                    1
-                                                </button>
-                                                @if ($startPage > 2)
-                                                    <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-400">...</span>
-                                                @endif
-                                            @endif
-
-                                            @for ($page = $startPage; $page <= $endPage; $page++)
-                                                @if ($page == $currentPage)
-                                                    <span class="relative z-10 inline-flex items-center bg-cyan-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-600">
-                                                        {{ $page }}
-                                                    </span>
-                                                @else
-                                                    <button wire:click="gotoPage({{ $page }}, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0">
-                                                        {{ $page }}
-                                                    </button>
-                                                @endif
-                                            @endfor
-
-                                            @if ($endPage < $lastPage)
-                                                @if ($endPage < $lastPage - 1)
-                                                    <span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-400">...</span>
-                                                @endif
-                                                <button wire:click="gotoPage({{ $lastPage }}, 'page')" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0">
-                                                    {{ $lastPage }}
-                                                </button>
-                                            @endif
-
-                                            @if ($products->hasMorePages())
-                                                <button wire:click="nextPage('page')" wire:loading.attr="disabled" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-cyan-50 hover:text-cyan-700 focus:z-20 focus:outline-offset-0 disabled:cursor-not-allowed disabled:opacity-50">
-                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </button>
-                                            @else
-                                                <span class="relative inline-flex items-center rounded-r-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-200">
-                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            @endif
-                                        </nav>
-                                    </div>
-                                </nav>
+                            <div class="mt-12 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+                                <div class="overflow-x-auto">
+                                    {{ $products->links() }}
+                                </div>
                             </div>
                         @else
                             <!-- Empty State -->
@@ -567,11 +546,11 @@
                                     <!-- Mobile Filter Sidebar -->
                                     @if ($isIndex)
                                         @if ($sidebarOpen)
-                                            <div class="fixed inset-0 z-40 lg:hidden">
+                                            <div class="fixed inset-0 z-40 md:hidden">
                                                 <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
                                                      wire:click="$toggle('sidebarOpen')"></div>
                                 
-                                                <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-white shadow-2xl">
+                                                <div class="absolute inset-y-0 right-0 w-full max-w-lg rounded-l-3xl bg-white shadow-2xl sm:w-11/12">
                                                     <div class="flex h-full flex-col overflow-y-auto">
                                                         <div class="flex items-center justify-between border-b border-slate-200 p-6">
                                                             <div class="space-y-2">
@@ -596,10 +575,7 @@
                                                             </button>
                                                         </div>
                                                         <div class="flex-1 space-y-6 overflow-y-auto p-6">
-                                                            @livewire('category.filters', [
-                                                                'isIndex' => $isIndex,
-                                                                'category' => $category ?? null,
-                                                            ])
+                                                            @include('livewire.pages.category.partials.filters', ['variant' => 'mobile'])
                                                         </div>
                                                         <div class="border-t border-slate-200 p-6">
                                                             <x-shared.button
@@ -616,9 +592,9 @@
                                             </div>
                                         @endif
                                     @else
-                                        <div x-cloak x-show="showFilters" class="fixed inset-0 z-40 lg:hidden">
+                                        <div x-cloak x-show="showFilters" class="fixed inset-0 z-40 md:hidden">
                                             <div @click="showFilters = false" class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"></div>
-                                            <div class="absolute inset-y-0 right-0 w-11/12 max-w-md rounded-l-3xl bg-white shadow-2xl">
+                                            <div class="absolute inset-y-0 right-0 w-full max-w-lg rounded-l-3xl bg-white shadow-2xl sm:w-11/12">
                                                 <div class="flex h-full flex-col overflow-y-auto">
                                                     <div class="flex items-center justify-between border-b border-slate-200 p-6">
                                                         <div class="space-y-2">

@@ -31,7 +31,7 @@
             </div>
     </section>
 
-    <section class="relative bg-gray-50 py-16 sm:py-20">
+    <section class="relative bg-sage py-16 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex flex-col gap-16">
                     <div class="space-y-4 text-center">
@@ -51,7 +51,7 @@
             </div>
         </section>
 
-    <section class="relative bg-white py-16 sm:py-20">
+    <section class="relative bg-sage py-16 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
                     <div class="space-y-8">
@@ -165,7 +165,7 @@
             </div>
         </section>
 
-    <section class="relative bg-white py-16 sm:py-20">
+    <section class="relative bg-sage py-16 sm:py-20">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1.2fr_1fr] lg:items-center">
                     <div class="space-y-6">

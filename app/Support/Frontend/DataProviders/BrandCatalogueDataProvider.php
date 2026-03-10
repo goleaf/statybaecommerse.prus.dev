@@ -23,6 +23,7 @@ final class BrandCatalogueDataProvider
 
         $brandsQuery = Brand::query()
             ->where('is_visible', true)
+            ->with('media')
             ->withCount([
                 'products as published_products_count' => static function (Builder $query): void {
                     $query->published();

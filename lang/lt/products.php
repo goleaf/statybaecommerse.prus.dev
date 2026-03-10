@@ -44,7 +44,7 @@ return [
     'page'         => [
         'about_brand'                => 'Apie :brand',
         'all_variants_options'       => 'Visi variantai ir parinktys',
-        'available_quantity'         => 'Laisvas kiekis',
+        'available_quantity'         => 'Sandėlyje',
         'avg_changes_30'             => 'Vidutiniškai pakeitimų per dieną (pask. 30 d.)',
         'cancel'                     => 'Atšaukti',
         'change_frequency_30'        => 'Pakeitimų dažnis (30 d.)',

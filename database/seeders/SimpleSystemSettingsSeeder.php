@@ -142,7 +142,7 @@ final class SimpleSystemSettingsSeeder extends BaseSeeder
             ->state([
                 'key'         => 'app.name',
                 'name'        => 'Application Name',
-                'value'       => 'Statybos E-commerce',
+                'value'       => 'egisstatyba.lt',
                 'group'       => 'general',
                 'description' => 'The name of your application',
                 'help_text'   => 'This will be displayed in the browser title and throughout the application',
@@ -244,7 +244,7 @@ final class SimpleSystemSettingsSeeder extends BaseSeeder
         SystemSetting::factory()->inCategory($emailCategory)->active()->private()->required()->ofType('string')->state([
             'key'         => 'mail.from_name',
             'name'        => 'From Name',
-            'value'       => 'Statybos E-commerce',
+            'value'       => 'egisstatyba.lt',
             'group'       => 'email',
             'description' => 'Default sender name',
             'sort_order'  => 2,
@@ -283,7 +283,7 @@ final class SimpleSystemSettingsSeeder extends BaseSeeder
         SystemSetting::factory()->inCategory($seoCategory)->active()->public()->optional()->ofType('string')->state([
             'key'         => 'seo.meta_title',
             'name'        => 'Default Meta Title',
-            'value'       => 'Statybos E-commerce - Professional Construction Materials',
+            'value'       => 'egisstatyba.lt - Professional Construction Materials',
             'group'       => 'seo',
             'description' => 'Default meta title for pages',
             'sort_order'  => 1,

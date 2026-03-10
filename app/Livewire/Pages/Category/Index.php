@@ -97,6 +97,16 @@ final class Index extends Component implements HasSchemas
         }
     }
 
+    public function openSidebar(): void
+    {
+        $this->sidebarOpen = true;
+    }
+
+    public function closeSidebar(): void
+    {
+        $this->sidebarOpen = false;
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -470,7 +480,7 @@ final class Index extends Component implements HasSchemas
             $title .= ' - ' . $appName;
         }
 
-        return view('livewire.pages.category.show')
+        return view('livewire.pages.category.index')
             ->layout('components.layouts.base', [
                 'title'       => $title,
                 'description' => $this->pageDescription(),

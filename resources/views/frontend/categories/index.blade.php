@@ -4,7 +4,7 @@
 @section('description', __('ui.navigate_the_full_taxonomy_of_products_and_find_the_collections_built_for_your_next_project'))
 
 @section('content')
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-sage">
 
         {{-- Hero Header --}}
         <div class="bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-500 px-4 py-12 sm:px-6 lg:px-8">

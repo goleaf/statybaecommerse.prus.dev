@@ -5,297 +5,253 @@
         canonical="{{ url()->current() }}" />
 @endsection
 
-<div class="bg-sage brands-page">
-    <div class="bg-dark text-sage">
-        <x-container class="px-4 py-12 sm:py-16">
-            <nav class="text-xs font-medium uppercase tracking-[0.3em] text-sage/80" aria-label="{{ __('messages.brands') }}">
-                <ol class="flex items-center gap-3">
+@php
+    $activeSortLabel = match ($sortBy) {
+        'name_desc'      => __('messages.brands_index_sort_option_name_desc'),
+        'products_count' => __('messages.brands_index_sort_option_products'),
+        'created_at'     => __('messages.brands_index_sort_option_newest'),
+        'featured'       => __('messages.brands_index_sort_option_featured'),
+        default          => __('messages.brands_index_sort_option_name'),
+    };
+    $alphabet = $paginator->getCollection()
+        ->pluck('name')
+        ->filter()
+        ->map(static fn ($name): string => mb_strtoupper(mb_substr(trim((string) $name), 0, 1)))
+        ->filter()
+        ->unique()
+        ->values();
+@endphp
+
+<div class="min-h-screen bg-sage text-dark brands-page">
+    <header class="bg-dark text-sage">
+        <x-container class="px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+            <nav class="mb-8 text-sm text-sage/90" aria-label="{{ __('messages.brands') }}">
+                <ol class="flex flex-wrap items-center gap-2">
                     <li>
-                        <a href="{{ route('home', []) }}"
-                           class="inline-flex items-center gap-2 text-sage transition hover:text-white">
-                            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h12a1 1 0 001-1V10" />
-                            </svg>
-                            {{ __('messages.frontend') }}
+                        <a href="{{ route('home', []) }}" class="font-medium text-sage underline decoration-sage/40 underline-offset-4 transition-colors hover:text-white hover:decoration-sage">
+                            {{ __('nav.home') }}
                         </a>
                     </li>
-                    <li class="text-sage/60">/</li>
+                    <li class="text-sage/70">/</li>
                     <li class="text-white">{{ __('messages.brands') }}</li>
                 </ol>
             </nav>
 
-            <div class="mt-8 flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-                <div class="max-w-2xl space-y-5">
-                    <span class="inline-flex items-center gap-2 rounded-full border border-sage bg-sage px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-dark">
+            <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+                <div class="max-w-3xl space-y-4">
+                    <span class="inline-flex items-center rounded-full border border-sage/40 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-sage">
                         {{ __('messages.brands_index_badge') }}
                     </span>
                     <h1 class="text-3xl font-bold leading-tight text-white sm:text-4xl md:text-5xl">
                         {{ __('messages.brands_index_title') }}
                     </h1>
-                    <p class="text-base text-sage sm:text-lg">
+                    <p class="text-base text-sage/90 sm:text-lg">
                         {{ __('messages.brands_index_description') }}
                     </p>
                 </div>
 
-                <div class="flex w-full flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:gap-4 lg:w-auto">
-                    <div class="w-full rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm font-semibold text-sage shadow-sm sm:w-auto">
-                        {{ __('messages.brands_index_catalogue_count', ['count' => number_format($totalBrands)]) }}
+                <dl class="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3 lg:grid-cols-1 lg:justify-items-end">
+                    <div class="border-b border-sage/40 pb-2 lg:min-w-56">
+                        <dt class="text-sage/70">{{ __('messages.brands') }}</dt>
+                        <dd class="mt-1 text-lg font-semibold text-white">{{ number_format($totalBrands) }}</dd>
                     </div>
-                    <div class="w-full rounded-2xl border border-sage/30 bg-sage/10 px-4 py-3 text-sm text-sage/80 shadow-sm sm:w-auto">
-                        @if ($activeFilterCount > 0)
-                            {{ trans_choice('messages.brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
-                        @else
-                            {{ __('messages.brands_index_status_none') }}
-                        @endif
+                    <div class="border-b border-sage/40 pb-2 lg:min-w-56">
+                        <dt class="text-sage/70">{{ __('messages.brands_index_filters_title') }}</dt>
+                        <dd class="mt-1 text-lg font-semibold text-white">
+                            @if ($activeFilterCount > 0)
+                                {{ trans_choice('messages.brands_index_status', $activeFilterCount, ['count' => $activeFilterCount]) }}
+                            @else
+                                {{ __('messages.brands_index_status_none') }}
+                            @endif
+                        </dd>
                     </div>
-                    <button type="button"
-                            wire:click="$toggle('sidebarOpen')"
-                            wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                            class="inline-flex w-full items-center justify-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-4 py-2 text-sm font-semibold text-sage shadow-sm transition hover:border-sage hover:bg-sage/20 sm:w-auto lg:hidden">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 5h6M3 12h6m-6 7h6M13 5h8M13 12h8m-8 7h8" />
-                        </svg>
-                        {{ __('messages.brands_index_filters_button') }}
-                    </button>
-            </div>
+                    <div class="border-b border-sage/40 pb-2 lg:min-w-56">
+                        <dt class="text-sage/70">{{ __('messages.brands_index_sort_label') }}</dt>
+                        <dd class="mt-1 text-lg font-semibold text-white">{{ $activeSortLabel }}</dd>
+                    </div>
+                </dl>
             </div>
         </x-container>
-        </div>
+    </header>
 
-    <x-container class="px-4 pb-16 pt-12">
-        <div class="grid gap-8 lg:grid-cols-12">
-            <aside class="hidden lg:col-span-3 lg:block">
-                <div class="lg:sticky lg:top-24">
-                <div class="rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
-                    <div class="mb-6 space-y-2">
-                        <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-sage">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                            </svg>
-                            {{ __('messages.brands_index_filters_button') }}
-                            </span>
-                        <h2 class="text-xl font-semibold text-white">{{ __('messages.brands_index_filters_title') }}</h2>
-                        @if(__('messages.brands_index_filters_description'))
-                            <p class="text-sm leading-relaxed text-sage/80">
-                                {{ __('messages.brands_index_filters_description') }}
-                            </p>
-                        @endif
-                    </div>
-                    <div class="space-y-6">
-                        @include('livewire.pages.brand.partials.filters', ['variant' => 'desktop'])
-                        </div>
-                        </div>
-                </div>
-            </aside>
-
-            <section class="lg:col-span-9 space-y-6">
-                <div class="rounded-3xl border border-sage/30 bg-dark p-4 shadow-sm sm:p-6">
-                    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                        <div class="flex flex-wrap items-center gap-3 text-sm text-sage">
-                            @if ($paginator->count() > 0)
-                                <span class="text-sage/80">{{ __('messages.brands_index_showing_results', ['from' => $paginator->firstItem() ?? 0, 'to' => $paginator->lastItem() ?? 0, 'total' => $totalBrands]) }}</span>
-                            @else
-                                <span class="text-sage/80">{{ __('messages.brands_index_no_results') }}</span>
-                            @endif
-                        </div>
-
-                        <div class="flex flex-wrap items-center gap-3">
-                            <div class="flex items-center gap-2 rounded-xl border border-sage/30 bg-dark/30 px-3 py-2 text-sm text-sage">
-                                <label for="sort" class="text-xs font-semibold uppercase tracking-wide text-sage/60">
-                                    {{ __('messages.brands_index_sort_label') }}
-                                </label>
-                                <select id="sort" wire:model.live="sortBy" class="border-0 bg-transparent text-sm font-medium text-sage focus:outline-none focus:ring-0">
-                                    <option value="name" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_name') }}</option>
-                                    <option value="name_desc" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_name_desc') }}</option>
-                                    <option value="products_count" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_products') }}</option>
-                                    <option value="created_at" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_newest') }}</option>
-                                    <option value="featured" class="bg-dark text-sage">{{ __('messages.brands_index_sort_option_featured') }}</option>
-                                </select>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                <div class="relative">
-                    <div wire:loading.delay.longer class="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-white/80 backdrop-blur-sm">
-                        <div class="h-10 w-10 animate-spin rounded-full border-2 border-brand-primary border-t-transparent"></div>
-                            </div>
-
-                    @if ($paginator->count() > 0)
-                        <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                            @foreach ($paginator as $brand)
-                                <article class="group flex flex-col overflow-hidden rounded-3xl border border-ash/30 bg-white shadow-sm transition hover:-translate-y-1 hover:border-ash/60 hover:shadow-xl">
-                                    <div class="relative h-48 overflow-hidden sm:h-52">
-                                        @if ($brand->getFirstMediaUrl('logo'))
-                                            <div class="flex h-full w-full items-center justify-center bg-ash/10 p-8">
-                                                <img src="{{ $brand->getFirstMediaUrl('logo') }}"
-                                                     alt="{{ $brand->name ?? '' }}"
-                                                    loading="lazy"
-                                                      class="max-h-24 object-contain transition duration-500 group-hover:scale-105" />
-                                            </div>
-                                        @else
-                                            <div class="flex h-full w-full items-center justify-center bg-ash/10">
-                                                <svg class="h-12 w-12 text-stone/50" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M15 9h.01M9 13h.01M15 13h.01" />
-                                                </svg>
-                                            </div>
-                                        @endif
-                                        @if ($brand->is_featured ?? false)
-                                            <div class="absolute left-4 top-4">
-                                                <span class="inline-flex items-center gap-1 rounded-full bg-brand-primary px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                                                    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                                                        <path d="M12 17.3 6.18 20l1.11-6.45L2 8.9l6.5-.94L12 2l2.5 5.96 6.5.94-4.7 4.65L17.82 20 12 17.3z" />
-                                                    </svg>
-                                                    {{ __('messages.sort_featured') }}
-                                                </span>
-                                            </div>
-                                        @endif
-                                        <div class="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/70 to-transparent px-5 pb-4 pt-12">
-                                            <h3 class="text-lg font-semibold text-white drop-shadow-lg">
-                                                {{ $brand->name ?? '' }}
-                                            </h3>
-                                            <span class="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-dark shadow-sm">
-                                                {{ $brand->products_count ?? 0 }}
-                                                <span class="text-ash">{{ __('messages.products') }}</span>
-                                            </span>
-                                        </div>
-                                            </div>
-
-                                    <div class="flex flex-1 flex-col justify-between gap-4 px-5 py-6">
-                                        @if ($brand->description)
-                                            <p class="text-sm leading-relaxed text-stone line-clamp-3">
-                                                {{ \Illuminate\Support\Str::limit(strip_tags($brand->description), 180) }}
-                                            </p>
-                                        @else
-                                            <p class="text-sm text-ash">
-                                                {{ __('messages.brands_index_description_placeholder') }}
-                                                    </p>
-                                        @endif
-
-                                        <div class="flex items-center justify-center">
-                                            <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}"
-                                               class="inline-flex items-center gap-2 rounded-full bg-sage px-4 py-2 text-sm font-semibold text-dark transition hover:bg-sage/90">
-                                                {{ __('messages.brands_index_visit_brand') }}
-                                                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </article>
-                            @endforeach
-                        </div>
-
-                        @if ($paginator->hasPages())
-                            <div class="mt-12 rounded-3xl border border-sage/30 bg-dark p-6 shadow-lg">
-                                <nav class="flex items-center justify-center" aria-label="{{ __('messages.brands_index_pagination_navigation') }}">
-                                    <div class="w-full overflow-x-auto pb-2 sm:w-auto">
-                                        <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="{{ __('messages.pagination') }}">
-                                            @if ($paginator->onFirstPage())
-                                                <span class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage/60 ring-1 ring-inset ring-sage/30">
-                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            @else
-                                                <a href="{{ $this->paginationUrl($paginator->previousPageUrl()) }}" class="relative inline-flex items-center rounded-l-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
-                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </a>
-                                            @endif
-
-                                            @foreach ($paginator->getUrlRange(1, $paginator->lastPage()) as $page => $url)
-                                                @if ($page == $paginator->currentPage())
-                                                    <span class="relative z-10 inline-flex items-center bg-sage px-4 py-2 text-sm font-semibold text-dark focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sage">
-                                                        {{ $page }}
-                                                    </span>
-                                                @else
-                                                    <a href="{{ $this->paginationUrl($url) }}" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
-                                                        {{ $page }}
-                                                    </a>
-                                                @endif
-                                            @endforeach
-
-                                            @if ($paginator->hasMorePages())
-                                                <a href="{{ $this->paginationUrl($paginator->nextPageUrl()) }}" class="relative inline-flex items-center rounded-r-md px-2 py-2 text-sage ring-1 ring-inset ring-sage/30 hover:bg-sage/10 hover:text-white focus:z-20 focus:outline-offset-0">
-                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </a>
-                                            @else
-                                                <span class="relative inline-flex items-center rounded-r-md px-2 py-2 text-sage/60 ring-1 ring-inset ring-sage/30">
-                                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </span>
-                                            @endif
-                                        </nav>
-                                    </div>
-                                </nav>
-                            </div>
-                        @endif
-                @else
-                    <x-shared.empty-state
-                            title="{{ __('messages.brands_index_empty_title') }}"
-                            description="{{ __('messages.brands_index_empty_description') }}"
-                            icon="heroicon-o-archive-box"
-                            :action-text="__('messages.brands_index_reset_filters')"
-                            :action-url="route('frontend.brands.index', [])"
+    <x-container class="px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <section class="border border-dark/25 bg-sage/60">
+            <div class="grid gap-4 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_240px_auto] lg:items-end">
+                <div>
+                    <label for="brand-search" class="text-sm font-semibold text-dark">{{ __('messages.brands_index_search_label') }}</label>
+                    <input
+                        id="brand-search"
+                        type="search"
+                        wire:model.live.debounce.400ms="search"
+                        placeholder="{{ __('messages.brands_index_search_placeholder') }}"
+                        class="mt-2 w-full border border-dark/30 bg-white/80 px-4 py-2.5 text-sm text-dark placeholder:text-dark/50 focus:border-dark focus:outline-none focus:ring-2 focus:ring-dark/20"
                     />
-                @endif
+                </div>
+
+                <div>
+                    <label for="brand-sort" class="text-sm font-semibold text-dark">{{ __('messages.brands_index_sort_label') }}</label>
+                    <select
+                        id="brand-sort"
+                        wire:model.live="sortBy"
+                        class="mt-2 w-full border border-dark/30 bg-white/80 px-4 py-2.5 text-sm font-medium text-dark focus:border-dark focus:outline-none focus:ring-2 focus:ring-dark/20"
+                    >
+                        <option value="name">{{ __('messages.brands_index_sort_option_name') }}</option>
+                        <option value="name_desc">{{ __('messages.brands_index_sort_option_name_desc') }}</option>
+                        <option value="products_count">{{ __('messages.brands_index_sort_option_products') }}</option>
+                        <option value="created_at">{{ __('messages.brands_index_sort_option_newest') }}</option>
+                        <option value="featured">{{ __('messages.brands_index_sort_option_featured') }}</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    @if (filled($search) || $sortBy !== 'name')
+                        <button
+                            type="button"
+                            wire:click="clearFilters"
+                            class="inline-flex items-center border border-dark/30 px-4 py-2.5 text-sm font-semibold text-dark transition-colors hover:border-dark hover:bg-sage/50"
+                        >
+                            {{ __('messages.brands_index_reset_filters') }}
+                        </button>
+                    @endif
+                </div>
             </div>
-            </section>
+
+            <p class="border-t border-dark/20 px-4 py-3 text-sm text-dark/75 sm:px-6">
+                @if ($paginator->count() > 0)
+                    {{ __('messages.brands_index_showing_results', ['from' => $paginator->firstItem() ?? 0, 'to' => $paginator->lastItem() ?? 0, 'total' => $totalBrands]) }}
+                @else
+                    {{ __('messages.brands_index_no_results') }}
+                @endif
+            </p>
+
+            @if ($alphabet->isNotEmpty())
+                <nav class="border-t border-dark/20 px-4 py-3 sm:px-6" aria-label="{{ __('messages.brands') }}">
+                    <ol class="flex flex-wrap items-center gap-2 text-xs font-semibold text-dark/70">
+                        @foreach ($alphabet as $letter)
+                            <li>
+                                <a href="#brands-letter-{{ $letter }}" class="inline-flex min-w-8 justify-center border border-dark/25 px-2.5 py-1 transition-colors hover:border-dark hover:bg-sage/50 hover:text-dark">
+                                    {{ $letter }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ol>
+                </nav>
+            @endif
+        </section>
+
+        <div class="relative mt-8">
+            <div wire:loading.delay.longer class="absolute inset-0 z-10 bg-white/70"></div>
+
+            @if ($paginator->count() > 0)
+                <section class="border border-dark/25 bg-white/50">
+                    <div class="hidden overflow-x-auto md:block">
+                        <table class="min-w-full table-auto border-collapse">
+                            <thead class="sticky top-0 z-10 bg-dark text-sage">
+                                <tr class="text-left text-xs uppercase tracking-wider">
+                                    <th scope="col" class="w-12 px-4 py-3 text-right font-semibold sm:px-6">#</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold sm:px-6">{{ __('messages.brand') }}</th>
+                                    <th scope="col" class="px-4 py-3 font-semibold sm:px-6">{{ __('messages.description') }}</th>
+                                    <th scope="col" class="px-4 py-3 text-right font-semibold sm:px-6">{{ __('messages.products') }}</th>
+                                    <th scope="col" class="px-4 py-3 text-right font-semibold sm:px-6">{{ __('messages.view') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-dark/15">
+                                @php
+                                    $renderedLetters = [];
+                                @endphp
+                                @foreach ($paginator as $brand)
+                                    @php
+                                        $letter = mb_strtoupper(mb_substr((string) ($brand->name ?? ''), 0, 1));
+                                        $rowNumber = ($paginator->firstItem() ?? 1) + $loop->index;
+                                        $anchorId = '';
+                                        if (! in_array($letter, $renderedLetters, true)) {
+                                            $anchorId = 'brands-letter-' . $letter;
+                                            $renderedLetters[] = $letter;
+                                        }
+                                    @endphp
+                                    <tr class="align-top odd:bg-white/40 even:bg-sage/20 hover:bg-sage/50">
+                                        <td id="{{ $anchorId }}" class="scroll-mt-20 px-4 py-4 text-right text-sm font-semibold text-dark/55 sm:px-6">
+                                            {{ $rowNumber }}
+                                        </td>
+                                        <td class="px-4 py-4 sm:px-6">
+                                            <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}" class="text-base font-semibold text-dark underline decoration-dark/40 underline-offset-4 transition-colors hover:decoration-dark">
+                                                {{ $brand->name ?? '' }}
+                                            </a>
+                                        </td>
+                                        <td class="px-4 py-4 text-sm leading-6 text-dark/75 sm:px-6">
+                                            @if ($brand->description)
+                                                {{ \Illuminate\Support\Str::limit(strip_tags((string) $brand->description), 180) }}
+                                            @else
+                                                {{ __('messages.brands_index_description_placeholder') }}
+                                            @endif
+                                        </td>
+                                        <td class="px-4 py-4 text-right text-sm font-semibold text-dark sm:px-6">
+                                            {{ number_format($brand->products_count ?? 0) }}
+                                        </td>
+                                        <td class="px-4 py-4 text-right sm:px-6">
+                                            <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}" class="text-sm font-semibold text-dark underline decoration-dark/40 underline-offset-4 transition-colors hover:decoration-dark">
+                                                {{ __('messages.brands_index_visit_brand') }}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <ul class="divide-y divide-dark/15 md:hidden">
+                        @foreach ($paginator as $brand)
+                            @php
+                                $letter = mb_strtoupper(mb_substr((string) ($brand->name ?? ''), 0, 1));
+                                $rowNumber = ($paginator->firstItem() ?? 1) + $loop->index;
+                            @endphp
+                            <li class="space-y-3 px-4 py-4">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div class="space-y-1">
+                                        <span class="inline-flex border border-dark/25 px-2 py-0.5 text-[10px] font-semibold text-dark/70">
+                                            {{ $letter }}{{ str_pad((string) $rowNumber, 2, '0', STR_PAD_LEFT) }}
+                                        </span>
+                                        <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}" class="block text-base font-semibold text-dark underline decoration-dark/40 underline-offset-4">
+                                            {{ $brand->name ?? '' }}
+                                        </a>
+                                    </div>
+                                    <span class="shrink-0 border border-dark/25 px-2.5 py-1 text-xs font-semibold text-dark">
+                                        {{ number_format($brand->products_count ?? 0) }} {{ __('messages.products') }}
+                                    </span>
+                                </div>
+                                <p class="text-sm leading-6 text-dark/75">
+                                    @if ($brand->description)
+                                        {{ \Illuminate\Support\Str::limit(strip_tags((string) $brand->description), 120) }}
+                                    @else
+                                        {{ __('messages.brands_index_description_placeholder') }}
+                                    @endif
+                                </p>
+                                <a href="{{ route('localized.brands.show', ['slug' => $brand->slug ?? '']) }}" class="inline-flex text-sm font-semibold text-dark underline decoration-dark/40 underline-offset-4">
+                                    {{ __('messages.brands_index_visit_brand') }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </section>
+
+                @if ($paginator->hasPages())
+                    <div class="brands-pagination mt-8 border-t border-dark/20 pt-6">
+                        {{ $paginator->onEachSide(1)->links('pagination::tailwind') }}
+                    </div>
+                @endif
+            @else
+                <section class="border border-dashed border-dark/30 bg-sage/40 p-10 text-center">
+                    <h2 class="text-xl font-semibold text-dark">{{ __('messages.brands_index_empty_title') }}</h2>
+                    <p class="mt-2 text-sm text-dark/70">{{ __('messages.brands_index_empty_description') }}</p>
+                    <button
+                        type="button"
+                        wire:click="clearFilters"
+                        class="mt-6 inline-flex items-center border border-dark bg-dark px-5 py-2.5 text-sm font-semibold text-sage transition-colors hover:bg-dark/90"
+                    >
+                        {{ __('messages.brands_index_reset_filters') }}
+                    </button>
+                </section>
+            @endif
         </div>
     </x-container>
-
-    @if ($sidebarOpen)
-        <div class="fixed inset-0 z-40 lg:hidden">
-            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
-                 wire:click="$toggle('sidebarOpen')"
-                 wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"></div>
-
-            <div class="absolute inset-y-0 right-0 w-full max-w-md rounded-l-none bg-dark shadow-2xl sm:w-11/12 sm:rounded-l-3xl">
-                <div class="flex h-full flex-col overflow-y-auto">
-                    <div class="flex items-center justify-between border-b border-sage/30 p-6">
-                        <div class="space-y-2">
-                            <span class="inline-flex items-center gap-2 rounded-full border border-sage/30 bg-sage/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-sage">
-                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                                </svg>
-                                {{ __('messages.brands_index_filters_button') }}
-                            </span>
-                            <h2 class="text-xl font-semibold text-white">{{ __('messages.brands_index_filters_title') }}</h2>
-                        </div>
-                        <button type="button"
-                                class="rounded-full border border-sage/30 p-2 text-sage transition hover:border-sage hover:bg-sage/10"
-                                wire:click="$toggle('sidebarOpen')"
-                                wire:confirm="{{ __('translations.confirm_toggle_sidebar') }}"
-                                aria-label="{{ __('ui.close') }}">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="flex-1 space-y-6 overflow-y-auto p-6">
-                        @include('livewire.pages.brand.partials.filters', ['variant' => 'mobile'])
-                    </div>
-                    <div class="border-t border-sage/30 p-6">
-                        <x-shared.button
-                            type="button"
-                            variant="primary"
-                            size="sm"
-                            class="w-full"
-                            wire:click="$toggle('sidebarOpen')"
-                        >
-                            {{ __('messages.brands_index_apply_filters') }}
-                        </x-shared.button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
 </div>
-
-

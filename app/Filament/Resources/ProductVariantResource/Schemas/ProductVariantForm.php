@@ -173,6 +173,7 @@ class ProductVariantForm
                     ])->columns(1),
 
                 Section::make(__('admin.product_variants.localization'))
+                    ->hiddenOn('edit')
                     ->schema([
                         Grid::make(2)
                             ->schema([
